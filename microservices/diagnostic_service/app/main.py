@@ -1,17 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from typing import List, Optional, Dict, Any
 import uvicorn
 import os
 import logging
-from datetime import datetime, timedelta
-
-# Imports para Supabase
-from app.core.supabase import initialize_supabase
-from app.api.router import api_router
-from app.core.config import settings
+from datetime import datetime
 
 # Configuração de logging
 logging.basicConfig(
@@ -20,83 +14,116 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Imports da aplicação
+from app.core.config import settings
+
+# Import condicional do router para evitar erros em caso de dependências faltantes
+try:
+    from app.api.router import api_router
+    API_ROUTER_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"API router not available: {e}")
+    API_ROUTER_AVAILABLE = False
+
 # Inicialização da aplicação FastAPI
 app = FastAPI(
-    title="TecnoReparo - Serviço de Diagnóstico",
-    description="API para diagnóstico completo de hardware e software com integração Supabase",
-    version="0.1.0",
-    docs_url="/docs",
-    redoc_url="/redoc",
+    title=settings.PROJECT_NAME,
+    description="API para diagnóstico completo de hardware e software",
+    version=settings.VERSION,
+    docs_url="/docs" if settings.DEBUG else None,
+    redoc_url="/redoc" if settings.DEBUG else None,
 )
 
-# Inicializar Supabase na inicialização da aplicação
-@app.on_event("startup")
-async def startup_event():
-    """Eventos de inicialização da aplicação."""
-    try:
-        # Temporariamente comentado devido a incompatibilidade de versão
-        # initialize_supabase()
-        logger.info("Aplicação iniciada com sucesso")
-    except Exception as e:
-        logger.error(f"Erro na inicialização: {e}")
-        raise
-
 # Configuração de CORS
-origins = [
-    "http://localhost",
-    "http://localhost:8080",
-    "http://localhost:3000",
-    "https://tecnoreparo.ulytech.com.br",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Incluir rotas da API
-app.include_router(api_router, prefix=settings.API_V1_STR)
+# Incluir rotas da API se disponíveis
+if API_ROUTER_AVAILABLE:
+    app.include_router(api_router, prefix=settings.API_V1_STR)
+else:
+    logger.warning("API routes not loaded - running in minimal mode")
 
 # Rotas básicas
 @app.get("/", tags=["Root"])
-async def root() -> Dict[str, str]:
+async def root():
     """Rota raiz do serviço de diagnóstico."""
     return {
-        "message": "Bem-vindo ao Serviço de Diagnóstico do TecnoReparo",
-        "version": "0.1.0",
-        "docs": "/docs",
-        "api": settings.API_V1_STR
+        "message": "Bem-vindo ao Serviço de Diagnóstico do TechZe",
+        "version": settings.VERSION,
+        "environment": settings.ENVIRONMENT,
+        "docs": "/docs" if settings.DEBUG else "disabled",
+        "api": settings.API_V1_STR,
+        "status": "running"
     }
 
 @app.get("/health", tags=["Health"])
-async def health_check() -> Dict[str, Any]:
+async def health_check():
     """Verificação de saúde do serviço."""
     return {
-        "status": "ok",
-        "version": "0.1.0",
+        "status": "healthy",
+        "version": settings.VERSION,
         "timestamp": datetime.now().isoformat(),
         "service": "diagnostic-service",
-        "supabase_configured": bool(settings.SUPABASE_URL and settings.SUPABASE_KEY)
+        "environment": settings.ENVIRONMENT,
+        "supabase_configured": bool(settings.SUPABASE_URL and settings.SUPABASE_KEY),
+        "api_router_available": API_ROUTER_AVAILABLE
     }
 
+@app.get("/info", tags=["Info"])
+async def service_info():
+    """Informações detalhadas do serviço."""
+    return {
+        "project_name": settings.PROJECT_NAME,
+        "version": settings.VERSION,
+        "environment": settings.ENVIRONMENT,
+        "debug_mode": settings.DEBUG,
+        "host": settings.HOST,
+        "port": settings.PORT,
+        "api_prefix": settings.API_V1_STR,
+        "cors_origins": settings.BACKEND_CORS_ORIGINS,
+        "features": {
+            "api_router": API_ROUTER_AVAILABLE,
+            "supabase": bool(settings.SUPABASE_URL),
+            "docs": settings.DEBUG
+        }
+    }
 
 # Manipulação de exceções
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
     return JSONResponse(
         status_code=exc.status_code,
-        content={"detail": exc.detail},
+        content={
+            "detail": exc.detail,
+            "timestamp": datetime.now().isoformat(),
+            "service": "diagnostic-service"
+        },
+    )
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request, exc):
+    logger.error(f"Unhandled exception: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Internal server error",
+            "timestamp": datetime.now().isoformat(),
+            "service": "diagnostic-service"
+        },
     )
 
 # Função principal para execução local
 if __name__ == "__main__":
     uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
+        "app.main:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=settings.DEBUG,
         log_level="info",
     )
