@@ -22,7 +22,7 @@ const Auth = () => {
 
   // Redirect if already logged in
   if (user) {
-    navigate("/dashboard");
+    navigate("/welcome");
     return null;
   }
 
@@ -33,7 +33,7 @@ const Auth = () => {
     const { error } = await signIn(loginEmail, loginPassword);
     
     if (!error) {
-      navigate("/dashboard");
+      navigate("/welcome");
     }
     
     setLoading(false);
@@ -56,7 +56,7 @@ const Auth = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Wrench className="w-8 h-8 text-orange-500" />
-            <h1 className="text-3xl font-bold text-white">TecnoReparo</h1>
+            <h1 className="text-3xl font-bold text-white">TechRepair</h1>
           </div>
           <p className="text-gray-300">Sistema de Diagnóstico Técnico</p>
         </div>

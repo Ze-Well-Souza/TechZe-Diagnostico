@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -37,7 +36,7 @@ const Navbar = () => {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
             <Wrench className="w-6 h-6 text-white" />
-            <span className="text-xl font-bold text-white">TecnoReparo</span>
+            <span className="text-xl font-bold text-white">TechRepair</span>
           </div>
           
           <div className="hidden md:flex items-center gap-4">

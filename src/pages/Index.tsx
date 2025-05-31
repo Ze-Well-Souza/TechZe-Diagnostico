@@ -20,9 +20,9 @@ const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // If user is logged in, redirect to dashboard
+  // If user is logged in, redirect to welcome
   if (user) {
-    navigate("/dashboard");
+    navigate("/welcome");
     return null;
   }
 
@@ -33,7 +33,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Wrench className="w-8 h-8 text-white" />
-            <h1 className="text-2xl font-bold text-white">TecnoReparo</h1>
+            <h1 className="text-2xl font-bold text-white">TechRepair</h1>
           </div>
           <Button 
             onClick={() => navigate("/auth")}
@@ -233,7 +233,7 @@ const Index = () => {
       <footer className="border-t border-white/20 bg-black/40 backdrop-blur-md py-8 px-6">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-gray-400">
-            © 2024 TecnoReparo. Sistema de Diagnóstico Técnico.
+            © 2024 TechRepair. Sistema de Diagnóstico Técnico.
           </p>
         </div>
       </footer>

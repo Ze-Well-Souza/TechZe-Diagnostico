@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       toast({
         title: "Login realizado com sucesso!",
-        description: "Bem-vindo ao TecnoReparo",
+        description: "Bem-vindo ao TechRepair",
       });
     }
 
