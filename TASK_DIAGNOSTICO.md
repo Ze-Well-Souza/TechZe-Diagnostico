@@ -17,11 +17,21 @@
 - ✅ Logging implementado
 - ✅ Error handling básico
 
+#### Frontend/Interface
+- ✅ **Dashboard corrigido e funcionando**
+- ✅ **API URL corrigida para https://techze-diagnostico.onrender.com**
+- ✅ **Interface real implementada (não mais JSON bruto)**
+- ✅ **Status da API em tempo real**
+- ✅ **Execução de diagnóstico rápido funcionando**
+- ✅ **Notificações toast implementadas**
+- ✅ **Error handling e loading states**
+
 #### Database
 - ✅ Supabase configurado
 - ✅ Conexão com microserviço estabelecida
 - ✅ Modelos de dados definidos
-- ⚠️ **PENDENTE: RLS Policies** (CRÍTICO)
+- ✅ **Script RLS criado (supabase_rls_policies.sql)**
+- 🔄 **EXECUTAR: Aplicar políticas RLS no Supabase** (PRÓXIMO PASSO)
 
 #### Deploy/Infraestrutura
 - ✅ Microserviço deployed no Render
@@ -29,6 +39,7 @@
 - ✅ Environment variables configuradas
 - ✅ Requirements.txt otimizado
 - ✅ Git repository configurado
+- ✅ **Arquivos obsoletos removidos**
 
 ---
 
@@ -36,12 +47,12 @@
 
 ### **FASE 1: Fundação e Segurança (1-2 dias) - ALTA PRIORIDADE**
 
-#### 1.1 🔒 Configurar Políticas de Segurança (URGENTE)
-- [ ] **Implementar RLS policies para todas as tabelas**
-  - [ ] Política para tabela `diagnostics`
-  - [ ] Política para tabela `devices` 
-  - [ ] Política para tabela `users`
-  - [ ] Política para tabela `reports`
+#### 1.1 🔒 Configurar Políticas de Segurança (EM ANDAMENTO)
+- ✅ **Script SQL criado (supabase_rls_policies.sql)**
+- [ ] **EXECUTAR: Aplicar políticas RLS no Supabase** ⚠️ **PRÓXIMO PASSO**
+  - [ ] Abrir SQL Editor no Supabase
+  - [ ] Executar script supabase_rls_policies.sql
+  - [ ] Verificar políticas aplicadas
 - [ ] **Configurar permissões por usuário**
   - [ ] Usuários só veem seus próprios diagnósticos
   - [ ] Admins têm acesso total
@@ -50,17 +61,17 @@
   - [ ] Proteção de rotas sensíveis
   - [ ] Validação de tokens JWT
 
-#### 1.2 🔗 Integração Frontend ↔ Microserviço  
-- [ ] **Configurar cliente HTTP para comunicação**
-  - [ ] Service class para diagnósticos
+#### 1.2 🔗 Integração Frontend ↔ Microserviço (PARCIALMENTE CONCLUÍDO)
+- ✅ **Configurar cliente HTTP para comunicação**
+  - ✅ Service class para diagnósticos
+  - ✅ Error handling centralizado
   - [ ] Interceptors para headers de auth
-  - [ ] Error handling centralizado
-- [ ] **Implementar serviço de diagnóstico no frontend**
-  - [ ] Interface para iniciar diagnósticos
+- ✅ **Implementar serviço de diagnóstico no frontend**
+  - ✅ Interface para iniciar diagnósticos
+  - ✅ Exibição de resultados básica
   - [ ] Polling para status updates
-  - [ ] Exibição de resultados
-- [ ] **Conectar com API Python**
-  - [ ] Endpoint `/api/v1/diagnostic/quick` 
+- ✅ **Conectar com API Python**
+  - ✅ Endpoint `/api/v1/diagnostic/quick` ✅ FUNCIONANDO
   - [ ] Endpoint `/api/v1/diagnostic/full`
   - [ ] Endpoint `/api/v1/diagnostic/history`
 
