@@ -1,99 +1,33 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Import Design System */
+@import './styles/design-system.css';
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 14 100% 57%;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 14 100% 57%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 14 100% 57%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 14 100% 57%;
-
-    /* TechRepair Dark Theme - Paleta Preto/Cinza */
-    --techrepair-black: 0 0% 0%;
-    --techrepair-dark: 220 13% 5%;
-    --techrepair-gray-900: 220 13% 9%;
-    --techrepair-gray-800: 220 13% 13%;
-    --techrepair-gray-700: 220 13% 18%;
-    --techrepair-gray-600: 220 13% 25%;
-    --techrepair-gray-500: 220 13% 35%;
-    --techrepair-gray-400: 220 13% 45%;
-    --techrepair-gray-300: 220 13% 65%;
-    --techrepair-gray-200: 220 13% 85%;
-    --techrepair-white: 0 0% 100%;
-  }
-
-  .dark {
     --background: 0 0% 0%;
     --foreground: 0 0% 98%;
-
     --card: 220 13% 9%;
     --card-foreground: 0 0% 98%;
-
     --popover: 220 13% 9%;
     --popover-foreground: 0 0% 98%;
-
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-
+    --primary: 14 100% 57%;
+    --primary-foreground: 0 0% 98%;
     --secondary: 220 13% 13%;
     --secondary-foreground: 0 0% 98%;
-
     --muted: 220 13% 13%;
     --muted-foreground: 220 13% 65%;
-
     --accent: 220 13% 13%;
     --accent-foreground: 0 0% 98%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-
     --border: 220 13% 18%;
     --input: 220 13% 18%;
-    --ring: 0 0% 98%;
-    
-    --sidebar-background: 0 0% 5%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 0 0% 98%;
-    --sidebar-primary-foreground: 0 0% 9%;
-    --sidebar-accent: 220 13% 13%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 220 13% 18%;
-    --sidebar-ring: 0 0% 98%;
+    --ring: 14 100% 57%;
+    --radius: 0.5rem;
   }
 }
 
@@ -108,10 +42,10 @@
   }
 
   body {
-    @apply bg-black text-white font-sans;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    @apply bg-black text-white font-display;
     background-color: #000000 !important;
     color: #ffffff !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   #root {
@@ -120,141 +54,73 @@
   }
 }
 
-/* Força o tema escuro para todos os elementos */
-.bg-white {
-  background-color: #000000 !important;
-}
-
-.text-black {
-  color: #ffffff !important;
-}
-
-/* Botão Tecno personalizado */
-.btn-tecno {
-  @apply bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 border border-orange-500 hover:border-orange-600 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 focus:ring-offset-black;
-}
-
-/* TechRepair Custom Classes - Paleta Preto/Cinza */
-.btn-primary {
-  @apply bg-white text-black hover:bg-gray-100 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black transition-all duration-200;
-}
-
-.btn-secondary {
-  @apply bg-gray-800 text-white hover:bg-gray-700 border border-gray-700 focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-black transition-all duration-200;
-}
-
-.btn-outline {
-  @apply bg-transparent text-gray-300 border border-gray-700 hover:bg-gray-800 hover:text-white focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-black transition-all duration-200;
-}
-
-.card-dark {
-  @apply bg-gray-900 border-gray-800 hover:border-gray-700 transition-all duration-200;
-}
-
-.card-darker {
-  @apply bg-black border-gray-800 hover:border-gray-600 transition-all duration-200;
-}
-
-.text-primary {
-  @apply text-white;
-}
-
-.text-secondary {
-  @apply text-gray-400;
-}
-
-.text-muted {
-  @apply text-gray-500;
-}
-
-.bg-primary {
-  @apply bg-black;
-}
-
-.bg-secondary {
-  @apply bg-gray-900;
-}
-
-.bg-tertiary {
-  @apply bg-gray-800;
-}
-
-.border-primary {
-  @apply border-gray-800;
-}
-
-.border-secondary {
-  @apply border-gray-700;
-}
-
-/* Estilo para links */
-a {
-  @apply text-gray-300 hover:text-white transition-colors duration-200;
-}
-
-/* Estilo para inputs */
-input, textarea, select {
-  @apply bg-gray-900 border-gray-700 text-white placeholder-gray-400 focus:border-gray-600 focus:ring-gray-600;
-}
-
-/* Estilo para badges */
-.badge-success {
-  @apply bg-green-900 text-green-300 border-green-700;
-}
-
-.badge-warning {
-  @apply bg-yellow-900 text-yellow-300 border-yellow-700;
-}
-
-.badge-error {
-  @apply bg-red-900 text-red-300 border-red-700;
-}
-
-/* Animações suaves */
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.6s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+/* Utility Classes */
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent;
   }
-  to {
+
+  .border-gradient {
+    border-image: linear-gradient(45deg, #0ea5e9, #10b981) 1;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Glass Morphism Effects */
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Hover Animations */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Loading Animations */
+.loading-pulse {
+  animation: loading-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes loading-pulse {
+  0%, 100% {
     opacity: 1;
-    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.5;
   }
 }
 
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
 }
 
-/* Scrollbar personalizada */
-::-webkit-scrollbar {
-  width: 8px;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
 }
 
-::-webkit-scrollbar-track {
-  background: #1f2937;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(14, 165, 233, 0.8);
+  border-radius: 3px;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #374151;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(14, 165, 233, 1);
 }

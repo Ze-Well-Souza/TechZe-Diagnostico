@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,8 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Navbar from "@/components/Navbar";
-import Index from "./pages/Index";
+import { TechNavbar } from "@/components/layout/TechNavbar";
+import NewIndex from "./pages/NewIndex";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Diagnostic from "./pages/Diagnostic";
@@ -22,8 +23,12 @@ const queryClient = new QueryClient();
 // Layout wrapper para páginas protegidas
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => (
   <ProtectedRoute>
-    <Navbar />
-    {children}
+    <div className="min-h-screen bg-black">
+      <TechNavbar />
+      <div className="pt-16">
+        {children}
+      </div>
+    </div>
   </ProtectedRoute>
 );
 
@@ -34,57 +39,59 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            {/* Rotas públicas */}
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            
-            {/* Rotas protegidas com layout */}
-            <Route path="/dashboard" element={
-              <ProtectedLayout>
-                <Dashboard />
-              </ProtectedLayout>
-            } />
-            
-            <Route path="/diagnostic" element={
-              <ProtectedLayout>
-                <Diagnostic />
-              </ProtectedLayout>
-            } />
-            
-            <Route path="/reports" element={
-              <ProtectedLayout>
-                <Reports />
-              </ProtectedLayout>
-            } />
-            
-            <Route path="/history" element={
-              <ProtectedLayout>
-                <History />
-              </ProtectedLayout>
-            } />
-            
-            <Route path="/admin" element={
-              <ProtectedLayout>
-                <Admin />
-              </ProtectedLayout>
-            } />
-            
-            <Route path="/file-converter" element={
-              <ProtectedLayout>
-                <FileConverter />
-              </ProtectedLayout>
-            } />
-            
-            <Route path="/marketplace" element={
-              <ProtectedLayout>
-                <Marketplace />
-              </ProtectedLayout>
-            } />
-            
-            {/* Catch-all route para 404 */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <div className="min-h-screen bg-black text-white">
+            <Routes>
+              {/* Rotas públicas */}
+              <Route path="/" element={<NewIndex />} />
+              <Route path="/auth" element={<Auth />} />
+              
+              {/* Rotas protegidas com layout */}
+              <Route path="/dashboard" element={
+                <ProtectedLayout>
+                  <Dashboard />
+                </ProtectedLayout>
+              } />
+              
+              <Route path="/diagnostic" element={
+                <ProtectedLayout>
+                  <Diagnostic />
+                </ProtectedLayout>
+              } />
+              
+              <Route path="/reports" element={
+                <ProtectedLayout>
+                  <Reports />
+                </ProtectedLayout>
+              } />
+              
+              <Route path="/history" element={
+                <ProtectedLayout>
+                  <History />
+                </ProtectedLayout>
+              } />
+              
+              <Route path="/admin" element={
+                <ProtectedLayout>
+                  <Admin />
+                </ProtectedLayout>
+              } />
+              
+              <Route path="/file-converter" element={
+                <ProtectedLayout>
+                  <FileConverter />
+                </ProtectedLayout>
+              } />
+              
+              <Route path="/marketplace" element={
+                <ProtectedLayout>
+                  <Marketplace />
+                </ProtectedLayout>
+              } />
+              
+              {/* Catch-all route para 404 */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
