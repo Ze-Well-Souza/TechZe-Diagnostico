@@ -27,10 +27,10 @@ export class DiagnosticApiService {
   private convertDiagnosticToSupabase(data: Partial<DiagnosticResult>): any {
     return {
       ...data,
-      cpu_metrics: data.cpu_metrics as Json,
-      memory_metrics: data.memory_metrics as Json,
-      disk_metrics: data.disk_metrics as Json,
-      network_metrics: data.network_metrics as Json,
+      cpu_metrics: data.cpu_metrics ? (data.cpu_metrics as unknown as Json) : null,
+      memory_metrics: data.memory_metrics ? (data.memory_metrics as unknown as Json) : null,
+      disk_metrics: data.disk_metrics ? (data.disk_metrics as unknown as Json) : null,
+      network_metrics: data.network_metrics ? (data.network_metrics as unknown as Json) : null,
     };
   }
   

@@ -43,8 +43,8 @@ const Diagnostic = () => {
     setProgress(0);
     
     try {
-      const diagnostic = await executeFullDiagnostic(selectedDeviceId);
-      setCurrentDiagnostic(diagnostic);
+      // executeFullDiagnostic retorna void, então vamos lidar com isso de forma diferente
+      executeFullDiagnostic(selectedDeviceId);
       
       // Simulate progress
       const progressInterval = setInterval(() => {
@@ -58,26 +58,19 @@ const Diagnostic = () => {
         });
       }, 500);
       
-      // Update diagnostic status
-      const statusInterval = setInterval(async () => {
-        if (diagnostic?.id) {
-          const updated = await getDiagnostic(diagnostic.id);
-          if (updated) {
-            setCurrentDiagnostic(updated);
-            if (updated.status === 'completed') {
-              clearInterval(statusInterval);
-              setProgress(100);
-              setIsRunning(false);
-            }
-          }
-        }
-      }, 1000);
-      
     } catch (error) {
       console.error("Erro ao executar diagnóstico:", error);
       setIsRunning(false);
     }
   };
+
+  // Efeito para monitorar quando o diagnóstico é concluído
+  useEffect(() => {
+    if (!isRunningDiagnostic && isRunning) {
+      setIsRunning(false);
+      setProgress(100);
+    }
+  }, [isRunningDiagnostic, isRunning]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {

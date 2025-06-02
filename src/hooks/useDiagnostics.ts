@@ -34,6 +34,11 @@ export const useDiagnostics = () => {
     queryFn: () => diagnosticApiService.getDevices(),
   });
 
+  // Função para buscar um diagnóstico específico
+  const getDiagnostic = async (diagnosticId: string): Promise<DiagnosticResult | null> => {
+    return await diagnosticApiService.getDiagnostic(diagnosticId);
+  };
+
   // Mutation para executar diagnóstico completo
   const executeFullDiagnosticMutation = useMutation({
     mutationFn: (deviceId: string) => {
@@ -145,6 +150,7 @@ export const useDiagnostics = () => {
     executeFullDiagnostic: executeFullDiagnosticMutation.mutate,
     createDevice: createDeviceMutation.mutate,
     deleteDevice: deleteDeviceMutation.mutate,
+    getDiagnostic,
     refetchDiagnostics,
     refetchDevices,
     getLastDiagnosticForDevice,
