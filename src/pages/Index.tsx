@@ -38,7 +38,7 @@ const Index = () => {
             <div className="p-2 bg-gray-900 rounded-lg">
               <Wrench className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-white">TecnoReparo</h1>
+            <h1 className="text-2xl font-bold text-white">TechRepair</h1>
           </div>
           <Button 
             onClick={() => navigate("/auth")}
@@ -303,10 +303,10 @@ const Index = () => {
               <div className="p-2 bg-gray-900 rounded-lg">
                 <Wrench className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">TecnoReparo</span>
+              <span className="text-xl font-bold text-white">TechRepair</span>
             </div>
             <p className="text-gray-400 text-center md:text-right">
-              © 2024 TecnoReparo. Sistema de Diagnóstico Técnico.
+              © 2024 TechRepair. Sistema de Diagnóstico Técnico.
               <br />
               <span className="text-sm">Todos os direitos reservados.</span>
             </p>
