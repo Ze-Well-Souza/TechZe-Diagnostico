@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     
     # Configurações de servidor
     HOST: str = "0.0.0.0"
-    PORT: int = 8000
+    PORT: int = int(os.getenv("PORT", 8000))  # Usa PORT do Render ou 8000 como fallback
     
     # Configurações do Supabase
     SUPABASE_URL: Optional[str] = None
@@ -41,6 +41,7 @@ class Settings(BaseSettings):
         "http://localhost",
         "http://localhost:3000",
         "http://localhost:8080",
+        "http://localhost:5173",
         "https://techze-diagnostic-frontend.onrender.com",
         "https://tecnoreparo.ulytech.com.br"
     ]

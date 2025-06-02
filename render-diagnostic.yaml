@@ -1,4 +1,3 @@
-
 services:
   # Frontend - React/TypeScript Application
   - type: web
@@ -39,14 +38,14 @@ services:
         value: /api/v1
       - key: PROJECT_NAME
         value: TechZe Diagnostic API
+      - key: HOST
+        value: 0.0.0.0
       - key: SUPABASE_URL
         value: https://waxnnwpsvitmeeivkwkn.supabase.co
       - key: SUPABASE_SERVICE_KEY
         sync: false
       - key: SUPABASE_ANON_KEY
         sync: false
-      - key: PORT
-        value: "10000"
       - key: REPORT_STORAGE_PATH
         value: /tmp/reports
         
