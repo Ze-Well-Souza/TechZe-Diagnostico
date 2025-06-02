@@ -1,6 +1,5 @@
-
 import os
-from typing import Optional
+from typing import Optional, List
 from pydantic_settings import BaseSettings
 
 
@@ -13,38 +12,49 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # Configurações de ambiente
-    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
-    DEBUG: bool = os.getenv("DEBUG", "True").lower() == "true"
+    ENVIRONMENT: str = "development"
+    DEBUG: bool = True
     
     # Configurações de servidor
-    HOST: str = os.getenv("HOST", "0.0.0.0")
-    PORT: int = int(os.getenv("PORT", "8000"))
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
     
     # Configurações do Supabase
-    SUPABASE_URL: Optional[str] = os.getenv("SUPABASE_URL")
-    SUPABASE_KEY: Optional[str] = os.getenv("SUPABASE_ANON_KEY")
-    SUPABASE_SERVICE_KEY: Optional[str] = os.getenv("SUPABASE_SERVICE_KEY")
+    SUPABASE_URL: Optional[str] = None
+    SUPABASE_KEY: Optional[str] = None
+    SUPABASE_SERVICE_KEY: Optional[str] = None
     
     # Configurações de banco de dados (para SQLAlchemy se necessário)
-    DATABASE_URL: Optional[str] = os.getenv("DATABASE_URL")
+    DATABASE_URL: Optional[str] = None
     SQLALCHEMY_DATABASE_URI: Optional[str] = None
     
     # Configurações de armazenamento
-    REPORT_STORAGE_PATH: str = os.getenv("REPORT_STORAGE_PATH", "/tmp/reports")
+    REPORT_STORAGE_PATH: str = "/tmp/reports"
     
     # Configurações de segurança
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-here")
+    SECRET_KEY: str = "your-secret-key-here"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # Configurações de CORS
-    BACKEND_CORS_ORIGINS: list = [
+    BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost",
         "http://localhost:3000",
         "http://localhost:8080",
         "https://techze-diagnostic-frontend.onrender.com",
         "https://tecnoreparo.ulytech.com.br"
     ]
+    
+    # Configurações adicionais opcionais
+    SUPABASE_JWT_SECRET: Optional[str] = None
+    SERVER_NAME: Optional[str] = None
+    SERVER_HOST: Optional[str] = None
+    LOG_LEVEL: str = "INFO"
+    MAX_CONCURRENT_DIAGNOSTICS: int = 5
+    DIAGNOSTIC_TIMEOUT_SECONDS: int = 300
+    DIAGNOSTIC_MAX_HISTORY: int = 100
+    REPORT_FORMATS: str = '["pdf","json"]'
+    REPORT_PUBLIC_URL_BASE: Optional[str] = None
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -56,6 +66,7 @@ class Settings(BaseSettings):
     class Config:
         case_sensitive = True
         env_file = ".env"
+        extra = "allow"  # Permite configurações extras
 
 
 # Instância global das configurações

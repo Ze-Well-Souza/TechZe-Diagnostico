@@ -1,4 +1,3 @@
-
 """
 Analisadores de sistema para diagnóstico.
 
@@ -14,6 +13,7 @@ try:
     from .memory_analyzer import MemoryAnalyzer
     from .disk_analyzer import DiskAnalyzer
     from .network_analyzer import NetworkAnalyzer
+    from .antivirus_analyzer import AntivirusAnalyzer
 except ImportError:
     # Fallback para casos onde algumas dependências podem não estar disponíveis
     class CPUAnalyzer:
@@ -32,4 +32,10 @@ except ImportError:
         def analyze(self):
             return {"status": "unknown", "speed": 0, "latency": 0}
 
-__all__ = ["CPUAnalyzer", "MemoryAnalyzer", "DiskAnalyzer", "NetworkAnalyzer"]
+__all__ = [
+    "CPUAnalyzer",
+    "MemoryAnalyzer", 
+    "DiskAnalyzer",
+    "NetworkAnalyzer",
+    "AntivirusAnalyzer"
+]

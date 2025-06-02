@@ -1,5 +1,6 @@
 import logging
 import platform
+import psutil
 import socket
 import uuid
 from datetime import datetime
@@ -117,59 +118,23 @@ class SystemInfoService:
         return obj
     
     def collect_system_info(self) -> Dict[str, Any]:
-        """Coleta informações detalhadas sobre o sistema.
+        """Coleta informações completas do sistema.
         
         Returns:
             Dicionário com informações do sistema
         """
         try:
-            # Informações básicas do sistema
-            hostname = socket.gethostname()
-            os_name = platform.system()
-            os_version = platform.version()
-            os_arch = platform.machine()
-            
-            # Coleta informações detalhadas usando os analisadores
-            cpu_info = self.cpu_analyzer.analyze()
-            memory_info = self.memory_analyzer.analyze()
-            disk_info = self.disk_analyzer.analyze()
-            network_info = self.network_analyzer.analyze()
-            
-            # Formata as informações do CPU
-            cpu_details = {
-                "model": platform.processor(),
-                "cores": cpu_info.get("cores", {}).get("physical", 0),
-                "threads": cpu_info.get("cores", {}).get("logical", 0),
-                "architecture": platform.architecture()[0],
-                "frequency": cpu_info.get("frequency", {}).get("current", 0)
-            }
-            
-            # Coleta informações sobre software instalado (simplificado)
-            installed_software = self._get_installed_software()
-            
-            # Coleta detalhes de hardware (simplificado)
-            hardware_details = self._get_hardware_details()
-            
-            # Compila todas as informações
             system_info = {
-                "hostname": hostname,
-                "os_name": os_name,
-                "os_version": os_version,
-                "os_arch": os_arch,
-                "cpu_info": cpu_details,
-                "cpu_cores": cpu_info.get("cores", {}).get("physical", 0),
-                "memory_total": memory_info.get("total", 0),
-                "disk_total": disk_info.get("total", 0),
-                "network_interfaces": self._format_network_interfaces(network_info),
-                "installed_software": installed_software,
-                "hardware_details": hardware_details,
-                "collected_at": datetime.now().isoformat(),
-                "raw_data": {
-                    "cpu": cpu_info,
-                    "memory": memory_info,
-                    "disk": disk_info,
-                    "network": network_info
-                }
+                "hostname": self._get_hostname(),
+                "os_name": self._get_os_name(),
+                "os_version": self._get_os_version(),
+                "architecture": self._get_architecture(),
+                "platform": self._get_platform(),
+                "python_version": self._get_python_version(),
+                "boot_time": self._get_boot_time(),
+                "uptime": self._get_uptime(),
+                "users": self._get_users(),
+                "processes": self._get_process_count()
             }
             
             logger.info("System information collected successfully")
@@ -179,78 +144,166 @@ class SystemInfoService:
             logger.exception(f"Error collecting system information: {str(e)}")
             return {
                 "error": str(e),
-                "hostname": socket.gethostname(),
-                "collected_at": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat()
             }
     
-    def _format_network_interfaces(self, network_info: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Formata as informações das interfaces de rede.
+    def _get_hostname(self) -> str:
+        """Obtém o nome do host do sistema.
         
-        Args:
-            network_info: Informações de rede coletadas
+        Returns:
+            Nome do host
+        """
+        try:
+            return socket.gethostname()
+        except Exception as e:
+            logger.error(f"Error getting hostname: {str(e)}")
+            return "unknown"
+    
+    def _get_os_name(self) -> str:
+        """Obtém o nome do sistema operacional.
+        
+        Returns:
+            Nome do SO
+        """
+        try:
+            return platform.system()
+        except Exception as e:
+            logger.error(f"Error getting OS name: {str(e)}")
+            return "unknown"
+    
+    def _get_os_version(self) -> str:
+        """Obtém a versão do sistema operacional.
+        
+        Returns:
+            Versão do SO
+        """
+        try:
+            return platform.release()
+        except Exception as e:
+            logger.error(f"Error getting OS version: {str(e)}")
+            return "unknown"
+    
+    def _get_architecture(self) -> str:
+        """Obtém a arquitetura do sistema.
+        
+        Returns:
+            Arquitetura do sistema
+        """
+        try:
+            return platform.machine()
+        except Exception as e:
+            logger.error(f"Error getting architecture: {str(e)}")
+            return "unknown"
+    
+    def _get_platform(self) -> str:
+        """Obtém informações detalhadas da plataforma.
+        
+        Returns:
+            Informações da plataforma
+        """
+        try:
+            return platform.platform()
+        except Exception as e:
+            logger.error(f"Error getting platform: {str(e)}")
+            return "unknown"
+    
+    def _get_python_version(self) -> str:
+        """Obtém a versão do Python.
+        
+        Returns:
+            Versão do Python
+        """
+        try:
+            return platform.python_version()
+        except Exception as e:
+            logger.error(f"Error getting Python version: {str(e)}")
+            return "unknown"
+    
+    def _get_boot_time(self) -> str:
+        """Obtém o horário do último boot do sistema.
+        
+        Returns:
+            Horário do último boot em formato ISO
+        """
+        try:
+            boot_timestamp = psutil.boot_time()
+            boot_time = datetime.fromtimestamp(boot_timestamp)
+            return boot_time.isoformat()
+        except Exception as e:
+            logger.error(f"Error getting boot time: {str(e)}")
+            return "unknown"
+    
+    def _get_uptime(self) -> Dict[str, Any]:
+        """Calcula o tempo de atividade do sistema.
+        
+        Returns:
+            Dicionário com informações de uptime
+        """
+        try:
+            boot_timestamp = psutil.boot_time()
+            current_time = datetime.now().timestamp()
+            uptime_seconds = current_time - boot_timestamp
             
-        Returns:
-            Lista formatada de interfaces de rede
-        """
-        interfaces = []
-        
-        if "interfaces" in network_info:
-            for name, info in network_info["interfaces"].items():
-                interfaces.append({
-                    "name": name,
-                    "mac_address": info.get("mac"),
-                    "ipv4": info.get("ipv4"),
-                    "ipv6": info.get("ipv6"),
-                    "is_up": info.get("is_up", False),
-                    "speed": info.get("speed", 0)
-                })
-        
-        return interfaces
-    
-    def _get_installed_software(self) -> List[Dict[str, str]]:
-        """Coleta informações sobre software instalado.
-        
-        Returns:
-            Lista de software instalado
-        """
-        # Em um sistema real, isso seria implementado para coletar software instalado
-        # Por enquanto, retornamos uma lista vazia ou alguns exemplos
-        try:
-            # Exemplo simplificado - em um sistema real, isso seria implementado
-            # para coletar informações reais sobre software instalado
-            return [
-                {
-                    "name": "Python",
-                    "version": platform.python_version(),
-                    "install_date": ""
-                },
-                {
-                    "name": "Operating System",
-                    "version": f"{platform.system()} {platform.version()}",
-                    "install_date": ""
-                }
-            ]
-        except Exception as e:
-            logger.error(f"Error getting installed software: {str(e)}")
-            return []
-    
-    def _get_hardware_details(self) -> Dict[str, Any]:
-        """Coleta detalhes de hardware.
-        
-        Returns:
-            Dicionário com detalhes de hardware
-        """
-        # Em um sistema real, isso seria implementado para coletar detalhes de hardware
-        # Por enquanto, retornamos informações básicas
-        try:
+            # Converte para dias, horas, minutos
+            days = int(uptime_seconds // 86400)
+            hours = int((uptime_seconds % 86400) // 3600)
+            minutes = int((uptime_seconds % 3600) // 60)
+            
             return {
-                "system": platform.system(),
-                "node": platform.node(),
-                "release": platform.release(),
-                "version": platform.version(),
-                "machine": platform.machine(),
-                "processor": platform.processor()
+                "total_seconds": int(uptime_seconds),
+                "days": days,
+                "hours": hours,
+                "minutes": minutes,
+                "formatted": f"{days}d {hours}h {minutes}m"
             }
         except Exception as e:
-            logger.error(f"Error getting hardware details: {str(e)}")
-            return {}
+            logger.error(f"Error calculating uptime: {str(e)}")
+            return {
+                "total_seconds": 0,
+                "days": 0,
+                "hours": 0,
+                "minutes": 0,
+                "formatted": "unknown"
+            }
+    
+    def _get_users(self) -> Dict[str, Any]:
+        """Obtém informações sobre usuários logados.
+        
+        Returns:
+            Informações sobre usuários
+        """
+        try:
+            users = psutil.users()
+            user_list = []
+            
+            for user in users:
+                user_info = {
+                    "name": user.name,
+                    "terminal": getattr(user, 'terminal', 'unknown'),
+                    "host": getattr(user, 'host', 'unknown'),
+                    "started": datetime.fromtimestamp(user.started).isoformat() if hasattr(user, 'started') else 'unknown'
+                }
+                user_list.append(user_info)
+            
+            return {
+                "count": len(user_list),
+                "users": user_list
+            }
+        except Exception as e:
+            logger.error(f"Error getting users: {str(e)}")
+            return {
+                "count": 0,
+                "users": []
+            }
+    
+    def _get_process_count(self) -> int:
+        """Obtém o número total de processos em execução.
+        
+        Returns:
+            Número de processos
+        """
+        try:
+            return len(psutil.pids())
+        except Exception as e:
+            logger.error(f"Error getting process count: {str(e)}")
+            return 0
