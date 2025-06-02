@@ -8,7 +8,6 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Navbar from "@/components/Navbar";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Welcome from "./pages/Welcome";
 import Dashboard from "./pages/Dashboard";
 import Diagnostic from "./pages/Diagnostic";
 import Reports from "./pages/Reports";
@@ -41,12 +40,6 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             
             {/* Rotas protegidas com layout */}
-            <Route path="/welcome" element={
-              <ProtectedRoute>
-                <Welcome />
-              </ProtectedRoute>
-            } />
-            
             <Route path="/dashboard" element={
               <ProtectedLayout>
                 <Dashboard />

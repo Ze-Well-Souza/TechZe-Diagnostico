@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,7 +32,7 @@ const Auth = () => {
     const { error } = await signIn(loginEmail, loginPassword);
     
     if (!error) {
-      navigate("/welcome");
+      navigate("/dashboard");
     }
     
     setLoading(false);

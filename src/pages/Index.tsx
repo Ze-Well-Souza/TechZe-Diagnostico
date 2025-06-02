@@ -22,9 +22,9 @@ const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // If user is logged in, redirect to welcome
+  // If user is logged in, redirect to dashboard
   if (user) {
-    navigate("/welcome");
+    navigate("/dashboard");
     return null;
   }
 
