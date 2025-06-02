@@ -1,24 +1,113 @@
-
 import { useState, useEffect } from "react";
 import { 
   Monitor, 
   Activity, 
   AlertTriangle, 
-  TrendingUp
+  TrendingUp,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { HealthTrendChart } from "@/components/dashboard/HealthTrendChart";
 import { RecentDiagnosticsList } from "@/components/dashboard/RecentDiagnosticsList";
 import { ComponentProblemsCard } from "@/components/dashboard/ComponentProblemsCard";
 import { QuickStatusCard } from "@/components/dashboard/QuickStatusCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const [diagnostics, setDiagnostics] = useState<any[]>([]);
   const [stats, setStats] = useState<any>({});
   const [healthTrend, setHealthTrend] = useState<any[]>([]);
+  const [apiStatus, setApiStatus] = useState<'loading' | 'connected' | 'disconnected'>('loading');
+  const [apiInfo, setApiInfo] = useState<any>(null);
+  const { toast } = useToast();
+
+  // Função para testar conexão com a API
+  const testApiConnection = async () => {
+    setApiStatus('loading');
+    try {
+      const response = await fetch('https://techze-diagnostico.onrender.com/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setApiInfo(data);
+        setApiStatus('connected');
+        toast({
+          title: "✅ API Conectada",
+          description: `Microserviço funcionando - ${data.version}`,
+        });
+      } else {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Erro ao conectar com API:', error);
+      setApiStatus('disconnected');
+      toast({
+        title: "❌ API Desconectada",
+        description: "Não foi possível conectar com o microserviço",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Função para executar diagnóstico rápido
+  const runQuickDiagnostic = async () => {
+    try {
+      toast({
+        title: "🔍 Executando Diagnóstico",
+        description: "Iniciando diagnóstico rápido do sistema...",
+      });
+      
+      const response = await fetch('https://techze-diagnostico.onrender.com/api/v1/diagnostic/quick', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Resultado do diagnóstico:', result);
+        
+        // Atualizar stats com dados reais
+        if (result.health_score) {
+          setStats(prev => ({
+            ...prev,
+            avgHealthScore: result.health_score,
+            lastDiagnostic: new Date().toISOString(),
+          }));
+        }
+        
+        toast({
+          title: "✅ Diagnóstico Concluído",
+          description: `Health Score: ${result.health_score || 'N/A'}`,
+        });
+      } else {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Erro ao executar diagnóstico:', error);
+      toast({
+        title: "❌ Erro no Diagnóstico",
+        description: "Não foi possível executar o diagnóstico",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
-    // Simular carregamento de dados
+    // Testar conexão da API na inicialização
+    testApiConnection();
+    
+    // Simular dados iniciais (será substituído por dados reais)
     const mockDiagnostics = [
       {
         id: 1,
@@ -82,6 +171,19 @@ const Dashboard = () => {
     return "text-red-400";
   };
 
+  const getApiStatusBadge = () => {
+    switch (apiStatus) {
+      case 'loading':
+        return <Badge variant="secondary" className="animate-pulse">🔄 Conectando...</Badge>;
+      case 'connected':
+        return <Badge variant="default" className="bg-green-500">✅ API Online</Badge>;
+      case 'disconnected':
+        return <Badge variant="destructive">❌ API Offline</Badge>;
+      default:
+        return <Badge variant="secondary">❓ Desconhecido</Badge>;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -92,6 +194,55 @@ const Dashboard = () => {
           </h1>
           <p className="text-gray-200">Visão geral dos diagnósticos e métricas do sistema</p>
         </div>
+
+        {/* Status da API */}
+        <Card className="bg-black/40 backdrop-blur-md border-white/20">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-3">
+              {apiStatus === 'connected' ? <Wifi className="w-6 h-6 text-green-400" /> : <WifiOff className="w-6 h-6 text-red-400" />}
+              Status do Microserviço
+              {getApiStatusBadge()}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap items-center gap-4">
+              {apiInfo && (
+                <div className="text-sm text-gray-300 grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
+                  <div>
+                    <span className="font-semibold">Versão:</span> {apiInfo.version}
+                  </div>
+                  <div>
+                    <span className="font-semibold">Ambiente:</span> {apiInfo.environment}
+                  </div>
+                  <div>
+                    <span className="font-semibold">Status:</span> {apiInfo.status}
+                  </div>
+                  <div>
+                    <span className="font-semibold">API:</span> {apiInfo.api}
+                  </div>
+                </div>
+              )}
+              <div className="flex gap-2">
+                <Button 
+                  onClick={testApiConnection}
+                  variant="outline"
+                  size="sm"
+                  className="border-white/30 text-white hover:bg-white/10"
+                >
+                  🔄 Testar Conexão
+                </Button>
+                <Button 
+                  onClick={runQuickDiagnostic}
+                  disabled={apiStatus !== 'connected'}
+                  size="sm"
+                  className="btn-tecno"
+                >
+                  🔍 Diagnóstico Rápido
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Cards de Estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
