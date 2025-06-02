@@ -29,7 +29,7 @@ const Dashboard = () => {
   const testApiConnection = async () => {
     setApiStatus('loading');
     try {
-      const response = await fetch('https://techze-diagnostico.onrender.com/', {
+      const response = await fetch('https://techze-diagnostic-api.onrender.com/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ const Dashboard = () => {
         description: "Iniciando diagnóstico rápido do sistema...",
       });
       
-      const response = await fetch('https://techze-diagnostico.onrender.com/api/v1/diagnostic/quick', {
+      const response = await fetch('https://techze-diagnostic-api.onrender.com/api/v1/diagnostic/quick', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -174,29 +174,29 @@ const Dashboard = () => {
   const getApiStatusBadge = () => {
     switch (apiStatus) {
       case 'loading':
-        return <Badge variant="secondary" className="animate-pulse">🔄 Conectando...</Badge>;
+        return <Badge variant="secondary" className="animate-pulse bg-gray-700 text-gray-300">🔄 Conectando...</Badge>;
       case 'connected':
-        return <Badge variant="default" className="bg-green-500">✅ API Online</Badge>;
+        return <Badge className="bg-green-900 text-green-300 border-green-700">✅ API Online</Badge>;
       case 'disconnected':
-        return <Badge variant="destructive">❌ API Offline</Badge>;
+        return <Badge variant="destructive" className="bg-red-900 text-red-300 border-red-700">❌ API Offline</Badge>;
       default:
-        return <Badge variant="secondary">❓ Desconhecido</Badge>;
+        return <Badge variant="secondary" className="bg-gray-700 text-gray-300">❓ Desconhecido</Badge>;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6">
+    <div className="min-h-screen bg-black p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">
             Dashboard de Diagnósticos
           </h1>
-          <p className="text-gray-200">Visão geral dos diagnósticos e métricas do sistema</p>
+          <p className="text-gray-400">Visão geral dos diagnósticos e métricas do sistema</p>
         </div>
 
         {/* Status da API */}
-        <Card className="bg-black/40 backdrop-blur-md border-white/20">
+        <Card className="bg-gray-900 border-gray-800">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-3">
               {apiStatus === 'connected' ? <Wifi className="w-6 h-6 text-green-400" /> : <WifiOff className="w-6 h-6 text-red-400" />}
@@ -209,16 +209,16 @@ const Dashboard = () => {
               {apiInfo && (
                 <div className="text-sm text-gray-300 grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
                   <div>
-                    <span className="font-semibold">Versão:</span> {apiInfo.version}
+                    <span className="font-semibold text-white">Versão:</span> {apiInfo.version}
                   </div>
                   <div>
-                    <span className="font-semibold">Ambiente:</span> {apiInfo.environment}
+                    <span className="font-semibold text-white">Ambiente:</span> {apiInfo.environment}
                   </div>
                   <div>
-                    <span className="font-semibold">Status:</span> {apiInfo.status}
+                    <span className="font-semibold text-white">Status:</span> {apiInfo.status}
                   </div>
                   <div>
-                    <span className="font-semibold">API:</span> {apiInfo.api}
+                    <span className="font-semibold text-white">API:</span> {apiInfo.api}
                   </div>
                 </div>
               )}
@@ -227,7 +227,7 @@ const Dashboard = () => {
                   onClick={testApiConnection}
                   variant="outline"
                   size="sm"
-                  className="border-white/30 text-white hover:bg-white/10"
+                  className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
                 >
                   🔄 Testar Conexão
                 </Button>
@@ -235,7 +235,7 @@ const Dashboard = () => {
                   onClick={runQuickDiagnostic}
                   disabled={apiStatus !== 'connected'}
                   size="sm"
-                  className="btn-tecno"
+                  className="bg-white text-black hover:bg-gray-100 disabled:bg-gray-700 disabled:text-gray-500"
                 >
                   🔍 Diagnóstico Rápido
                 </Button>
