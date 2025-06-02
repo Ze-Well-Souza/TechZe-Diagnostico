@@ -7,8 +7,32 @@ import {
   CreateDiagnosticRequest, 
   CreateDeviceRequest 
 } from "@/types/diagnostic";
+import { Json } from "@/integrations/supabase/types";
 
 export class DiagnosticApiService {
+  
+  // Helper function to convert Supabase Json to our types
+  private convertSupabaseToDiagnostic(data: any): DiagnosticResult {
+    return {
+      ...data,
+      status: data.status as 'pending' | 'running' | 'completed' | 'failed',
+      cpu_metrics: data.cpu_metrics as any,
+      memory_metrics: data.memory_metrics as any,
+      disk_metrics: data.disk_metrics as any,
+      network_metrics: data.network_metrics as any,
+    };
+  }
+
+  // Helper function to convert our types to Supabase Json
+  private convertDiagnosticToSupabase(data: Partial<DiagnosticResult>): any {
+    return {
+      ...data,
+      cpu_metrics: data.cpu_metrics as Json,
+      memory_metrics: data.memory_metrics as Json,
+      disk_metrics: data.disk_metrics as Json,
+      network_metrics: data.network_metrics as Json,
+    };
+  }
   
   // Métodos para diagnósticos via microserviço
   async runDiagnostic(request: CreateDiagnosticRequest): Promise<DiagnosticResult> {
@@ -115,7 +139,7 @@ export class DiagnosticApiService {
       throw new Error(error.message);
     }
 
-    return data || [];
+    return (data || []).map(this.convertSupabaseToDiagnostic);
   }
 
   async getDiagnostic(diagnosticId: string): Promise<DiagnosticResult | null> {
@@ -130,7 +154,7 @@ export class DiagnosticApiService {
       throw new Error(error.message);
     }
 
-    return data;
+    return data ? this.convertSupabaseToDiagnostic(data) : null;
   }
 
   async saveDiagnostic(diagnostic: Partial<DiagnosticResult>): Promise<DiagnosticResult> {
@@ -140,12 +164,14 @@ export class DiagnosticApiService {
       throw new Error("Usuário não autenticado");
     }
 
+    const supabaseData = this.convertDiagnosticToSupabase({
+      ...diagnostic,
+      user_id: user.id,
+    });
+
     const { data, error } = await supabase
       .from('diagnostics')
-      .insert({
-        ...diagnostic,
-        user_id: user.id,
-      })
+      .insert(supabaseData)
       .select()
       .single();
 
@@ -154,13 +180,15 @@ export class DiagnosticApiService {
       throw new Error(error.message);
     }
 
-    return data;
+    return this.convertSupabaseToDiagnostic(data);
   }
 
   async updateDiagnostic(diagnosticId: string, updates: Partial<DiagnosticResult>): Promise<DiagnosticResult> {
+    const supabaseData = this.convertDiagnosticToSupabase(updates);
+
     const { data, error } = await supabase
       .from('diagnostics')
-      .update(updates)
+      .update(supabaseData)
       .eq('id', diagnosticId)
       .select()
       .single();
@@ -170,7 +198,7 @@ export class DiagnosticApiService {
       throw new Error(error.message);
     }
 
-    return data;
+    return this.convertSupabaseToDiagnostic(data);
   }
 
   // Método híbrido: executa diagnóstico via API e salva no Supabase
