@@ -45,6 +45,20 @@ export interface SystemInfo {
   architecture?: string;
 }
 
+export interface AntivirusMetrics {
+  installed: string[];
+  real_time_protection: boolean;
+  firewall_enabled: boolean;
+  recommendations: string[];
+}
+
+export interface DriverMetrics {
+  total_drivers: number;
+  problematic_drivers: number;
+  outdated_drivers: number;
+  recommendations: string[];
+}
+
 export interface DiagnosticResult {
   id: string;
   user_id: string;
@@ -58,6 +72,10 @@ export interface DiagnosticResult {
   disk_metrics?: DiskMetrics;
   network_status?: 'good' | 'warning' | 'critical';
   network_metrics?: NetworkMetrics;
+  antivirus_status?: 'good' | 'warning' | 'critical';
+  antivirus_metrics?: AntivirusMetrics;
+  driver_status?: 'good' | 'warning' | 'critical';
+  driver_metrics?: DriverMetrics;
   health_score?: number;
   raw_data?: any;
   error_message?: string;

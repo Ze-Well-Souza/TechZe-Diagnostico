@@ -20,6 +20,8 @@ export class DiagnosticApiService {
       memory_metrics: data.memory_metrics as any,
       disk_metrics: data.disk_metrics as any,
       network_metrics: data.network_metrics as any,
+      antivirus_metrics: data.antivirus_metrics as any,
+      driver_metrics: data.driver_metrics as any,
     };
   }
 
@@ -31,6 +33,8 @@ export class DiagnosticApiService {
       memory_metrics: data.memory_metrics ? (data.memory_metrics as unknown as Json) : null,
       disk_metrics: data.disk_metrics ? (data.disk_metrics as unknown as Json) : null,
       network_metrics: data.network_metrics ? (data.network_metrics as unknown as Json) : null,
+      antivirus_metrics: data.antivirus_metrics ? (data.antivirus_metrics as unknown as Json) : null,
+      driver_metrics: data.driver_metrics ? (data.driver_metrics as unknown as Json) : null,
     };
   }
   
@@ -43,6 +47,69 @@ export class DiagnosticApiService {
   async getDiagnosticStatus(diagnosticId: string): Promise<DiagnosticResult> {
     console.log("Consultando status do diagnóstico:", diagnosticId);
     return apiClient.get<DiagnosticResult>(`/api/v1/diagnostics/${diagnosticId}`);
+  }
+
+  // Novo método para obter histórico de diagnósticos
+  async getDiagnosticHistory(params?: {
+    page?: number;
+    limit?: number;
+    device_id?: string;
+    status?: string;
+    start_date?: string;
+    end_date?: string;
+  }): Promise<{ data: DiagnosticResult[]; total: number; page: number; limit: number }> {
+    console.log("Obtendo histórico de diagnósticos com parâmetros:", params);
+    try {
+      // Primeiro tentamos obter do endpoint específico de histórico
+      return await apiClient.get<{ data: DiagnosticResult[]; total: number; page: number; limit: number }>(
+        "/api/v1/diagnostic/history",
+        { params }
+      );
+    } catch (error) {
+      console.warn("Endpoint de histórico não disponível, usando fallback para Supabase", error);
+      
+      // Fallback: Se o endpoint não estiver disponível, usamos o Supabase diretamente
+      let query = supabase.from('diagnostics').select('*', { count: 'exact' });
+      
+      // Aplicar filtros se fornecidos
+      if (params?.device_id) {
+        query = query.eq('device_id', params.device_id);
+      }
+      
+      if (params?.status) {
+        query = query.eq('status', params.status);
+      }
+      
+      if (params?.start_date) {
+        query = query.gte('created_at', params.start_date);
+      }
+      
+      if (params?.end_date) {
+        query = query.lte('created_at', params.end_date);
+      }
+      
+      // Aplicar paginação
+      const page = params?.page || 1;
+      const limit = params?.limit || 10;
+      const start = (page - 1) * limit;
+      
+      query = query.order('created_at', { ascending: false })
+                   .range(start, start + limit - 1);
+      
+      const { data, error, count } = await query;
+      
+      if (error) {
+        console.error("Erro ao buscar histórico de diagnósticos:", error);
+        throw new Error(error.message);
+      }
+      
+      return {
+        data: (data || []).map(this.convertSupabaseToDiagnostic),
+        total: count || 0,
+        page,
+        limit
+      };
+    }
   }
 
   // Métodos para dispositivos via Supabase
@@ -220,16 +287,34 @@ export class DiagnosticApiService {
 
       // 3. Executar diagnóstico via microserviço
       try {
-        const diagnosticResult = await this.runDiagnostic({
-          device_id: deviceId,
-          system_info: {
-            os: device.os || 'Unknown',
-            os_version: device.os_version || 'Unknown',
-            processor: device.processor || 'Unknown',
-            ram: device.ram || 'Unknown',
-            storage: device.storage || 'Unknown',
-          }
-        });
+        // Tentar usar o endpoint /api/v1/diagnostic/full se disponível
+        let diagnosticResult;
+        try {
+          diagnosticResult = await apiClient.post<DiagnosticResult>(`/api/v1/diagnostic/full`, {
+            device_id: deviceId,
+            diagnostic_id: initialDiagnostic.id,
+            system_info: {
+              os: device.os || 'Unknown',
+              os_version: device.os_version || 'Unknown',
+              processor: device.processor || 'Unknown',
+              ram: device.ram || 'Unknown',
+              storage: device.storage || 'Unknown',
+            }
+          });
+        } catch (fullEndpointError) {
+          console.warn("Endpoint /api/v1/diagnostic/full não disponível, usando fallback", fullEndpointError);
+          // Fallback para o endpoint padrão
+          diagnosticResult = await this.runDiagnostic({
+            device_id: deviceId,
+            system_info: {
+              os: device.os || 'Unknown',
+              os_version: device.os_version || 'Unknown',
+              processor: device.processor || 'Unknown',
+              ram: device.ram || 'Unknown',
+              storage: device.storage || 'Unknown',
+            }
+          });
+        }
 
         // 4. Atualizar com os resultados
         const updatedDiagnostic = await this.updateDiagnostic(initialDiagnostic.id, {
