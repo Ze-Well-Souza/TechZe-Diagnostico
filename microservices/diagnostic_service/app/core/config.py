@@ -36,11 +36,26 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
+    # Rate Limiting
+    REDIS_URL: Optional[str] = None
+    RATE_LIMIT_ENABLED: bool = True
+    
+    # Monitoramento
+    PROMETHEUS_ENABLED: bool = True
+    SENTRY_DSN: Optional[str] = None
+    
+    # Auditoria
+    AUDIT_LOG_FILE: str = "/tmp/audit.log"
+    AUDIT_LOG_TO_FILE: bool = True
+    AUDIT_LOG_TO_SUPABASE: bool = True
+    AUDIT_LOG_TO_CONSOLE: bool = True
+    
     # Configurações de CORS
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost",
         "http://localhost:3000",
         "http://localhost:8080",
+        "http://localhost:8081",
         "http://localhost:5173",
         "https://techze-diagnostic-frontend.onrender.com",
         "https://tecnoreparo.ulytech.com.br"

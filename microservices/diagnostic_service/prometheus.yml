@@ -1,0 +1,47 @@
+# Configuração do Prometheus para TechZe Diagnostic Service
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Regras de alertas
+rule_files:
+  - "alert_rules.yml"
+
+# Configuração do Alertmanager
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Configuração de scraping
+scrape_configs:
+  # TechZe Diagnostic Service
+  - job_name: 'techze-diagnostic'
+    static_configs:
+      - targets: ['localhost:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    
+  # Node Exporter (se disponível)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
+    scrape_interval: 30s
+    
+  # Redis Exporter (se disponível)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['localhost:9121']
+    scrape_interval: 30s
+
+# Configuração de armazenamento
+storage:
+  tsdb:
+    retention.time: 30d

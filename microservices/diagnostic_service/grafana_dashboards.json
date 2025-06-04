@@ -1,0 +1,418 @@
+{
+  "techze_operational_dashboard": {
+    "dashboard": {
+      "id": null,
+      "title": "TechZe - Dashboard Operacional",
+      "tags": ["techze", "operational", "monitoring"],
+      "timezone": "browser",
+      "panels": [
+        {
+          "id": 1,
+          "title": "System Overview",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "techze_system_cpu_usage_percent",
+              "legendFormat": "CPU Usage %"
+            },
+            {
+              "expr": "techze_system_memory_usage_percent", 
+              "legendFormat": "Memory Usage %"
+            },
+            {
+              "expr": "techze_system_disk_usage_percent",
+              "legendFormat": "Disk Usage %"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "steps": [
+                  {"color": "green", "value": null},
+                  {"color": "yellow", "value": 70},
+                  {"color": "red", "value": 90}
+                ]
+              },
+              "unit": "percent"
+            }
+          },
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+        },
+        {
+          "id": 2,
+          "title": "Request Rate",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "rate(techze_requests_total[5m])",
+              "legendFormat": "Requests/sec"
+            }
+          ],
+          "yAxes": [
+            {
+              "label": "Requests/sec",
+              "min": 0
+            }
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+        },
+        {
+          "id": 3,
+          "title": "Response Time",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, rate(techze_request_duration_seconds_bucket[5m]))",
+              "legendFormat": "95th percentile"
+            },
+            {
+              "expr": "histogram_quantile(0.50, rate(techze_request_duration_seconds_bucket[5m]))",
+              "legendFormat": "50th percentile"
+            }
+          ],
+          "yAxes": [
+            {
+              "label": "Seconds",
+              "min": 0
+            }
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+        },
+        {
+          "id": 4,
+          "title": "Error Rate",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "rate(techze_errors_total[5m])",
+              "legendFormat": "Errors/sec"
+            }
+          ],
+          "yAxes": [
+            {
+              "label": "Errors/sec",
+              "min": 0
+            }
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+        },
+        {
+          "id": 5,
+          "title": "Active Diagnostics",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "techze_active_diagnostics",
+              "legendFormat": "Active"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "short"
+            }
+          },
+          "gridPos": {"h": 4, "w": 6, "x": 0, "y": 16}
+        },
+        {
+          "id": 6,
+          "title": "Connected Users",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "techze_connected_users",
+              "legendFormat": "Users"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "short"
+            }
+          },
+          "gridPos": {"h": 4, "w": 6, "x": 6, "y": 16}
+        },
+        {
+          "id": 7,
+          "title": "Cache Hit Rate",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "techze_cache_hit_rate_percent",
+              "legendFormat": "Hit Rate"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "steps": [
+                  {"color": "red", "value": null},
+                  {"color": "yellow", "value": 70},
+                  {"color": "green", "value": 90}
+                ]
+              },
+              "unit": "percent"
+            }
+          },
+          "gridPos": {"h": 4, "w": 6, "x": 12, "y": 16}
+        },
+        {
+          "id": 8,
+          "title": "Rate Limit Violations",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "increase(techze_rate_limit_exceeded_total[1h])",
+              "legendFormat": "Violations/hour"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "steps": [
+                  {"color": "green", "value": null},
+                  {"color": "yellow", "value": 10},
+                  {"color": "red", "value": 50}
+                ]
+              },
+              "unit": "short"
+            }
+          },
+          "gridPos": {"h": 4, "w": 6, "x": 18, "y": 16}
+        }
+      ],
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "refresh": "30s"
+    }
+  },
+  "techze_security_dashboard": {
+    "dashboard": {
+      "id": null,
+      "title": "TechZe - Dashboard de Segurança",
+      "tags": ["techze", "security", "monitoring"],
+      "timezone": "browser",
+      "panels": [
+        {
+          "id": 1,
+          "title": "Authentication Attempts",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "rate(techze_auth_attempts_total{status=\"success\"}[5m])",
+              "legendFormat": "Successful"
+            },
+            {
+              "expr": "rate(techze_auth_attempts_total{status=\"failed\"}[5m])",
+              "legendFormat": "Failed"
+            }
+          ],
+          "yAxes": [
+            {
+              "label": "Attempts/sec",
+              "min": 0
+            }
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+        },
+        {
+          "id": 2,
+          "title": "Rate Limiting",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "rate(techze_rate_limit_exceeded_total[5m])",
+              "legendFormat": "Rate Limits Exceeded"
+            }
+          ],
+          "yAxes": [
+            {
+              "label": "Violations/sec",
+              "min": 0
+            }
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+        },
+        {
+          "id": 3,
+          "title": "Security Events by Type",
+          "type": "piechart",
+          "targets": [
+            {
+              "expr": "sum by (event_type) (increase(techze_security_events_total[1h]))",
+              "legendFormat": "{{event_type}}"
+            }
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+        },
+        {
+          "id": 4,
+          "title": "Failed Login Attempts by IP",
+          "type": "table",
+          "targets": [
+            {
+              "expr": "topk(10, sum by (source_ip) (increase(techze_auth_attempts_total{status=\"failed\"}[1h])))",
+              "format": "table"
+            }
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+        },
+        {
+          "id": 5,
+          "title": "Security Alerts",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "sum(techze_active_alerts{severity=\"critical\", type=\"security\"})",
+              "legendFormat": "Critical"
+            },
+            {
+              "expr": "sum(techze_active_alerts{severity=\"high\", type=\"security\"})",
+              "legendFormat": "High"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "steps": [
+                  {"color": "green", "value": null},
+                  {"color": "yellow", "value": 1},
+                  {"color": "red", "value": 5}
+                ]
+              },
+              "unit": "short"
+            }
+          },
+          "gridPos": {"h": 4, "w": 24, "x": 0, "y": 16}
+        }
+      ],
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "refresh": "30s"
+    }
+  },
+  "techze_business_dashboard": {
+    "dashboard": {
+      "id": null,
+      "title": "TechZe - Dashboard de Negócio",
+      "tags": ["techze", "business", "kpi"],
+      "timezone": "browser",
+      "panels": [
+        {
+          "id": 1,
+          "title": "Diagnósticos por Hora",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "rate(techze_diagnostic_requests_total{status=\"completed\"}[1h])",
+              "legendFormat": "Completed"
+            },
+            {
+              "expr": "rate(techze_diagnostic_requests_total{status=\"failed\"}[1h])",
+              "legendFormat": "Failed"
+            }
+          ],
+          "yAxes": [
+            {
+              "label": "Diagnostics/hour",
+              "min": 0
+            }
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+        },
+        {
+          "id": 2,
+          "title": "Taxa de Sucesso",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "(sum(rate(techze_diagnostic_requests_total{status=\"completed\"}[1h])) / sum(rate(techze_diagnostic_requests_total[1h]))) * 100",
+              "legendFormat": "Success Rate"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "steps": [
+                  {"color": "red", "value": null},
+                  {"color": "yellow", "value": 90},
+                  {"color": "green", "value": 95}
+                ]
+              },
+              "unit": "percent"
+            }
+          },
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+        },
+        {
+          "id": 3,
+          "title": "Tempo Médio de Diagnóstico",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.50, rate(techze_diagnostic_duration_seconds_bucket[5m]))",
+              "legendFormat": "Median"
+            },
+            {
+              "expr": "histogram_quantile(0.95, rate(techze_diagnostic_duration_seconds_bucket[5m]))",
+              "legendFormat": "95th percentile"
+            }
+          ],
+          "yAxes": [
+            {
+              "label": "Seconds",
+              "min": 0
+            }
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+        },
+        {
+          "id": 4,
+          "title": "Usuários Ativos",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "techze_connected_users",
+              "legendFormat": "Connected Users"
+            }
+          ],
+          "yAxes": [
+            {
+              "label": "Users",
+              "min": 0
+            }
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+        }
+      ],
+      "time": {
+        "from": "now-24h",
+        "to": "now"
+      },
+      "refresh": "1m"
+    }
+  }
+}

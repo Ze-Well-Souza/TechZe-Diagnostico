@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" fill="#4f46e5" rx="38" ry="38"/>
+  <text x="50%" y="50%" font-size="82" text-anchor="middle" dominant-baseline="middle" fill="white" font-family="Arial, sans-serif" font-weight="bold">TZ</text>
+  <path d="M96 56 L132 96 L96 136 L60 96 Z" fill="white" opacity="0.2"/>
+</svg>

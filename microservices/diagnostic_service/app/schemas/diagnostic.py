@@ -27,6 +27,8 @@ class DiagnosticUpdate(BaseModel):
     memory_status: Optional[str] = None
     disk_status: Optional[str] = None
     network_status: Optional[str] = None
+    antivirus_status: Optional[str] = None
+    driver_status: Optional[str] = None
     cpu_usage: Optional[float] = None
     cpu_temperature: Optional[float] = None
     memory_usage: Optional[float] = None
@@ -51,6 +53,8 @@ class DiagnosticInDB(DiagnosticBase):
     memory_status: Optional[str] = None
     disk_status: Optional[str] = None
     network_status: Optional[str] = None
+    antivirus_status: Optional[str] = None
+    driver_status: Optional[str] = None
     cpu_usage: Optional[float] = None
     cpu_temperature: Optional[float] = None
     memory_usage: Optional[float] = None
@@ -112,6 +116,20 @@ class DiagnosticResult(BaseModel):
         "connectivity": "stable",
         "speed": 100.5,  # Mbps
         "latency": 15.3  # ms
+    })
+    antivirus: Dict[str, Any] = Field(..., example={
+        "status": "healthy",
+        "installed": ["Windows Defender"],
+        "real_time_protection": True,
+        "firewall_enabled": True,
+        "recommendations": []
+    })
+    drivers: Dict[str, Any] = Field(..., example={
+        "status": "warning",
+        "total_drivers": 150,
+        "problematic_drivers": 2,
+        "outdated_drivers": 5,
+        "recommendations": ["Atualize os drivers de vídeo"]
     })
     overall_health: int = Field(..., ge=0, le=100, example=85)
     

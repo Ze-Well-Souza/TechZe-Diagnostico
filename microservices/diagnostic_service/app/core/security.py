@@ -1,13 +1,20 @@
 from datetime import datetime, timedelta
 from typing import Any, Optional, Union
 
-from jose import jwt
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from jose import jwt, JWTError
 from passlib.context import CryptContext
 from pydantic import ValidationError
 
 from app.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Atualização para usar algoritmos mais seguros e configurações modernas
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+    bcrypt__rounds=12  # Aumentando o custo do bcrypt para maior segurança
+)
 
 
 def create_access_token(
@@ -28,8 +35,21 @@ def create_access_token(
         expire = datetime.utcnow() + timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
-    to_encode = {"exp": expire, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    
+    # Adicionando mais claims para aumentar a segurança
+    to_encode = {
+        "exp": expire,
+        "sub": str(subject),
+        "iat": datetime.utcnow(),  # Issued At
+        "nbf": datetime.utcnow(),  # Not Before
+        "jti": f"{subject}-{datetime.utcnow().timestamp()}"  # JWT ID único
+    }
+    
+    encoded_jwt = jwt.encode(
+        to_encode, 
+        settings.SECRET_KEY, 
+        algorithm=settings.ALGORITHM
+    )
     return encoded_jwt
 
 
@@ -68,11 +88,23 @@ def decode_access_token(token: str) -> Optional[dict]:
         Payload do token se válido, None caso contrário
     """
     try:
+        # Adicionando verificações de segurança adicionais
         payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+            token, 
+            settings.SECRET_KEY, 
+            algorithms=[settings.ALGORITHM],
+            options={
+                "verify_signature": True,
+                "verify_exp": True,
+                "verify_nbf": True,
+                "verify_iat": True,
+                "require_exp": True,
+                "require_iat": True,
+                "require_nbf": True
+            }
         )
         return payload
-    except (jwt.JWTError, ValidationError):
+    except (JWTError, ValidationError):
         return None
 
 
@@ -89,3 +121,35 @@ def get_token_data(token: str) -> Optional[str]:
     if payload:
         return payload.get("sub")
     return None
+
+
+# Configuração de segurança para autenticação via Bearer token
+security = HTTPBearer(
+    auto_error=True,
+    description="Bearer Authentication"
+)
+
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
+    """Obtém o usuário atual a partir do token JWT.
+    
+    Args:
+        credentials: Credenciais de autorização HTTP
+        
+    Returns:
+        ID do usuário atual
+        
+    Raises:
+        HTTPException: Se o token for inválido ou expirado
+    """
+    token = credentials.credentials
+    user_id = get_token_data(token)
+    
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    return user_id

@@ -1,0 +1,180 @@
+# Regras de Alertas para TechZe Diagnostic Service
+groups:
+  - name: techze_system_alerts
+    rules:
+      # Alerta de CPU alta
+      - alert: HighCPUUsage
+        expr: techze_system_cpu_usage_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: techze-diagnostic
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for more than 5 minutes. Current value: {{ $value }}%"
+      
+      # Alerta de CPU crítica
+      - alert: CriticalCPUUsage
+        expr: techze_system_cpu_usage_percent > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: techze-diagnostic
+        annotations:
+          summary: "Critical CPU usage detected"
+          description: "CPU usage is above 95% for more than 2 minutes. Current value: {{ $value }}%"
+      
+      # Alerta de memória alta
+      - alert: HighMemoryUsage
+        expr: techze_system_memory_usage_percent > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: techze-diagnostic
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 85% for more than 5 minutes. Current value: {{ $value }}%"
+      
+      # Alerta de memória crítica
+      - alert: CriticalMemoryUsage
+        expr: techze_system_memory_usage_percent > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: techze-diagnostic
+        annotations:
+          summary: "Critical memory usage detected"
+          description: "Memory usage is above 95% for more than 2 minutes. Current value: {{ $value }}%"
+      
+      # Alerta de disco cheio
+      - alert: HighDiskUsage
+        expr: techze_system_disk_usage_percent > 90
+        for: 10m
+        labels:
+          severity: warning
+          service: techze-diagnostic
+        annotations:
+          summary: "High disk usage detected"
+          description: "Disk usage is above 90% for more than 10 minutes. Current value: {{ $value }}%"
+
+  - name: techze_application_alerts
+    rules:
+      # Alerta de alta taxa de erro
+      - alert: HighErrorRate
+        expr: rate(techze_errors_total[5m]) > 0.1
+        for: 3m
+        labels:
+          severity: warning
+          service: techze-diagnostic
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is above 0.1 errors/second for more than 3 minutes. Current rate: {{ $value }}"
+      
+      # Alerta de tempo de resposta alto
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(techze_request_duration_seconds_bucket[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: techze-diagnostic
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is above 5 seconds for more than 5 minutes. Current value: {{ $value }}s"
+      
+      # Alerta de serviço indisponível
+      - alert: ServiceDown
+        expr: up{job="techze-diagnostic"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: techze-diagnostic
+        annotations:
+          summary: "TechZe Diagnostic Service is down"
+          description: "The TechZe Diagnostic Service has been down for more than 1 minute"
+      
+      # Alerta de baixa taxa de hit do cache
+      - alert: LowCacheHitRate
+        expr: techze_cache_hit_rate_percent < 70
+        for: 10m
+        labels:
+          severity: warning
+          service: techze-diagnostic
+        annotations:
+          summary: "Low cache hit rate"
+          description: "Cache hit rate is below 70% for more than 10 minutes. Current rate: {{ $value }}%"
+
+  - name: techze_security_alerts
+    rules:
+      # Alerta de muitas tentativas de login falhadas
+      - alert: HighFailedLoginAttempts
+        expr: rate(techze_auth_attempts_total{status="failed"}[5m]) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+          service: techze-diagnostic
+          type: security
+        annotations:
+          summary: "High number of failed login attempts"
+          description: "Failed login attempts rate is above 0.5/second for more than 2 minutes. Current rate: {{ $value }}"
+      
+      # Alerta de violações de rate limit
+      - alert: HighRateLimitViolations
+        expr: rate(techze_rate_limit_exceeded_total[5m]) > 1
+        for: 3m
+        labels:
+          severity: warning
+          service: techze-diagnostic
+          type: security
+        annotations:
+          summary: "High rate limit violations"
+          description: "Rate limit violations are above 1/second for more than 3 minutes. Current rate: {{ $value }}"
+      
+      # Alerta de eventos de segurança críticos
+      - alert: CriticalSecurityEvent
+        expr: increase(techze_security_events_total{severity="critical"}[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          service: techze-diagnostic
+          type: security
+        annotations:
+          summary: "Critical security event detected"
+          description: "A critical security event has been detected. Event type: {{ $labels.event_type }}"
+
+  - name: techze_business_alerts
+    rules:
+      # Alerta de baixa taxa de sucesso de diagnósticos
+      - alert: LowDiagnosticSuccessRate
+        expr: (rate(techze_diagnostic_requests_total{status="completed"}[10m]) / rate(techze_diagnostic_requests_total[10m])) * 100 < 90
+        for: 5m
+        labels:
+          severity: warning
+          service: techze-diagnostic
+          type: business
+        annotations:
+          summary: "Low diagnostic success rate"
+          description: "Diagnostic success rate is below 90% for more than 5 minutes. Current rate: {{ $value }}%"
+      
+      # Alerta de tempo de diagnóstico muito alto
+      - alert: SlowDiagnostics
+        expr: histogram_quantile(0.95, rate(techze_diagnostic_duration_seconds_bucket[5m])) > 30
+        for: 5m
+        labels:
+          severity: warning
+          service: techze-diagnostic
+          type: business
+        annotations:
+          summary: "Slow diagnostic performance"
+          description: "95th percentile diagnostic time is above 30 seconds for more than 5 minutes. Current value: {{ $value }}s"
+      
+      # Alerta de muitos usuários conectados
+      - alert: HighUserLoad
+        expr: techze_connected_users > 100
+        for: 10m
+        labels:
+          severity: info
+          service: techze-diagnostic
+          type: business
+        annotations:
+          summary: "High user load"
+          description: "Number of connected users is above 100 for more than 10 minutes. Current count: {{ $value }}"

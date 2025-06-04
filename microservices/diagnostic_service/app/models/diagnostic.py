@@ -29,6 +29,8 @@ class Diagnostic(Base):
     memory_status: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     disk_status: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     network_status: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    antivirus_status: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    driver_status: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     
     # Métricas detalhadas
     cpu_usage: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
@@ -74,6 +76,8 @@ class Diagnostic(Base):
             "memory_status": self.memory_status,
             "disk_status": self.disk_status,
             "network_status": self.network_status,
+            "antivirus_status": self.antivirus_status,
+            "driver_status": self.driver_status,
             "cpu_usage": self.cpu_usage,
             "cpu_temperature": self.cpu_temperature,
             "memory_usage": self.memory_usage,

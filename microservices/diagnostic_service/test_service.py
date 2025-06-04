@@ -13,7 +13,7 @@ from datetime import datetime
 # Adiciona o diretório do app ao path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'app'))
 
-from app.services.analyzers import CPUAnalyzer, MemoryAnalyzer, DiskAnalyzer, NetworkAnalyzer, AntivirusAnalyzer
+from app.services.analyzers import CPUAnalyzer, MemoryAnalyzer, DiskAnalyzer, NetworkAnalyzer, AntivirusAnalyzer, DriverAnalyzer
 from app.services.system_info_service import SystemInfoService
 
 # Configuração de logging
@@ -32,6 +32,7 @@ class DiagnosticTester:
         self.disk_analyzer = DiskAnalyzer()
         self.network_analyzer = NetworkAnalyzer()
         self.antivirus_analyzer = AntivirusAnalyzer()
+        self.driver_analyzer = DriverAnalyzer()
         self.system_info_service = SystemInfoService()
     
     async def test_all_analyzers(self):
@@ -51,11 +52,12 @@ class DiagnosticTester:
             disk_task = asyncio.create_task(self._test_disk_analyzer())
             network_task = asyncio.create_task(self._test_network_analyzer())
             antivirus_task = asyncio.create_task(self._test_antivirus_analyzer())
+            driver_task = asyncio.create_task(self._test_driver_analyzer())
             system_info_task = asyncio.create_task(self._test_system_info())
             
             # Aguarda todas as análises
-            cpu_result, memory_result, disk_result, network_result, antivirus_result, system_info = await asyncio.gather(
-                cpu_task, memory_task, disk_task, network_task, antivirus_task, system_info_task,
+            cpu_result, memory_result, disk_result, network_result, antivirus_result, driver_result, system_info = await asyncio.gather(
+                cpu_task, memory_task, disk_task, network_task, antivirus_task, driver_task, system_info_task,
                 return_exceptions=True
             )
             
@@ -66,6 +68,7 @@ class DiagnosticTester:
                 "disk": disk_result,
                 "network": network_result,
                 "antivirus": antivirus_result,
+                "drivers": driver_result,
                 "system_info": system_info
             }
             
@@ -145,6 +148,20 @@ class DiagnosticTester:
             print(f"❌ Erro no analisador de antivírus: {str(e)}")
             return {"status": "error", "error": str(e)}
     
+    async def _test_driver_analyzer(self):
+        """Testa o analisador de drivers."""
+        print("🔍 Testando analisador de drivers...")
+        try:
+            result = await asyncio.to_thread(self.driver_analyzer.analyze)
+            total_drivers = result.get('total_drivers', 0)
+            problematic = result.get('problematic_drivers', 0)
+            outdated = result.get('outdated_drivers', 0)
+            print(f"✅ Drivers: {result.get('status', 'unknown')} - Total: {total_drivers} - Problemáticos: {problematic} - Desatualizados: {outdated}")
+            return result
+        except Exception as e:
+            print(f"❌ Erro no analisador de drivers: {str(e)}")
+            return {"status": "error", "error": str(e)}
+    
     async def _test_system_info(self):
         """Testa a coleta de informações do sistema."""
         print("🔍 Testando coleta de informações do sistema...")
@@ -217,6 +234,17 @@ class DiagnosticTester:
                 scores.append(30)
             else:
                 scores.append(50)
+                
+            # Score dos Drivers
+            driver_status = results.get("drivers", {}).get("status", "error")
+            if driver_status == "healthy":
+                scores.append(100)
+            elif driver_status == "warning":
+                scores.append(70)
+            elif driver_status == "critical":
+                scores.append(30)
+            else:
+                scores.append(50)
             
             return int(sum(scores) / len(scores)) if scores else 50
             
@@ -254,7 +282,8 @@ class DiagnosticTester:
             ("Memória", results.get("memory", {}).get("status", "error")),
             ("Disco", results.get("disk", {}).get("status", "error")),
             ("Rede", results.get("network", {}).get("status", "error")),
-            ("Antivírus", results.get("antivirus", {}).get("status", "error"))
+            ("Antivírus", results.get("antivirus", {}).get("status", "error")),
+            ("Drivers", results.get("drivers", {}).get("status", "error"))
         ]
         
         for component, status in components:
@@ -300,4 +329,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    asyncio.run(main())
