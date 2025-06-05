@@ -38,7 +38,7 @@ class RiskLevel(str, Enum):
 class AutoFixRequest(BaseModel):
     """Solicitação de correção automática"""
     problem_type: AutoFixType
-    severity: str = Field(regex="^(low|medium|high|critical)$")
+    severity: str = Field(pattern="^(low|medium|high|critical)$")
     system_state: Dict[str, Any]
     parameters: Optional[Dict[str, Any]] = None
     safety_checks: bool = True
@@ -103,13 +103,13 @@ class WorkflowResponse(BaseModel):
 
 class OptimizationRequest(BaseModel):
     """Solicitação de otimização"""
-    optimization_type: str = Field(regex="^(performance|resource|cost|energy)$")
+    optimization_type: str = Field(pattern="^(performance|resource|cost|energy)$")
     target_resources: List[str]
     target_metrics: Dict[str, float]
     constraints: Optional[Dict[str, Any]] = None
     safety_mode: bool = True
     execute_immediately: bool = False
-    optimization_level: str = Field(default="moderate", regex="^(conservative|moderate|aggressive)$")
+    optimization_level: str = Field(default="moderate", pattern="^(conservative|moderate|aggressive)$")
 
 class OptimizationResponse(BaseModel):
     """Resposta de otimização"""
@@ -234,7 +234,7 @@ class AutomationPolicy(BaseModel):
     description: str
     scope: List[str]  # Components or systems affected
     rules: List[AutomationRule]
-    enforcement_level: str = Field(regex="^(advisory|enforced|strict)$")
+    enforcement_level: str = Field(pattern="^(advisory|enforced|strict)$")
     exceptions: List[Dict[str, Any]] = []
     effective_from: datetime
     expires_at: Optional[datetime] = None
@@ -260,7 +260,7 @@ class ProcessAutomationConfig(BaseModel):
     """Configuração de automação de processo"""
     config_id: str
     process_name: str
-    automation_level: str = Field(regex="^(manual|semi_auto|full_auto)$")
+    automation_level: str = Field(pattern="^(manual|semi_auto|full_auto)$")
     trigger_conditions: Dict[str, Any]
     automation_steps: List[Dict[str, Any]]
     approval_required: bool = False
@@ -317,8 +317,8 @@ class AutomationNotification(BaseModel):
     recipient: str
     subject: str
     message: str
-    priority: str = Field(regex="^(low|medium|high|urgent)$")
-    delivery_method: str = Field(regex="^(email|sms|webhook|in_app)$")
+    priority: str = Field(pattern="^(low|medium|high|urgent)$")
+    delivery_method: str = Field(pattern="^(email|sms|webhook|in_app)$")
     sent_at: Optional[datetime] = None
     delivered: bool = False
     read: bool = False
@@ -357,7 +357,7 @@ class AutomationCompliance(BaseModel):
     """Conformidade de automação"""
     compliance_id: str
     regulation_name: str
-    compliance_status: str = Field(regex="^(compliant|non_compliant|partial|unknown)$")
+    compliance_status: str = Field(pattern="^(compliant|non_compliant|partial|unknown)$")
     requirements: List[Dict[str, Any]]
     violations: List[Dict[str, Any]]
     remediation_actions: List[str]
@@ -402,7 +402,7 @@ class AutomationSLA(BaseModel):
     performance_target: Dict[str, float]
     current_availability: float
     current_performance: Dict[str, float]
-    sla_status: str = Field(regex="^(met|at_risk|breached)$")
+    sla_status: str = Field(pattern="^(met|at_risk|breached)$")
     breach_count: int
     last_breach: Optional[datetime] = None
     remediation_time: Optional[int] = None

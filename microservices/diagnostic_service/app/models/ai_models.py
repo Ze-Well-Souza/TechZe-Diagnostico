@@ -69,7 +69,7 @@ class PatternAnalysisRequest(BaseModel):
     system_data: Dict[str, Any]
     analysis_period: int = Field(default=30, description="Período de análise em dias")
     pattern_types: List[str] = ["seasonal", "trend", "cyclical", "irregular"]
-    granularity: str = Field(default="hour", regex="^(minute|hour|day|week)$")
+    granularity: str = Field(default="hour", pattern="^(minute|hour|day|week)$")
     min_pattern_strength: float = Field(default=0.7, ge=0.0, le=1.0)
 
 class PatternAnalysisResponse(BaseModel):
@@ -88,7 +88,7 @@ class RecommendationRequest(BaseModel):
     system_state: Dict[str, Any]
     user_preferences: Optional[Dict[str, Any]] = None
     context: str = Field(description="Contexto da recomendação")
-    priority_level: str = Field(default="medium", regex="^(low|medium|high|critical)$")
+    priority_level: str = Field(default="medium", pattern="^(low|medium|high|critical)$")
     max_recommendations: int = Field(default=5, ge=1, le=20)
 
 class RecommendationResponse(BaseModel):
@@ -118,7 +118,7 @@ class MLModelInfo(BaseModel):
 
 class TrainingRequest(BaseModel):
     """Solicitação de treinamento de modelo"""
-    model_type: str = Field(regex="^(predictive|anomaly|pattern|recommendation)$")
+    model_type: str = Field(pattern="^(predictive|anomaly|pattern|recommendation)$")
     training_data: List[Dict[str, Any]]
     model_parameters: Optional[Dict[str, Any]] = None
     validation_split: float = Field(default=0.2, ge=0.1, le=0.5)
@@ -196,7 +196,7 @@ class DataQualityReport(BaseModel):
 
 class AutoMLRequest(BaseModel):
     """Solicitação de AutoML"""
-    problem_type: str = Field(regex="^(classification|regression|clustering|forecasting)$")
+    problem_type: str = Field(pattern="^(classification|regression|clustering|forecasting)$")
     target_variable: str
     dataset: Dict[str, Any]
     max_training_time: int = Field(default=3600, description="Tempo máximo em segundos")

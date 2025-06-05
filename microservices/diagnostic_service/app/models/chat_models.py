@@ -148,7 +148,7 @@ class Tutorial(BaseModel):
     title: str
     description: str
     tutorial_type: TutorialType
-    difficulty_level: str = Field(regex="^(beginner|intermediate|advanced)$")
+    difficulty_level: str = Field(pattern="^(beginner|intermediate|advanced)$")
     estimated_duration: int  # minutes
     steps: List[Dict[str, Any]]
     prerequisites: List[str] = []
@@ -201,7 +201,7 @@ class ChatFeedback(BaseModel):
     message_id: Optional[str] = None
     rating: int = Field(ge=1, le=5)
     feedback_text: Optional[str] = None
-    feedback_type: str = Field(regex="^(helpful|not_helpful|incorrect|other)$")
+    feedback_type: str = Field(pattern="^(helpful|not_helpful|incorrect|other)$")
     user_id: str
     submitted_at: datetime
 
@@ -281,7 +281,7 @@ class ChatAlert(BaseModel):
     """Alerta do chat"""
     alert_id: str
     alert_type: str
-    severity: str = Field(regex="^(info|warning|error|critical)$")
+    severity: str = Field(pattern="^(info|warning|error|critical)$")
     message: str
     session_id: Optional[str] = None
     triggered_at: datetime
@@ -317,7 +317,7 @@ class ChatPersonalization(BaseModel):
     preferences: Dict[str, Any]
     conversation_style: str
     topics_of_interest: List[str]
-    skill_level: str = Field(regex="^(beginner|intermediate|advanced|expert)$")
+    skill_level: str = Field(pattern="^(beginner|intermediate|advanced|expert)$")
     language: str = "pt-BR"
     notification_settings: Dict[str, bool] = {}
     last_updated: datetime
@@ -338,8 +338,8 @@ class ChatEscalation(BaseModel):
     escalation_id: str
     session_id: str
     reason: str
-    escalation_type: str = Field(regex="^(human_agent|specialist|supervisor)$")
-    priority: str = Field(regex="^(low|medium|high|urgent)$")
+    escalation_type: str = Field(pattern="^(human_agent|specialist|supervisor)$")
+    priority: str = Field(pattern="^(low|medium|high|urgent)$")
     created_at: datetime
     assigned_to: Optional[str] = None
     resolved: bool = False
@@ -355,7 +355,7 @@ class ChatTraining(BaseModel):
     started_at: datetime
     completed_at: Optional[datetime] = None
     accuracy_score: Optional[float] = None
-    status: str = Field(regex="^(pending|running|completed|failed)$")
+    status: str = Field(pattern="^(pending|running|completed|failed)$")
 
 class ChatModel(BaseModel):
     """Modelo do chat"""
@@ -375,7 +375,7 @@ class ChatExport(BaseModel):
     export_type: str  # conversation, analytics, feedback
     session_ids: List[str]
     date_range: Dict[str, datetime]
-    format: str = Field(regex="^(json|csv|pdf|txt)$")
+    format: str = Field(pattern="^(json|csv|pdf|txt)$")
     file_path: str
     created_at: datetime
     expires_at: datetime
@@ -387,8 +387,8 @@ class ChatNotification(BaseModel):
     recipient: str
     subject: str
     message: str
-    priority: str = Field(regex="^(low|medium|high|urgent)$")
-    delivery_method: str = Field(regex="^(email|sms|push|in_app)$")
+    priority: str = Field(pattern="^(low|medium|high|urgent)$")
+    delivery_method: str = Field(pattern="^(email|sms|push|in_app)$")
     sent_at: Optional[datetime] = None
     delivered: bool = False
     read: bool = False
@@ -396,7 +396,7 @@ class ChatNotification(BaseModel):
 class ChatSecurity(BaseModel):
     """Segurança do chat"""
     session_id: str
-    security_level: str = Field(regex="^(low|medium|high|maximum)$")
+    security_level: str = Field(pattern="^(low|medium|high|maximum)$")
     encryption_enabled: bool = True
     data_retention_days: int = 90
     pii_detected: bool = False
@@ -435,7 +435,7 @@ class ChatMemory(BaseModel):
     """Memória do chat"""
     memory_id: str
     session_id: str
-    memory_type: str = Field(regex="^(short_term|long_term|episodic|semantic)$")
+    memory_type: str = Field(pattern="^(short_term|long_term|episodic|semantic)$")
     content: Dict[str, Any]
     importance_score: float = Field(ge=0.0, le=1.0)
     created_at: datetime

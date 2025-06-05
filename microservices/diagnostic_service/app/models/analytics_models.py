@@ -40,7 +40,7 @@ class AnalyticsRequest(BaseModel):
     time_range: Dict[str, datetime]
     filters: Optional[Dict[str, Any]] = None
     aggregation: AggregationType = AggregationType.AVG
-    granularity: str = Field(default="hour", regex="^(minute|hour|day|week|month)$")
+    granularity: str = Field(default="hour", pattern="^(minute|hour|day|week|month)$")
     include_predictions: bool = False
 
 class AnalyticsResponse(BaseModel):
@@ -64,7 +64,7 @@ class ReportRequest(BaseModel):
     components: List[str] = []
     metrics: List[str] = []
     custom_parameters: Optional[Dict[str, Any]] = None
-    format: str = Field(default="json", regex="^(json|pdf|excel|csv)$")
+    format: str = Field(default="json", pattern="^(json|pdf|excel|csv)$")
     email_delivery: bool = False
     email_recipients: List[str] = []
     schedule: Optional[str] = None  # Cron expression
@@ -218,7 +218,7 @@ class Alert(BaseModel):
     metric_name: str
     condition: str  # >, <, ==, !=, etc.
     threshold: float
-    severity: str = Field(regex="^(info|warning|critical)$")
+    severity: str = Field(pattern="^(info|warning|critical)$")
     enabled: bool = True
     notification_channels: List[str]
     created_at: datetime
@@ -251,7 +251,7 @@ class AnalyticsJob(BaseModel):
     """Job de analytics"""
     job_id: str
     job_type: str
-    status: str = Field(regex="^(pending|running|completed|failed|cancelled)$")
+    status: str = Field(pattern="^(pending|running|completed|failed|cancelled)$")
     progress: float = Field(ge=0.0, le=1.0)
     created_at: datetime
     started_at: Optional[datetime] = None
@@ -331,7 +331,7 @@ class Anomaly(BaseModel):
     actual_value: float
     expected_value: float
     deviation_score: float
-    severity: str = Field(regex="^(low|medium|high|critical)$")
+    severity: str = Field(pattern="^(low|medium|high|critical)$")
     description: str
     root_cause: Optional[str] = None
     resolved: bool = False
@@ -345,7 +345,7 @@ class BusinessMetric(BaseModel):
     target_value: Optional[float] = None
     current_value: float
     trend: str  # up, down, stable
-    impact_level: str = Field(regex="^(low|medium|high|critical)$")
+    impact_level: str = Field(pattern="^(low|medium|high|critical)$")
     owner: str
     last_updated: datetime
 
@@ -358,7 +358,7 @@ class KPI(BaseModel):
     current_value: float
     previous_value: float
     change_percentage: float
-    status: str = Field(regex="^(on_track|at_risk|off_track)$")
+    status: str = Field(pattern="^(on_track|at_risk|off_track)$")
     measurement_unit: str
     frequency: str  # daily, weekly, monthly
     owner: str
@@ -368,7 +368,7 @@ class AnalyticsExport(BaseModel):
     """Exportação de analytics"""
     export_id: str
     export_type: str  # report, dashboard, dataset
-    format: str = Field(regex="^(pdf|excel|csv|json|png)$")
+    format: str = Field(pattern="^(pdf|excel|csv|json|png)$")
     file_path: str
     file_size: int
     created_at: datetime
@@ -403,7 +403,7 @@ class UserAnalytics(BaseModel):
 class SystemHealth(BaseModel):
     """Saúde do sistema"""
     component: str
-    status: str = Field(regex="^(healthy|warning|critical|unknown)$")
+    status: str = Field(pattern="^(healthy|warning|critical|unknown)$")
     uptime_percentage: float
     response_time_avg: float
     error_rate: float
@@ -443,7 +443,7 @@ class AnalyticsInsight(BaseModel):
     insight_type: str
     title: str
     description: str
-    impact_level: str = Field(regex="^(low|medium|high|critical)$")
+    impact_level: str = Field(pattern="^(low|medium|high|critical)$")
     confidence: float = Field(ge=0.0, le=1.0)
     supporting_data: Dict[str, Any]
     recommended_actions: List[str]
@@ -469,7 +469,7 @@ class AnalyticsSubscription(BaseModel):
     user_id: str
     report_type: str
     frequency: str  # daily, weekly, monthly
-    delivery_method: str = Field(regex="^(email|webhook|dashboard)$")
+    delivery_method: str = Field(pattern="^(email|webhook|dashboard)$")
     filters: Dict[str, Any] = {}
     enabled: bool = True
     last_delivery: Optional[datetime] = None

@@ -90,8 +90,8 @@ async def get_system_metrics(
     metric_types: List[str] = Query(...),
     start_date: datetime = Query(...),
     end_date: datetime = Query(...),
-    granularity: str = Query("hour", regex="^(minute|hour|day|week|month)$"),
-    aggregation: str = Query("avg", regex="^(avg|sum|min|max|count)$")
+    granularity: str = Query("hour", pattern="^(minute|hour|day|week|month)$"),
+    aggregation: str = Query("avg", pattern="^(avg|sum|min|max|count)$")
 ) -> MetricsResponse:
     """
     Obtém métricas do sistema com agregação personalizada
@@ -155,7 +155,7 @@ async def analyze_trends(
     metric_name: str,
     period_days: int = Query(30, ge=1, le=365),
     comparison_period: Optional[int] = Query(None, ge=1, le=365),
-    trend_type: str = Query("linear", regex="^(linear|polynomial|seasonal)$")
+    trend_type: str = Query("linear", pattern="^(linear|polynomial|seasonal)$")
 ) -> TrendAnalysis:
     """
     Analisa tendências de uma métrica específica
@@ -285,7 +285,7 @@ async def get_performance_report(
 @router.get("/usage-statistics", response_model=UsageStatistics)
 async def get_usage_statistics(
     period_days: int = Query(30, ge=1, le=365),
-    breakdown_by: str = Query("day", regex="^(hour|day|week|month)$"),
+    breakdown_by: str = Query("day", pattern="^(hour|day|week|month)$"),
     include_user_analytics: bool = True
 ) -> UsageStatistics:
     """
@@ -442,7 +442,7 @@ async def create_custom_dashboard(
 @router.get("/export/{report_id}")
 async def export_report(
     report_id: str,
-    format: str = Query("pdf", regex="^(pdf|excel|csv|json)$")
+    format: str = Query("pdf", pattern="^(pdf|excel|csv|json)$")
 ) -> Dict[str, Any]:
     """
     Exporta relatório em formato específico
