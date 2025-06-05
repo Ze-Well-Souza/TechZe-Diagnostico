@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <!-- Fundo com preenchimento completo para ícone maskable -->
-  <rect width="512" height="512" fill="#4f46e5"/>
-  <!-- Conteúdo centralizado com margem de segurança para área visível -->
-  <g transform="translate(64, 64) scale(0.75)">
-    <text x="256" y="256" font-size="220" text-anchor="middle" dominant-baseline="middle" fill="white" font-family="Arial, sans-serif" font-weight="bold">TZ</text>
-    <path d="M256 150 L356 250 L256 350 L156 250 Z" fill="white" opacity="0.2"/>
-  </g>
-</svg>

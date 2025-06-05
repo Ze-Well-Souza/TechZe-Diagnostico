@@ -1,6 +1,10 @@
 
 import { createRoot } from 'react-dom/client'
-import App from '../frontend-v3/src/App.tsx'
-import '../frontend-v3/src/index.css'
+import App from './App.tsx'
+import './index.css'
+import { registerServiceWorker } from './registerSW'
+
+// Registra o service worker
+registerServiceWorker()
 
 createRoot(document.getElementById("root")!).render(<App />);
