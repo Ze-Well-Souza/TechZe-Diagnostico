@@ -63,10 +63,10 @@ TechZe-Diagnostico/
 
 ## 📚 Documentação
 
+- [`DOCUMENTACAO_CONSOLIDADA.md`](DOCUMENTACAO_CONSOLIDADA.md) - Documentação completa do projeto
 - [`docs/COMECE_AQUI.md`](docs/COMECE_AQUI.md) - Início rápido
 - [`docs/INSTRUCOES_RAPIDAS.md`](docs/INSTRUCOES_RAPIDAS.md) - Comandos essenciais
 - [`docs/STATUS_FINAL.md`](docs/STATUS_FINAL.md) - Status da implementação
-- [`ANALISE_PROJETO_LIMPO.md`](ANALISE_PROJETO_LIMPO.md) - Análise técnica completa
 
 ## 🛠️ Tecnologias
 

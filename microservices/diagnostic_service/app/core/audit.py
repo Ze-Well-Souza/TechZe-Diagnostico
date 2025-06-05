@@ -615,7 +615,7 @@ class AuditService:
             
             if hasattr(result, 'error') and result.error:
                 logger.error(f"Erro no fallback de busca de auditoria: {result.error}")
-        return []
+                return []
             
             return result.data if hasattr(result, 'data') else []
         except Exception as e:
