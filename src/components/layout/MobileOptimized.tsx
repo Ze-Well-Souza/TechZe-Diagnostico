@@ -1,62 +1,88 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { Bars3Icon, XMarkIcon, BellIcon, CogIcon } from '@heroicons/react/24/outline'
+import React, { useState, useEffect, useCallback, memo } from 'react';
+import { useIsMobile } from '../../hooks/use-mobile';
+import { useInstallPWA } from '../../hooks/useInstallPWA';
+import { useOfflineStatus } from '../../hooks/useOfflineStatus';
+import { usePWAOptimization } from '../../hooks/usePWAOptimization';
 
 interface MobileOptimizedProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 interface NotificationBadge {
-  count: number
-  hasUnread: boolean
+  count: number;
+  hasUnread: boolean;
 }
 
-export default function MobileOptimized({ children }: MobileOptimizedProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
+/**
+ * Componente que otimiza a interface para dispositivos móveis
+ * Inclui detecção de teclado, orientação, pull-to-refresh e navegação adaptativa
+ * Utiliza o hook usePWAOptimization para implementar otimizações avançadas de desempenho
+ */
+const MobileOptimized = memo(({ children }: MobileOptimizedProps) => {
+  const isMobile = useIsMobile();
+  const { isOnline } = useOfflineStatus();
+  const { isInstallable, promptInstall } = useInstallPWA();
+  const { isLowEndDevice, metrics, applyMobileOptimizations } = usePWAOptimization({
+    prefetchAssets: true,
+    lazyLoadImages: true,
+    monitorPerformance: true,
+    cacheFirstStrategy: true
+  });
+  
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [notificationBadge, setNotificationBadge] = useState<NotificationBadge>({
     count: 0,
     hasUnread: false
-  })
-  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait')
-  const [isStandalone, setIsStandalone] = useState(false)
+  });
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
+  const [isStandalone, setIsStandalone] = useState(false);
+
+  // Aplicar otimizações mobile
+  useEffect(() => {
+    if (isMobile) {
+      const cleanup = applyMobileOptimizations();
+      return cleanup;
+    }
+  }, [isMobile, applyMobileOptimizations]);
 
   // Detectar modo PWA standalone
   useEffect(() => {
     const isStandalonePWA = window.matchMedia('(display-mode: standalone)').matches ||
                            (window.navigator as any).standalone ||
-                           document.referrer.includes('android-app://')
-    setIsStandalone(isStandalonePWA)
-  }, [])
+                           document.referrer.includes('android-app://');
+    setIsStandalone(isStandalonePWA);
+  }, []);
 
   // Detectar orientação
   useEffect(() => {
     const updateOrientation = () => {
-      setOrientation(window.innerHeight > window.innerWidth ? 'portrait' : 'landscape')
-    }
+      setOrientation(window.innerHeight > window.innerWidth ? 'portrait' : 'landscape');
+    };
 
-    updateOrientation()
-    window.addEventListener('resize', updateOrientation)
-    window.addEventListener('orientationchange', updateOrientation)
+    updateOrientation();
+    window.addEventListener('resize', updateOrientation, { passive: true });
+    window.addEventListener('orientationchange', updateOrientation, { passive: true });
 
     return () => {
-      window.removeEventListener('resize', updateOrientation)
-      window.removeEventListener('orientationchange', updateOrientation)
-    }
-  }, [])
+      window.removeEventListener('resize', updateOrientation);
+      window.removeEventListener('orientationchange', updateOrientation);
+    };
+  }, []);
 
   // Detectar teclado virtual
   useEffect(() => {
     const handleResize = () => {
-      const viewportHeight = window.visualViewport?.height || window.innerHeight
-      const windowHeight = window.innerHeight
-      setIsKeyboardVisible(viewportHeight < windowHeight * 0.8)
-    }
+      const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      const windowHeight = window.innerHeight;
+      setIsKeyboardVisible(viewportHeight < windowHeight * 0.8);
+    };
 
     if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleResize)
-      return () => window.visualViewport?.removeEventListener('resize', handleResize)
+      window.visualViewport.addEventListener('resize', handleResize, { passive: true });
+      return () => window.visualViewport?.removeEventListener('resize', handleResize);
     }
-  }, [])
+  }, []);
 
   // Gestão de notificações
   useEffect(() => {
@@ -65,54 +91,59 @@ export default function MobileOptimized({ children }: MobileOptimizedProps) {
       setNotificationBadge({
         count: Math.floor(Math.random() * 10),
         hasUnread: Math.random() > 0.5
-      })
-    }
+      });
+    };
 
-    updateNotifications()
-    const interval = setInterval(updateNotifications, 30000) // Update every 30s
+    updateNotifications();
+    const interval = setInterval(updateNotifications, 30000); // Update every 30s
 
-    return () => clearInterval(interval)
-  }, [])
+    return () => clearInterval(interval);
+  }, []);
 
   // Fechar menu ao clicar fora
   const handleMenuToggle = useCallback(() => {
-    setIsMenuOpen(!isMenuOpen)
-  }, [isMenuOpen])
+    setIsMenuOpen(!isMenuOpen);
+  }, [isMenuOpen]);
 
   // Haptic feedback para PWA
   const triggerHapticFeedback = useCallback(() => {
     if ('vibrate' in navigator) {
-      navigator.vibrate(50) // Vibração leve de 50ms
+      navigator.vibrate(50); // Vibração leve de 50ms
     }
-  }, [])
+  }, []);
 
   // Pull-to-refresh gesture
-  const [pullDistance, setPullDistance] = useState(0)
-  const [isPulling, setIsPulling] = useState(false)
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isPulling, setIsPulling] = useState(false);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (window.scrollY === 0) {
-      setIsPulling(true)
+      setIsPulling(true);
     }
-  }, [])
+  }, []);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (isPulling && window.scrollY === 0) {
-      const touch = e.touches[0]
-      const distance = Math.max(0, touch.clientY - 50)
-      setPullDistance(Math.min(distance, 100))
+      const touch = e.touches[0];
+      const distance = Math.max(0, touch.clientY - 50);
+      setPullDistance(Math.min(distance, 100));
     }
-  }, [isPulling])
+  }, [isPulling]);
 
   const handleTouchEnd = useCallback(() => {
     if (isPulling && pullDistance > 60) {
-      triggerHapticFeedback()
+      triggerHapticFeedback();
       // Trigger refresh
-      window.location.reload()
+      window.location.reload();
     }
-    setIsPulling(false)
-    setPullDistance(0)
-  }, [isPulling, pullDistance, triggerHapticFeedback])
+    setIsPulling(false);
+    setPullDistance(0);
+  }, [isPulling, pullDistance, triggerHapticFeedback]);
+
+  // Se não for mobile, apenas renderiza o conteúdo sem otimizações
+  if (!isMobile) {
+    return <>{children}</>;
+  }
 
   return (
     <div 
@@ -121,11 +152,22 @@ export default function MobileOptimized({ children }: MobileOptimizedProps) {
         ${isStandalone ? 'pt-safe-top pb-safe-bottom' : ''}
         ${orientation === 'landscape' ? 'landscape-mode' : 'portrait-mode'}
         ${isKeyboardVisible ? 'keyboard-visible' : ''}
+        ${isLowEndDevice ? 'low-end-device reduce-motion' : ''}
       `}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
+      {/* Performance metrics debug (apenas em desenvolvimento) */}
+      {process.env.NODE_ENV === 'development' && metrics.lcp && (
+        <div className="fixed bottom-24 right-2 bg-black bg-opacity-70 text-white text-xs p-2 rounded z-50">
+          <div>FCP: {metrics.fcp ? `${Math.round(metrics.fcp)}ms` : 'N/A'}</div>
+          <div>LCP: {metrics.lcp ? `${Math.round(metrics.lcp)}ms` : 'N/A'}</div>
+          <div>FID: {metrics.fid ? `${Math.round(metrics.fid)}ms` : 'N/A'}</div>
+          <div>CLS: {metrics.cls?.toFixed(3) || 'N/A'}</div>
+        </div>
+      )}
+
       {/* Pull to refresh indicator */}
       {isPulling && (
         <div 
@@ -153,17 +195,21 @@ export default function MobileOptimized({ children }: MobileOptimizedProps) {
           {/* Menu Toggle */}
           <button
             onClick={() => {
-              handleMenuToggle()
-              triggerHapticFeedback()
+              handleMenuToggle();
+              triggerHapticFeedback();
             }}
-            className="p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-optimized"
             data-testid="mobile-menu-button"
             aria-label="Abrir menu"
           >
             {isMenuOpen ? (
-              <XMarkIcon className="h-6 w-6" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             ) : (
-              <Bars3Icon className="h-6 w-6" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
             )}
           </button>
 
@@ -177,11 +223,13 @@ export default function MobileOptimized({ children }: MobileOptimizedProps) {
           {/* Notifications */}
           <div className="flex items-center space-x-2">
             <button
-              className="relative p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="relative p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-optimized"
               onClick={triggerHapticFeedback}
               aria-label="Notificações"
             >
-              <BellIcon className="h-6 w-6" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
               {notificationBadge.hasUnread && (
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full animate-pulse" />
               )}
@@ -193,11 +241,14 @@ export default function MobileOptimized({ children }: MobileOptimizedProps) {
             </button>
 
             <button
-              className="p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-optimized"
               onClick={triggerHapticFeedback}
               aria-label="Configurações"
             >
-              <CogIcon className="h-6 w-6" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
             </button>
           </div>
         </div>
@@ -234,10 +285,10 @@ export default function MobileOptimized({ children }: MobileOptimizedProps) {
               <a
                 key={item.name}
                 href={item.href}
-                className="flex items-center space-x-3 p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="flex items-center space-x-3 p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-optimized"
                 onClick={() => {
-                  setIsMenuOpen(false)
-                  triggerHapticFeedback()
+                  setIsMenuOpen(false);
+                  triggerHapticFeedback();
                 }}
               >
                 <span className="text-xl">{item.icon}</span>
@@ -245,6 +296,24 @@ export default function MobileOptimized({ children }: MobileOptimizedProps) {
               </a>
             ))}
           </div>
+
+          {/* Instalação do PWA */}
+          {isInstallable && (
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => {
+                  promptInstall();
+                  triggerHapticFeedback();
+                }}
+                className="w-full flex items-center justify-center space-x-2 p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors touch-optimized"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>Instalar Aplicativo</span>
+              </button>
+            </div>
+          )}
         </nav>
       </div>
 
@@ -276,7 +345,7 @@ export default function MobileOptimized({ children }: MobileOptimizedProps) {
               <a
                 key={item.name}
                 href={item.href}
-                className="flex flex-col items-center justify-center p-2 space-y-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="flex flex-col items-center justify-center p-2 space-y-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors touch-optimized"
                 onClick={triggerHapticFeedback}
               >
                 <span className="text-xl">{item.icon}</span>
@@ -286,8 +355,20 @@ export default function MobileOptimized({ children }: MobileOptimizedProps) {
           </div>
         </nav>
       )}
+
+      {/* Indicador de status offline */}
+      {!isOnline && (
+        <div className="fixed bottom-16 left-0 right-0 p-2 bg-yellow-500 text-white text-center z-40">
+          <div className="flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span className="font-medium">Você está offline. Algumas funcionalidades podem estar limitadas.</span>
+          </div>
+        </div>
+      )}
     </div>
-  )
+  );
 }
 
 // CSS adicional para safe areas e orientação
@@ -320,11 +401,22 @@ const mobileStyles = `
       min-width: 44px;
     }
   }
-`
+  
+  .reduce-motion * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+  
+  .low-end-device .animate-pulse {
+    animation: none;
+  }
+`;
 
 // Inject styles
 if (typeof document !== 'undefined') {
-  const styleSheet = document.createElement('style')
-  styleSheet.textContent = mobileStyles
-  document.head.appendChild(styleSheet)
-} 
+  const styleSheet = document.createElement('style');
+  styleSheet.textContent = mobileStyles;
+  document.head.appendChild(styleSheet);
+}
+
+export default MobileOptimized;
