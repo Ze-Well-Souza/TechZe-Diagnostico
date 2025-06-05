@@ -1,46 +1,55 @@
+
+// Comandos customizados para testes E2E
 /// <reference types="cypress" />
-
-// Comandos customizados para TechZe Diagnóstico
-// Este arquivo contém comandos reutilizáveis para os testes E2E
-
-// Comando para fazer login
-Cypress.Commands.add('login', (email: string, password: string) => {
-  cy.session([email, password], () => {
-    cy.visit('/login')
-    cy.get('[data-testid="email-input"]').type(email)
-    cy.get('[data-testid="password-input"]').type(password)
-    cy.get('[data-testid="login-button"]').click()
-    cy.url().should('not.include', '/login')
-  })
-})
-
-// Comando para navegar para dashboard
-Cypress.Commands.add('goToDashboard', () => {
-  cy.visit('/dashboard')
-  cy.get('[data-testid="dashboard-title"]').should('be.visible')
-})
-
-// Comando para testar responsividade
-Cypress.Commands.add('testResponsive', () => {
-  // Desktop
-  cy.viewport(1920, 1080)
-  cy.get('[data-testid="main-content"]').should('be.visible')
-  
-  // Tablet
-  cy.viewport(768, 1024)
-  cy.get('[data-testid="main-content"]').should('be.visible')
-  
-  // Mobile
-  cy.viewport(375, 667)
-  cy.get('[data-testid="main-content"]').should('be.visible')
-})
 
 declare global {
   namespace Cypress {
     interface Chainable {
       login(email: string, password: string): Chainable<void>
-      goToDashboard(): Chainable<void>
-      testResponsive(): Chainable<void>
+      logout(): Chainable<void>
+      createDevice(deviceData: any): Chainable<void>
+      runDiagnostic(deviceId: string): Chainable<void>
+      switchCompany(companyCode: string): Chainable<void>
     }
   }
-} 
+}
+
+// Login command
+Cypress.Commands.add('login', (email: string, password: string) => {
+  cy.session([email, password], () => {
+    cy.visit('/auth')
+    cy.get('[data-testid="email-input"]').type(email)
+    cy.get('[data-testid="password-input"]').type(password)
+    cy.get('[data-testid="login-button"]').click()
+    cy.url().should('include', '/dashboard')
+  })
+})
+
+// Logout command
+Cypress.Commands.add('logout', () => {
+  cy.get('[data-testid="user-menu"]').click()
+  cy.get('[data-testid="logout-button"]').click()
+  cy.url().should('include', '/')
+})
+
+// Create device command
+Cypress.Commands.add('createDevice', (deviceData) => {
+  cy.get('[data-testid="add-device-button"]').click()
+  cy.get('[data-testid="device-name-input"]').type(deviceData.name)
+  cy.get('[data-testid="device-type-select"]').select(deviceData.type)
+  cy.get('[data-testid="save-device-button"]').click()
+})
+
+// Run diagnostic command
+Cypress.Commands.add('runDiagnostic', (deviceId) => {
+  cy.get(`[data-testid="device-${deviceId}"]`).click()
+  cy.get('[data-testid="run-diagnostic-button"]').click()
+  cy.get('[data-testid="diagnostic-status"]').should('contain', 'completed')
+})
+
+// Switch company command  
+Cypress.Commands.add('switchCompany', (companyCode) => {
+  cy.get('[data-testid="company-switcher"]').click()
+  cy.get(`[data-testid="company-${companyCode}"]`).click()
+  cy.get('[data-testid="current-company"]').should('contain', companyCode)
+})
