@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useIsMobile } from '../../hooks/use-mobile';
 import { useInstallPWA } from '../../hooks/useInstallPWA';
@@ -369,54 +370,8 @@ const MobileOptimized = memo(({ children }: MobileOptimizedProps) => {
       )}
     </div>
   );
-}
+});
 
-// CSS adicional para safe areas e orientação
-const mobileStyles = `
-  .safe-top { padding-top: env(safe-area-inset-top); }
-  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-  .safe-left { padding-left: env(safe-area-inset-left); }
-  .safe-right { padding-right: env(safe-area-inset-right); }
-  
-  .pt-safe-top { padding-top: env(safe-area-inset-top); }
-  .pb-safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-  .h-safe-top { height: env(safe-area-inset-top); }
-  
-  .landscape-mode .bottom-nav { 
-    height: 60px; 
-  }
-  
-  .portrait-mode .bottom-nav { 
-    height: 80px; 
-  }
-  
-  .keyboard-visible {
-    height: 100vh;
-    overflow: hidden;
-  }
-  
-  @media (hover: none) and (pointer: coarse) {
-    .touch-optimized {
-      min-height: 44px;
-      min-width: 44px;
-    }
-  }
-  
-  .reduce-motion * {
-    animation-duration: 0.001ms !important;
-    transition-duration: 0.001ms !important;
-  }
-  
-  .low-end-device .animate-pulse {
-    animation: none;
-  }
-`;
-
-// Inject styles
-if (typeof document !== 'undefined') {
-  const styleSheet = document.createElement('style');
-  styleSheet.textContent = mobileStyles;
-  document.head.appendChild(styleSheet);
-}
+MobileOptimized.displayName = 'MobileOptimized';
 
 export default MobileOptimized;
