@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """
-Sistema de Monitoramento Avan√ßado - Semana 2
-Implementa dashboards, alertas e m√©tricas avan√ßadas
+Sistema de Monitoramento Avançado - Semana 2
+Implementa dashboards, alertas e métricas avançadas
 """
 import asyncio
 import json
@@ -17,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class AlertSeverity(Enum):
-    """N√≠veis de severidade de alertas"""
+    """Níveis de severidade de alertas"""
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -50,7 +49,7 @@ class Alert:
     resolved_at: Optional[datetime] = None
     
     def to_dict(self) -> Dict:
-        """Converte para dicion√°rio"""
+        """Converte para dicionário"""
         data = asdict(self)
         data['timestamp'] = self.timestamp.isoformat()
         data['resolved_at'] = self.resolved_at.isoformat() if self.resolved_at else None
@@ -60,21 +59,21 @@ class Alert:
 
 
 class MetricsCollector:
-    """Coletor avan√ßado de m√©tricas"""
+    """Coletor avançado de métricas"""
     
     def __init__(self):
         self.metrics_history = []
         self.max_history = 1000
         
     async def collect_system_metrics(self) -> Dict[str, Any]:
-        """Coleta m√©tricas detalhadas do sistema"""
+        """Coleta métricas detalhadas do sistema"""
         try:
             # CPU
             cpu_percent = psutil.cpu_percent(interval=1)
             cpu_count = psutil.cpu_count()
             cpu_freq = psutil.cpu_freq()
             
-            # Mem√≥ria
+            # Memória
             memory = psutil.virtual_memory()
             swap = psutil.swap_memory()
             
@@ -139,7 +138,7 @@ class MetricsCollector:
                 }
             }
             
-            # Adiciona ao hist√≥rico
+            # Adiciona ao histórico
             self.metrics_history.append(metrics)
             if len(self.metrics_history) > self.max_history:
                 self.metrics_history.pop(0)
@@ -147,21 +146,21 @@ class MetricsCollector:
             return metrics
             
         except Exception as e:
-            logger.error(f"Erro ao coletar m√©tricas do sistema: {e}")
+            logger.error(f"Erro ao coletar métricas do sistema: {e}")
             return {}
     
     async def collect_application_metrics(self) -> Dict[str, Any]:
-        """Coleta m√©tricas espec√≠ficas da aplica√ß√£o"""
+        """Coleta métricas específicas da aplicação"""
         try:
-            # Simula m√©tricas da aplica√ß√£o
-            # Em produ√ß√£o, isso viria do Prometheus ou outras fontes
+            # Simula métricas da aplicação
+            # Em produção, isso viria do Prometheus ou outras fontes
             
             metrics = {
                 "timestamp": datetime.now().isoformat(),
                 "requests": {
-                    "total": 1000,  # Total de requisi√ß√µes
-                    "rate": 10.5,   # Requisi√ß√µes por segundo
-                    "errors": 5,    # N√∫mero de erros
+                    "total": 1000,  # Total de requisições
+                    "rate": 10.5,   # Requisições por segundo
+                    "errors": 5,    # Número de erros
                     "error_rate": 0.5  # Taxa de erro em %
                 },
                 "diagnostics": {
@@ -185,11 +184,11 @@ class MetricsCollector:
             return metrics
             
         except Exception as e:
-            logger.error(f"Erro ao coletar m√©tricas da aplica√ß√£o: {e}")
+            logger.error(f"Erro ao coletar métricas da aplicação: {e}")
             return {}
     
     def get_metrics_history(self, minutes: int = 60) -> List[Dict[str, Any]]:
-        """Retorna hist√≥rico de m√©tricas dos √∫ltimos N minutos"""
+        """Retorna histórico de métricas dos últimos N minutos"""
         cutoff_time = datetime.now() - timedelta(minutes=minutes)
         
         return [
@@ -199,7 +198,7 @@ class MetricsCollector:
 
 
 class AlertManager:
-    """Gerenciador avan√ßado de alertas"""
+    """Gerenciador avançado de alertas"""
     
     def __init__(self):
         self.alerts = []
@@ -207,7 +206,7 @@ class AlertManager:
         self.notification_channels = []
         
     def _load_default_rules(self) -> List[Dict]:
-        """Carrega regras de alerta padr√£o"""
+        """Carrega regras de alerta padrão"""
         return [
             {
                 "name": "high_cpu_usage",
@@ -225,7 +224,7 @@ class AlertManager:
                 "operator": ">",
                 "severity": AlertSeverity.HIGH,
                 "type": AlertType.RESOURCE,
-                "description": "Uso de mem√≥ria acima de 85%"
+                "description": "Uso de memória acima de 85%"
             },
             {
                 "name": "low_disk_space",
@@ -234,7 +233,7 @@ class AlertManager:
                 "operator": ">",
                 "severity": AlertSeverity.CRITICAL,
                 "type": AlertType.RESOURCE,
-                "description": "Espa√ßo em disco abaixo de 10%"
+                "description": "Espaço em disco abaixo de 10%"
             },
             {
                 "name": "high_error_rate",
@@ -252,12 +251,12 @@ class AlertManager:
                 "operator": "<",
                 "severity": AlertSeverity.MEDIUM,
                 "type": AlertType.BUSINESS,
-                "description": "Taxa de sucesso de diagn√≥sticos abaixo de 95%"
+                "description": "Taxa de sucesso de diagnósticos abaixo de 95%"
             }
         ]
     
     def _get_nested_value(self, data: Dict, path: str) -> Optional[float]:
-        """Obt√©m valor aninhado usando nota√ß√£o de ponto"""
+        """Obtém valor aninhado usando notação de ponto"""
         try:
             keys = path.split('.')
             value = data
@@ -281,7 +280,7 @@ class AlertManager:
                 threshold = rule["threshold"]
                 operator = rule["operator"]
                 
-                # Verifica condi√ß√£o
+                # Verifica condição
                 triggered = False
                 if operator == ">" and current_value > threshold:
                     triggered = True
@@ -307,7 +306,7 @@ class AlertManager:
                     new_alerts.append(alert)
                     self.alerts.append(alert)
                     
-                    logger.warning(f"üö® Alerta disparado: {alert.title}")
+                    logger.warning(f"🚨 Alerta disparado: {alert.title}")
                     
             except Exception as e:
                 logger.error(f"Erro ao verificar regra {rule['name']}: {e}")
@@ -315,7 +314,7 @@ class AlertManager:
         return new_alerts
     
     def get_active_alerts(self) -> List[Alert]:
-        """Retorna alertas ativos (n√£o resolvidos)"""
+        """Retorna alertas ativos (não resolvidos)"""
         return [alert for alert in self.alerts if not alert.resolved]
     
     def resolve_alert(self, alert_id: str) -> bool:
@@ -324,7 +323,7 @@ class AlertManager:
             if alert.id == alert_id and not alert.resolved:
                 alert.resolved = True
                 alert.resolved_at = datetime.now()
-                logger.info(f"‚úÖ Alerta resolvido: {alert.title}")
+                logger.info(f"✅ Alerta resolvido: {alert.title}")
                 return True
         return False
     
@@ -354,7 +353,7 @@ class AlertManager:
 
 
 class DashboardGenerator:
-    """Gerador de dashboards din√¢micos"""
+    """Gerador de dashboards dinâmicos"""
     
     def __init__(self, metrics_collector: MetricsCollector, alert_manager: AlertManager):
         self.metrics_collector = metrics_collector
@@ -363,11 +362,11 @@ class DashboardGenerator:
     async def generate_operational_dashboard(self) -> Dict[str, Any]:
         """Gera dashboard operacional"""
         try:
-            # Coleta m√©tricas atuais
+            # Coleta métricas atuais
             system_metrics = await self.metrics_collector.collect_system_metrics()
             app_metrics = await self.metrics_collector.collect_application_metrics()
             
-            # Hist√≥rico de m√©tricas
+            # Histórico de métricas
             history = self.metrics_collector.get_metrics_history(60)
             
             # Resumo de alertas
@@ -379,7 +378,7 @@ class DashboardGenerator:
                 "refresh_interval": 30,
                 "sections": {
                     "overview": {
-                        "title": "Vis√£o Geral",
+                        "title": "Visão Geral",
                         "widgets": [
                             {
                                 "type": "metric",
@@ -447,14 +446,14 @@ class DashboardGenerator:
             return {"error": str(e)}
     
     async def generate_security_dashboard(self) -> Dict[str, Any]:
-        """Gera dashboard de seguran√ßa"""
+        """Gera dashboard de segurança"""
         try:
             dashboard = {
-                "title": "Dashboard de Seguran√ßa - TechZe",
+                "title": "Dashboard de Segurança - TechZe",
                 "generated_at": datetime.now().isoformat(),
                 "sections": {
                     "authentication": {
-                        "title": "Autentica√ß√£o",
+                        "title": "Autenticação",
                         "widgets": [
                             {
                                 "type": "metric",
@@ -489,7 +488,7 @@ class DashboardGenerator:
                         ]
                     },
                     "security_events": {
-                        "title": "Eventos de Seguran√ßa",
+                        "title": "Eventos de Segurança",
                         "widgets": [
                             {
                                 "type": "list",
@@ -511,7 +510,7 @@ class DashboardGenerator:
             return dashboard
             
         except Exception as e:
-            logger.error(f"Erro ao gerar dashboard de seguran√ßa: {e}")
+            logger.error(f"Erro ao gerar dashboard de segurança: {e}")
             return {"error": str(e)}
     
     def _get_status(self, value: float, warning_threshold: float, critical_threshold: float) -> str:
@@ -524,10 +523,10 @@ class DashboardGenerator:
             return "healthy"
     
     def _extract_time_series(self, history: List[Dict], metric_path: str) -> List[Dict]:
-        """Extrai s√©rie temporal de uma m√©trica"""
+        """Extrai série temporal de uma métrica"""
         try:
             time_series = []
-            for entry in history[-20:]:  # √öltimos 20 pontos
+            for entry in history[-20:]:  # Últimos 20 pontos
                 value = self._get_nested_value(entry, metric_path)
                 if value is not None:
                     time_series.append({
@@ -539,7 +538,7 @@ class DashboardGenerator:
             return []
     
     def _get_nested_value(self, data: Dict, path: str) -> Optional[float]:
-        """Obt√©m valor aninhado usando nota√ß√£o de ponto"""
+        """Obtém valor aninhado usando notação de ponto"""
         try:
             keys = path.split('.')
             value = data
@@ -551,7 +550,7 @@ class DashboardGenerator:
 
 
 class AdvancedMonitoringService:
-    """Servi√ßo principal de monitoramento avan√ßado"""
+    """Serviço principal de monitoramento avançado"""
     
     def __init__(self):
         self.metrics_collector = MetricsCollector()
@@ -561,17 +560,17 @@ class AdvancedMonitoringService:
         self.monitoring_task = None
     
     async def start_monitoring(self, interval: int = 30):
-        """Inicia monitoramento cont√≠nuo"""
+        """Inicia monitoramento contínuo"""
         if self.monitoring_active:
-            logger.warning("Monitoramento j√° est√° ativo")
+            logger.warning("Monitoramento já está ativo")
             return
         
         self.monitoring_active = True
         self.monitoring_task = asyncio.create_task(self._monitoring_loop(interval))
-        logger.info(f"üîç Monitoramento avan√ßado iniciado (intervalo: {interval}s)")
+        logger.info(f"🔍 Monitoramento avançado iniciado (intervalo: {interval}s)")
     
     async def stop_monitoring(self):
-        """Para monitoramento cont√≠nuo"""
+        """Para monitoramento contínuo"""
         if not self.monitoring_active:
             return
         
@@ -583,13 +582,13 @@ class AdvancedMonitoringService:
             except asyncio.CancelledError:
                 pass
         
-        logger.info("üõë Monitoramento avan√ßado parado")
+        logger.info("🛑 Monitoramento avançado parado")
     
     async def _monitoring_loop(self, interval: int):
         """Loop principal de monitoramento"""
         while self.monitoring_active:
             try:
-                # Coleta m√©tricas
+                # Coleta métricas
                 system_metrics = await self.metrics_collector.collect_system_metrics()
                 app_metrics = await self.metrics_collector.collect_application_metrics()
                 
@@ -597,9 +596,9 @@ class AdvancedMonitoringService:
                 new_alerts = await self.alert_manager.check_alerts(system_metrics, app_metrics)
                 
                 if new_alerts:
-                    logger.info(f"üö® {len(new_alerts)} novos alertas detectados")
+                    logger.info(f"🚨 {len(new_alerts)} novos alertas detectados")
                 
-                # Aguarda pr√≥ximo ciclo
+                # Aguarda próximo ciclo
                 await asyncio.sleep(interval)
                 
             except asyncio.CancelledError:
@@ -613,7 +612,7 @@ class AdvancedMonitoringService:
         return await self.dashboard_generator.generate_operational_dashboard()
     
     async def get_security_dashboard(self) -> Dict[str, Any]:
-        """Retorna dashboard de seguran√ßa"""
+        """Retorna dashboard de segurança"""
         return await self.dashboard_generator.generate_security_dashboard()
     
     def get_alert_summary(self) -> Dict[str, Any]:
@@ -629,5 +628,5 @@ class AdvancedMonitoringService:
         return self.alert_manager.resolve_alert(alert_id)
 
 
-# Inst√¢ncia global do servi√ßo
+# Instância global do serviço
 advanced_monitoring = AdvancedMonitoringService()

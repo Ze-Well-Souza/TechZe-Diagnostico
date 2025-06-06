@@ -16,7 +16,6 @@ from pathlib import Path
 
 # Configuração de logging
 logging.basicConfig(
-    force=True,
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
@@ -158,7 +157,7 @@ class ComprehensiveSystemValidator:
         # Verifica health checks avançados
         monitoring_file = self.project_root / "microservices/diagnostic_service/app/core/monitoring.py"
         if monitoring_file.exists():
-            content = monitoring_file.read_text(encoding='utf-8')
+            content = monitoring_file.read_text()
             
             # Verifica funções específicas
             if "check_database_health" in content and "check_redis_health" in content:
@@ -193,7 +192,7 @@ class ComprehensiveSystemValidator:
         # Verifica ML engine
         ml_engine = self.project_root / "microservices/diagnostic_service/app/ai/ml_engine.py"
         if ml_engine.exists():
-            content = ml_engine.read_text(encoding='utf-8')
+            content = ml_engine.read_text()
             
             if "PredictiveAnalyzer" in content:
                 score += 20
@@ -380,7 +379,7 @@ class ComprehensiveSystemValidator:
         for file_path in async_files:
             full_path = self.project_root / file_path
             if full_path.exists():
-                content = full_path.read_text(encoding='utf-8')
+                content = full_path.read_text()
                 if any(pattern in content for pattern in async_patterns):
                     score += 20
                     details.append(f"✅ Async otimizado: {file_path}")

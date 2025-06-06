@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 // Configuração da URL base do microserviço
-const DIAGNOSTIC_SERVICE_URL = "https://techze-diagnostic-api.onrender.com";
+const DIAGNOSTIC_SERVICE_URL = "http://localhost:8000";
 
 export class ApiClient {
   private baseUrl: string;

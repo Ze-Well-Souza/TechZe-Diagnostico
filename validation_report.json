@@ -1,0 +1,28 @@
+{
+  "timestamp": "2025-06-05T16:43:30.091513",
+  "duration_seconds": 32.186779,
+  "total_tests": 17,
+  "passed_tests": 3,
+  "failed_tests": 14,
+  "success_rate": 17.647058823529413,
+  "classification": "🔴 CRÍTICO",
+  "results": {
+    "File: microservices/diagnostic_service/app/main.py": true,
+    "File: frontend-v3/package.json": false,
+    "File: frontend-v3/src/hooks/useDiagnostics.ts": false,
+    "File: frontend-v3/src/services/diagnosticApiService.ts": false,
+    "File: frontend-v3/src/types/diagnostic.ts": false,
+    "Backend Health": false,
+    "Root Endpoint": false,
+    "Service Info": false,
+    "Quick Diagnostic": false,
+    "CORS Test": false,
+    "Frontend Access": false,
+    "Supabase Connection": true,
+    "Supabase Table: users": false,
+    "Supabase Table: devices": false,
+    "Supabase Table: diagnostics": false,
+    "Supabase Table: reports": true,
+    "Integration Test": false
+  }
+}
