@@ -274,9 +274,116 @@ export function usePWAOptimization(options: PWAOptimizationOptions = {}) {
     };
   }, [isLowEndDevice]);
 
+  // Configura estratégia de cache cache-first
+  const applyCacheFirstStrategy = useCallback(async () => {
+    if (!cacheFirstStrategy || !('serviceWorker' in navigator)) return;
+    
+    try {
+      // Verifica se o Service Worker está ativo
+      const registration = await navigator.serviceWorker.ready;
+      
+      // Envia mensagem para o Service Worker para ativar estratégia cache-first
+      registration.active?.postMessage({
+        type: 'ENABLE_CACHE_FIRST',
+        enabled: true
+      });
+      
+      console.log('[PWA Optimization] Estratégia cache-first ativada');
+    } catch (error) {
+      console.error('[PWA Optimization] Erro ao configurar estratégia de cache:', error);
+    }
+  }, [cacheFirstStrategy]);
+
+  // Sincronização em background
+  const scheduleBackgroundSync = useCallback(async (tag: string, data?: any) => {
+    if (!('serviceWorker' in navigator) || !('sync' in window.ServiceWorkerRegistration.prototype)) {
+      console.warn('[PWA Optimization] Background Sync não suportado');
+      return false;
+    }
+
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      
+      // Armazena dados para sincronização se fornecidos
+      if (data) {
+        localStorage.setItem(`sync-data-${tag}`, JSON.stringify(data));
+      }
+      
+      await registration.sync.register(tag);
+      console.log(`[PWA Optimization] Background sync agendado: ${tag}`);
+      return true;
+    } catch (error) {
+      console.error('[PWA Optimization] Erro ao agendar background sync:', error);
+      return false;
+    }
+  }, []);
+
+  // Limpa cache expirado
+  const cleanExpiredCache = useCallback(async () => {
+    if (!('caches' in window)) return;
+
+    try {
+      const cacheNames = await caches.keys();
+      const now = Date.now();
+      
+      for (const cacheName of cacheNames) {
+        const cache = await caches.open(cacheName);
+        const requests = await cache.keys();
+        
+        for (const request of requests) {
+          const response = await cache.match(request);
+          if (response) {
+            const dateHeader = response.headers.get('date');
+            if (dateHeader) {
+              const cacheDate = new Date(dateHeader).getTime();
+              const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 dias
+              
+              if (now - cacheDate > maxAge) {
+                await cache.delete(request);
+                console.log('[PWA Optimization] Cache expirado removido:', request.url);
+              }
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('[PWA Optimization] Erro ao limpar cache:', error);
+    }
+  }, []);
+
+  // Monitora uso de dados
+  const monitorDataUsage = useCallback(() => {
+    if ('connection' in navigator) {
+      const connection = (navigator as any).connection;
+      
+      const dataUsageInfo = {
+        effectiveType: connection.effectiveType,
+        downlink: connection.downlink,
+        rtt: connection.rtt,
+        saveData: connection.saveData
+      };
+      
+      console.log('[PWA Optimization] Info de conexão:', dataUsageInfo);
+      
+      // Ajusta estratégias baseado na conexão
+      if (connection.saveData || connection.effectiveType === 'slow-2g') {
+        console.log('[PWA Optimization] Modo economia de dados ativado');
+        // Implementa otimizações para economia de dados
+        document.documentElement.classList.add('data-saver-mode');
+      }
+      
+      return dataUsageInfo;
+    }
+    return null;
+  }, []);
+
   return {
     isLowEndDevice,
     metrics,
-    applyMobileOptimizations
+    applyMobileOptimizations,
+    applyCacheFirstStrategy,
+    scheduleBackgroundSync,
+    cleanExpiredCache,
+    monitorDataUsage
   };
 }

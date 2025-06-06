@@ -1,0 +1,583 @@
+# Rolling Deployment Strategy para TechZe Diagnostic Service
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: techze-diagnostic-backend-rollout
+  namespace: production
+  labels:
+    app: techze-diagnostic
+    component: backend
+    version: v3.0.0
+spec:
+  replicas: 5
+  strategy:
+    canary:
+      # Configuração de Canary Deployment
+      canaryService: techze-diagnostic-backend-canary
+      stableService: techze-diagnostic-backend-stable
+      trafficRouting:
+        nginx:
+          stableIngress: techze-diagnostic-ingress
+          annotationPrefix: nginx.ingress.kubernetes.io
+          additionalIngressAnnotations:
+            canary-by-header: "X-Canary"
+            canary-by-header-value: "true"
+      
+      steps:
+      # Etapa 1: Deploy 10% do tráfego para canary
+      - setWeight: 10
+      - pause:
+          duration: 2m
+      
+      # Etapa 2: Análise automática de métricas
+      - analysis:
+          templates:
+          - templateName: success-rate
+          - templateName: latency-check
+          args:
+          - name: service-name
+            value: techze-diagnostic-backend-canary
+      
+      # Etapa 3: Aumentar para 25%
+      - setWeight: 25
+      - pause:
+          duration: 5m
+      
+      # Etapa 4: Nova análise
+      - analysis:
+          templates:
+          - templateName: success-rate
+          - templateName: latency-check
+          - templateName: error-rate-check
+          args:
+          - name: service-name
+            value: techze-diagnostic-backend-canary
+      
+      # Etapa 5: Aumentar para 50%
+      - setWeight: 50
+      - pause:
+          duration: 10m
+      
+      # Etapa 6: Análise final antes de 100%
+      - analysis:
+          templates:
+          - templateName: comprehensive-check
+          args:
+          - name: service-name
+            value: techze-diagnostic-backend-canary
+      
+      # Etapa 7: Deploy completo
+      - setWeight: 100
+      - pause:
+          duration: 2m
+      
+      # Configurações de rollback automático
+      abortScaleDownDelaySeconds: 30
+      scaleDownDelaySeconds: 30
+      
+  selector:
+    matchLabels:
+      app: techze-diagnostic
+      component: backend
+  
+  template:
+    metadata:
+      labels:
+        app: techze-diagnostic
+        component: backend
+        version: v3.0.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: techze-diagnostic
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      
+      # Configuração de afinidade para distribuição
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - techze-diagnostic
+                - key: component
+                  operator: In
+                  values:
+                  - backend
+              topologyKey: kubernetes.io/hostname
+          - weight: 50
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - techze-diagnostic
+              topologyKey: topology.kubernetes.io/zone
+      
+      containers:
+      - name: backend
+        image: ghcr.io/techze/diagnostic-service-backend:latest
+        imagePullPolicy: Always
+        
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-secret
+              key: url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: redis-secret
+              key: url
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secret
+              key: secret-key
+        
+        # Recursos otimizados
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        
+        # Health checks otimizados para rolling deployment
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 2
+        
+        startupProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 2
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 15
+        
+        # Graceful shutdown
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - |
+                echo "Iniciando graceful shutdown..."
+                # Aguardar conexões ativas terminarem
+                sleep 15
+                echo "Graceful shutdown concluído"
+        
+        # Configuração de terminação
+        terminationGracePeriodSeconds: 30
+
+---
+# AnalysisTemplate para verificação de taxa de sucesso
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+  namespace: production
+spec:
+  args:
+  - name: service-name
+  metrics:
+  - name: success-rate
+    interval: 30s
+    count: 5
+    successCondition: result[0] >= 0.95
+    failureLimit: 2
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          (
+            sum(rate(http_requests_total{service="{{args.service-name}}", status!~"5.."}[2m]))
+            /
+            sum(rate(http_requests_total{service="{{args.service-name}}"}[2m]))
+          )
+
+---
+# AnalysisTemplate para verificação de latência
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: latency-check
+  namespace: production
+spec:
+  args:
+  - name: service-name
+  metrics:
+  - name: latency-p95
+    interval: 30s
+    count: 5
+    successCondition: result[0] <= 0.5
+    failureLimit: 2
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{service="{{args.service-name}}"}[2m])) by (le)
+          )
+
+---
+# AnalysisTemplate para verificação de taxa de erro
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: error-rate-check
+  namespace: production
+spec:
+  args:
+  - name: service-name
+  metrics:
+  - name: error-rate
+    interval: 30s
+    count: 5
+    successCondition: result[0] <= 0.01
+    failureLimit: 2
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          (
+            sum(rate(http_requests_total{service="{{args.service-name}}", status=~"5.."}[2m]))
+            /
+            sum(rate(http_requests_total{service="{{args.service-name}}"}[2m]))
+          )
+
+---
+# AnalysisTemplate para verificação abrangente
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: comprehensive-check
+  namespace: production
+spec:
+  args:
+  - name: service-name
+  metrics:
+  # Taxa de sucesso
+  - name: success-rate
+    interval: 30s
+    count: 10
+    successCondition: result[0] >= 0.95
+    failureLimit: 3
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          (
+            sum(rate(http_requests_total{service="{{args.service-name}}", status!~"5.."}[2m]))
+            /
+            sum(rate(http_requests_total{service="{{args.service-name}}"}[2m]))
+          )
+  
+  # Latência P95
+  - name: latency-p95
+    interval: 30s
+    count: 10
+    successCondition: result[0] <= 0.5
+    failureLimit: 3
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{service="{{args.service-name}}"}[2m])) by (le)
+          )
+  
+  # Uso de CPU
+  - name: cpu-usage
+    interval: 30s
+    count: 5
+    successCondition: result[0] <= 0.8
+    failureLimit: 2
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          (
+            sum(rate(container_cpu_usage_seconds_total{pod=~".*{{args.service-name}}.*"}[2m]))
+            /
+            sum(container_spec_cpu_quota{pod=~".*{{args.service-name}}.*"} / container_spec_cpu_period{pod=~".*{{args.service-name}}.*"})
+          )
+  
+  # Uso de memória
+  - name: memory-usage
+    interval: 30s
+    count: 5
+    successCondition: result[0] <= 0.8
+    failureLimit: 2
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          (
+            sum(container_memory_working_set_bytes{pod=~".*{{args.service-name}}.*"})
+            /
+            sum(container_spec_memory_limit_bytes{pod=~".*{{args.service-name}}.*"})
+          )
+
+---
+# Service para versão estável
+apiVersion: v1
+kind: Service
+metadata:
+  name: techze-diagnostic-backend-stable
+  namespace: production
+  labels:
+    app: techze-diagnostic
+    component: backend
+    version: stable
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  selector:
+    app: techze-diagnostic
+    component: backend
+
+---
+# Service para versão canary
+apiVersion: v1
+kind: Service
+metadata:
+  name: techze-diagnostic-backend-canary
+  namespace: production
+  labels:
+    app: techze-diagnostic
+    component: backend
+    version: canary
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  selector:
+    app: techze-diagnostic
+    component: backend
+
+---
+# Ingress com suporte a canary
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: techze-diagnostic-ingress
+  namespace: production
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # Rate limiting
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    # CORS
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://techze-diagnostic.com"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+spec:
+  tls:
+  - hosts:
+    - api.techze-diagnostic.com
+    secretName: techze-diagnostic-tls
+  rules:
+  - host: api.techze-diagnostic.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: techze-diagnostic-backend-stable
+            port:
+              number: 80
+
+---
+# ConfigMap para scripts de deployment
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: deployment-scripts
+  namespace: production
+data:
+  pre-deployment-check.sh: |
+    #!/bin/bash
+    set -e
+    
+    echo "Executando verificações pré-deployment..."
+    
+    # Verificar saúde dos serviços dependentes
+    echo "Verificando PostgreSQL..."
+    kubectl exec -n production deployment/postgres -- pg_isready -U postgres
+    
+    echo "Verificando Redis..."
+    kubectl exec -n production deployment/redis -- redis-cli ping
+    
+    # Verificar métricas atuais
+    echo "Verificando métricas atuais..."
+    CURRENT_ERROR_RATE=$(curl -s "http://prometheus.monitoring.svc.cluster.local:9090/api/v1/query?query=rate(http_requests_total{status=~\"5..\"}[5m])/rate(http_requests_total[5m])" | jq -r '.data.result[0].value[1] // "0"')
+    
+    if (( $(echo "$CURRENT_ERROR_RATE > 0.05" | bc -l) )); then
+        echo "❌ Taxa de erro atual muito alta: $CURRENT_ERROR_RATE"
+        exit 1
+    fi
+    
+    echo "✅ Verificações pré-deployment concluídas"
+  
+  post-deployment-check.sh: |
+    #!/bin/bash
+    set -e
+    
+    echo "Executando verificações pós-deployment..."
+    
+    # Aguardar estabilização
+    sleep 30
+    
+    # Verificar health endpoints
+    echo "Verificando health endpoints..."
+    kubectl exec -n production deployment/techze-diagnostic-backend-rollout -- curl -f http://localhost:8000/health
+    
+    # Verificar métricas
+    echo "Verificando métricas pós-deployment..."
+    NEW_ERROR_RATE=$(curl -s "http://prometheus.monitoring.svc.cluster.local:9090/api/v1/query?query=rate(http_requests_total{status=~\"5..\"}[2m])/rate(http_requests_total[2m])" | jq -r '.data.result[0].value[1] // "0"')
+    
+    if (( $(echo "$NEW_ERROR_RATE > 0.01" | bc -l) )); then
+        echo "❌ Taxa de erro pós-deployment muito alta: $NEW_ERROR_RATE"
+        exit 1
+    fi
+    
+    echo "✅ Verificações pós-deployment concluídas"
+  
+  rollback.sh: |
+    #!/bin/bash
+    set -e
+    
+    echo "Executando rollback..."
+    
+    # Abortar rollout atual
+    kubectl argo rollouts abort techze-diagnostic-backend-rollout -n production
+    
+    # Fazer rollback para versão anterior
+    kubectl argo rollouts undo techze-diagnostic-backend-rollout -n production
+    
+    # Aguardar conclusão do rollback
+    kubectl argo rollouts status techze-diagnostic-backend-rollout -n production --timeout=600s
+    
+    echo "✅ Rollback concluído"
+
+---
+# Job para verificações pré-deployment
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pre-deployment-check
+  namespace: production
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: pre-check
+        image: curlimages/curl:latest
+        command:
+        - /bin/sh
+        - /scripts/pre-deployment-check.sh
+        volumeMounts:
+        - name: scripts
+          mountPath: /scripts
+      volumes:
+      - name: scripts
+        configMap:
+          name: deployment-scripts
+          defaultMode: 0755
+  backoffLimit: 2
+
+---
+# Job para verificações pós-deployment
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: post-deployment-check
+  namespace: production
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: post-check
+        image: curlimages/curl:latest
+        command:
+        - /bin/sh
+        - /scripts/post-deployment-check.sh
+        volumeMounts:
+        - name: scripts
+          mountPath: /scripts
+      volumes:
+      - name: scripts
+        configMap:
+          name: deployment-scripts
+          defaultMode: 0755
+  backoffLimit: 2

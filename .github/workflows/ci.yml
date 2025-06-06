@@ -18,14 +18,15 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: frontend-v3/package-lock.json
+        cache-dependency-path: package-lock.json
 
-    - name: Install dependencies
-      working-directory: ./frontend-v3
-      run: npm ci
+    - name: Install frontend dependencies
+      run: npm install
 
-    - name: Run frontend tests
-      working-directory: ./frontend-v3
+    - name: Build frontend
+      run: npm run build
+
+    - name: Test frontend
       run: npm test
 
     - name: Generate test coverage report

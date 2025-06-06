@@ -10,16 +10,19 @@ WORKDIR /app/frontend
 
 # Copia arquivos de dependências
 COPY package*.json ./
-COPY frontend-v3/package*.json ./frontend-v3/
 
 # Instala dependências do frontend
 RUN npm ci --only=production
 
 # Copia código fonte do frontend
-COPY frontend-v3/ ./frontend-v3/
+COPY src/ ./src/
+COPY public/ ./public/
+COPY index.html ./
+COPY vite.config.ts ./
+COPY tsconfig*.json ./
 
 # Build do frontend para produção
-WORKDIR /app/frontend/frontend-v3
+WORKDIR /app/frontend
 RUN npm run build
 
 # =============================================================================
@@ -82,7 +85,7 @@ RUN mkdir -p /app/static /app/logs /app/data \
 COPY --from=python-deps --chown=techze:techze /app/.venv /app/.venv
 
 # Copia build do frontend
-COPY --from=frontend-builder --chown=techze:techze /app/frontend/frontend-v3/dist /app/static
+COPY --from=frontend-builder --chown=techze:techze /app/frontend/dist /app/static
 
 # Copia código fonte da aplicação
 COPY --chown=techze:techze microservices/diagnostic_service/app /app/app
@@ -118,4 +121,4 @@ USER techze
 
 # Comando de inicialização
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"] 
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

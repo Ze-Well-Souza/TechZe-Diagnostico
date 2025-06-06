@@ -27,6 +27,10 @@ class ErrorTracker:
     
     def initialize_sentry(self):
         """Inicializa Sentry para error tracking"""
+        if not self.dsn or self.dsn.strip() == "" or "your-sentry-dsn" in self.dsn:
+            logger.warning("SENTRY_DSN não configurado ou inválido. Monitoramento Sentry desativado.")
+            return
+            
         try:
             # Configuração de logging para Sentry
             sentry_logging = LoggingIntegration(

@@ -21,7 +21,7 @@ start_all.bat    # Windows
 
 ```
 TechZe-Diagnostico/
-├── 📂 frontend-v3/              # Frontend React + TypeScript
+├── 📂 src/                      # Frontend React + TypeScript
 ├── 📂 microservices/            # Backend FastAPI
 ├── 📂 docs/                     # Documentação
 ├── 🔧 run_setup.py              # Setup automático

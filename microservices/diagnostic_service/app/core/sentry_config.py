@@ -21,8 +21,8 @@ def setup_sentry(app: FastAPI) -> None:
     environment = os.getenv("ENVIRONMENT", "development")
     release = os.getenv("RELEASE", "local")
     
-    if not sentry_dsn:
-        logger.warning("SENTRY_DSN não configurado. Monitoramento Sentry desativado.")
+    if not sentry_dsn or sentry_dsn.strip() == "" or "your-sentry-dsn" in sentry_dsn:
+        logger.warning("SENTRY_DSN não configurado ou inválido. Monitoramento Sentry desativado.")
         return
     
     # Configurar integrações

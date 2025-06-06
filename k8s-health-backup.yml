@@ -1,0 +1,267 @@
+# Kubernetes Health Checks e Backup Automático
+# Configuração para atingir 100% de completude do projeto
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: techze-health-config
+  namespace: techze-production
+data:
+  health-check.sh: |
+    #!/bin/bash
+    # Health check avançado para Kubernetes
+    
+    # Verificar API principal
+    if ! curl -f http://localhost:8000/health > /dev/null 2>&1; then
+      echo "API health check failed"
+      exit 1
+    fi
+    
+    # Verificar pool de conexões
+    if ! curl -f http://localhost:8000/api/v3/pool/health > /dev/null 2>&1; then
+      echo "Database pool health check failed"
+      exit 1
+    fi
+    
+    # Verificar métricas
+    if ! curl -f http://localhost:8000/metrics > /dev/null 2>&1; then
+      echo "Metrics endpoint failed"
+      exit 1
+    fi
+    
+    echo "All health checks passed"
+    exit 0
+
+  backup.sh: |
+    #!/bin/bash
+    # Script de backup automático
+    
+    TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+    BACKUP_DIR="/backups"
+    
+    # Backup do banco de dados
+    pg_dump $DATABASE_URL > "$BACKUP_DIR/db_backup_$TIMESTAMP.sql"
+    
+    # Backup de configurações
+    kubectl get configmaps -o yaml > "$BACKUP_DIR/configmaps_$TIMESTAMP.yaml"
+    kubectl get secrets -o yaml > "$BACKUP_DIR/secrets_$TIMESTAMP.yaml"
+    
+    # Compactar backups antigos (manter últimos 7 dias)
+    find $BACKUP_DIR -name "*.sql" -mtime +7 -delete
+    find $BACKUP_DIR -name "*.yaml" -mtime +7 -delete
+    
+    echo "Backup completed: $TIMESTAMP"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: techze-diagnostic-service
+  namespace: techze-production
+  labels:
+    app: techze-diagnostic
+    version: v3.0.0
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: techze-diagnostic
+  template:
+    metadata:
+      labels:
+        app: techze-diagnostic
+        version: v3.0.0
+    spec:
+      containers:
+      - name: diagnostic-service
+        image: ghcr.io/techze/diagnostic-service:latest
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: techze-secrets
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: techze-secrets
+              key: redis-url
+        
+        # Health Checks Avançados
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - /config/health-check.sh
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 30
+        
+        # Resources
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        
+        # Volume mounts
+        volumeMounts:
+        - name: health-config
+          mountPath: /config
+        - name: backup-storage
+          mountPath: /backups
+      
+      volumes:
+      - name: health-config
+        configMap:
+          name: techze-health-config
+          defaultMode: 0755
+      - name: backup-storage
+        persistentVolumeClaim:
+          claimName: techze-backup-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: techze-diagnostic-service
+  namespace: techze-production
+  labels:
+    app: techze-diagnostic
+spec:
+  selector:
+    app: techze-diagnostic
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: techze-backup-pvc
+  namespace: techze-production
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: fast-ssd
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: techze-backup-job
+  namespace: techze-production
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: postgres:15-alpine
+            command:
+            - /bin/bash
+            - /config/backup.sh
+            env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: techze-secrets
+                  key: database-url
+            volumeMounts:
+            - name: health-config
+              mountPath: /config
+            - name: backup-storage
+              mountPath: /backups
+          volumes:
+          - name: health-config
+            configMap:
+              name: techze-health-config
+              defaultMode: 0755
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: techze-backup-pvc
+          restartPolicy: OnFailure
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: techze-diagnostic-monitor
+  namespace: techze-production
+  labels:
+    app: techze-diagnostic
+spec:
+  selector:
+    matchLabels:
+      app: techze-diagnostic
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: techze-diagnostic-ingress
+  namespace: techze-production
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+spec:
+  tls:
+  - hosts:
+    - api.techreparo.com
+    secretName: techze-tls
+  rules:
+  - host: api.techreparo.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: techze-diagnostic-service
+            port:
+              number: 80
