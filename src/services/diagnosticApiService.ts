@@ -65,8 +65,8 @@ export class DiagnosticApiService {
         "/api/v1/diagnostic/history",
         { params }
       );
-    } catch (error) {
-      console.warn("Endpoint de histórico não disponível, usando fallback para Supabase", error);
+    } catch (apiError) {
+      console.warn("Endpoint de histórico não disponível, usando fallback para Supabase", apiError);
       
       // Fallback: Se o endpoint não estiver disponível, usamos o Supabase diretamente
       let query = supabase.from('diagnostics').select('*', { count: 'exact' });
@@ -96,11 +96,11 @@ export class DiagnosticApiService {
       query = query.order('created_at', { ascending: false })
                    .range(start, start + limit - 1);
       
-      const { data, error, count } = await query;
+      const { data, error: queryError, count } = await query;
       
-      if (error) {
-        console.error("Erro ao buscar histórico de diagnósticos:", error);
-        throw new Error(error.message);
+      if (queryError) {
+        console.error("Erro ao buscar histórico de diagnósticos:", queryError);
+        throw new Error(queryError.message);
       }
       
       return {
@@ -340,21 +340,21 @@ export class DiagnosticApiService {
 
         return updatedDiagnostic;
 
-      } catch (apiError) {
-        console.error("Erro no microserviço:", apiError);
+      } catch (serviceError) {
+        console.error("Erro no microserviço:", serviceError);
         
         // Atualizar diagnóstico com erro
         const failedDiagnostic = await this.updateDiagnostic(initialDiagnostic.id, {
           status: 'failed',
-          error_message: apiError instanceof Error ? apiError.message : 'Erro desconhecido no microserviço',
+          error_message: serviceError instanceof Error ? serviceError.message : 'Erro desconhecido no microserviço',
         });
 
         return failedDiagnostic;
       }
 
-    } catch (error) {
-      console.error("Erro no diagnóstico completo:", error);
-      throw error;
+    } catch (generalError) {
+      console.error("Erro no diagnóstico completo:", generalError);
+      throw generalError;
     }
   }
 }
