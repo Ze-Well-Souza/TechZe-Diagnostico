@@ -44,7 +44,7 @@ class ReportInDB(ReportBase):
     updated_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Schema para resposta de relatório

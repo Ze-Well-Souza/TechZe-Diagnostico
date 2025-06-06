@@ -5,9 +5,11 @@ const DIAGNOSTIC_SERVICE_URL = "http://localhost:8000";
 
 export class ApiClient {
   private baseUrl: string;
+  public baseURL: string; // Para compatibilidade com authService
 
   constructor(baseUrl: string = DIAGNOSTIC_SERVICE_URL) {
     this.baseUrl = baseUrl;
+    this.baseURL = baseUrl; // Expor publicamente
   }
 
   private async getAuthHeaders(): Promise<HeadersInit> {

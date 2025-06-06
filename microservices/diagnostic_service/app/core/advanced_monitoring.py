@@ -106,8 +106,8 @@ class MetricsCollector:
                     "percent": memory.percent,
                     "used": memory.used,
                     "free": memory.free,
-                    "buffers": memory.buffers,
-                    "cached": memory.cached
+                    "buffers": getattr(memory, 'buffers', 0),
+                    "cached": getattr(memory, 'cached', 0)
                 },
                 "swap": {
                     "total": swap.total,

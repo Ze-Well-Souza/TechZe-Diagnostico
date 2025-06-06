@@ -12,4 +12,4 @@ class User(BaseModel):
     metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
     
     class Config:
-        orm_mode = True
+        from_attributes = True

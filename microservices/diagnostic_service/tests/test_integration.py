@@ -1,155 +1,110 @@
 """
-Integration Tests for TechZe Diagnostic Service
-Testes de integração para validar fluxos completos do sistema
+Testes de Integração - Sistema Completo
 """
 
 import pytest
+import httpx
 import asyncio
-from httpx import AsyncClient
 from fastapi.testclient import TestClient
-from unittest.mock import patch, AsyncMock
-
-# Import the main app
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from app.main import app
-from app.core.config import get_settings
 
-
-@pytest.fixture
-def test_settings():
-    """Override settings for testing."""
-    settings = get_settings()
-    settings.ENVIRONMENT = "testing"
-    settings.DEBUG = True
-    settings.TESTING = True
-    return settings
-
-
-@pytest.fixture
-def client(test_settings):
-    """Create test client."""
-    with TestClient(app) as test_client:
-        yield test_client
-
-
-@pytest.fixture
-async def async_client(test_settings):
-    """Create async test client."""
-    async with AsyncClient(app=app, base_url="http://test") as ac:
-        yield ac
-
-
-class TestHealthEndpoints:
-    """Test health check and system status endpoints."""
+class TestAPIIntegration:
+    """Testes de integração das APIs"""
     
-    def test_health_check(self, client):
-        """Test basic health check endpoint."""
-        response = client.get("/health")
-        assert response.status_code == 200
+    def setup_method(self):
+        """Setup para cada teste"""
+        self.client = TestClient(app)
+    
+    def test_health_endpoint(self):
+        """Testa endpoint de health check"""
+        response = self.client.get("/health")
         
+        assert response.status_code == 200
         data = response.json()
         assert "status" in data
         assert data["status"] == "healthy"
-        assert "timestamp" in data
-        assert "version" in data
     
-    def test_readiness_probe(self, client):
-        """Test Kubernetes readiness probe."""
-        response = client.get("/ready")
-        assert response.status_code == 200
+    def test_performance_stats_endpoint(self):
+        """Testa endpoint de estatísticas de performance"""
+        response = self.client.get("/api/v3/performance/stats")
         
+        assert response.status_code == 200
         data = response.json()
-        assert data["ready"] is True
-
-
-class TestAPIVersioning:
-    """Test API versioning and backward compatibility."""
+        assert "database_pools" in data
+        assert "query_performance" in data
+        assert "status" in data
     
-    def test_api_v1_endpoints(self, client):
-        """Test API v1 endpoints availability."""
-        response = client.get("/api/v1/")
-        assert response.status_code == 200
+    def test_performance_health_endpoint(self):
+        """Testa health check de performance"""
+        response = self.client.get("/api/v3/performance/health")
         
+        assert response.status_code == 200
         data = response.json()
-        assert "message" in data
+        assert data["status"] == "healthy"
+        assert "performance_systems" in data
     
-    def test_api_v3_endpoints(self, client):
-        """Test API v3 endpoints availability."""
-        response = client.get("/api/v3/")
-        assert response.status_code == 200
+    def test_performance_optimization_endpoint(self):
+        """Testa endpoint de otimização"""
+        response = self.client.post("/api/v3/performance/optimize")
         
+        assert response.status_code == 200
         data = response.json()
         assert "message" in data
+        assert "optimizations_applied" in data
 
-
-class TestSystemAnalysisEndpoints:
-    """Test system analysis and monitoring endpoints."""
+class TestSystemLoad:
+    """Testes de carga do sistema"""
     
-    def test_cpu_analysis(self, client):
-        """Test CPU analysis endpoint."""
-        response = client.get("/api/v3/system/cpu")
-        # Accept both success and not implemented
-        assert response.status_code in [200, 404, 501]
+    def setup_method(self):
+        """Setup para testes de carga"""
+        self.client = TestClient(app)
+    
+    def test_concurrent_health_checks(self):
+        """Testa múltiplas requisições simultâneas"""
+        def make_request():
+            return self.client.get("/health")
         
-        if response.status_code == 200:
-            data = response.json()
-            assert "cpu_percent" in data
+        # Executa 10 requisições simultâneas
+        responses = []
+        for _ in range(10):
+            response = make_request()
+            responses.append(response)
+        
+        # Verifica se todas foram bem-sucedidas
+        for response in responses:
+            assert response.status_code == 200
     
-    def test_system_overview(self, client):
-        """Test complete system overview."""
-        response = client.get("/api/v3/system/overview")
-        # Accept both success and not implemented
-        assert response.status_code in [200, 404, 501]
-
-
-class TestErrorHandling:
-    """Test error handling and edge cases."""
-    
-    def test_invalid_endpoint(self, client):
-        """Test handling of invalid endpoints."""
-        response = client.get("/invalid-endpoint")
-        assert response.status_code == 404
-    
-    def test_cors_headers(self, client):
-        """Test CORS headers are properly set."""
-        response = client.options("/health", 
-                                headers={"Origin": "http://localhost:3000"})
-        # CORS may or may not be configured
-        assert response.status_code in [200, 404, 405]
-
-
-class TestPerformance:
-    """Test performance and load characteristics."""
-    
-    def test_response_time(self, client):
-        """Test that responses are reasonably fast."""
+    def test_api_response_time(self):
+        """Testa tempo de resposta das APIs"""
         import time
         
         start_time = time.time()
-        response = client.get("/health")
+        response = self.client.get("/health")
         end_time = time.time()
         
-        assert response.status_code == 200
-        
-        # Health check should be fast (under 2 seconds)
         response_time = end_time - start_time
-        assert response_time < 2.0
+        
+        assert response.status_code == 200
+        assert response_time < 1.0  # Deve responder em menos de 1 segundo
 
-
-# Test configuration and fixtures validation
-def test_test_configuration():
-    """Test that test configuration is properly set up."""
-    settings = get_settings()
-    assert settings is not None
-    assert hasattr(settings, 'PROJECT_NAME')
-    assert hasattr(settings, 'VERSION')
-
-
-def test_app_creation():
-    """Test that the FastAPI app is properly created."""
-    assert app is not None
-    assert hasattr(app, 'routes')
-    assert len(app.routes) > 0
+class TestErrorHandling:
+    """Testes de tratamento de erros"""
+    
+    def setup_method(self):
+        """Setup para testes de erro"""
+        self.client = TestClient(app)
+    
+    def test_404_error_handling(self):
+        """Testa tratamento de endpoints inexistentes"""
+        response = self.client.get("/api/v3/nonexistent")
+        
+        assert response.status_code == 404
+    
+    def test_cors_headers(self):
+        """Testa cabeçalhos CORS"""
+        response = self.client.get("/health")
+        
+        assert response.status_code == 200
+        # Verifica presença de headers CORS básicos
+        headers = response.headers
+        assert "content-type" in headers

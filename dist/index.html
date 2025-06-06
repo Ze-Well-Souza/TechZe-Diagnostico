@@ -1,35 +1,259 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TechZe Diagnóstico</title>
-    <meta name="description" content="Aplicativo de diagnóstico de dispositivos TechZe" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>TechZe Diagnóstico - Sistema Profissional</title>
+    <meta name="description" content="Sistema Profissional de Diagnóstico para Assistências Técnicas - Interface otimizada para tablets e dispositivos móveis" />
     <meta name="author" content="TechZe" />
+    <meta name="keywords" content="diagnóstico, assistência técnica, hardware, TechZe, PWA" />
 
-    <meta property="og:title" content="TechZe Diagnóstico" />
-    <meta property="og:description" content="Aplicativo de diagnóstico de dispositivos TechZe" />
+    <!-- SEO Tags -->
+    <meta property="og:title" content="TechZe Diagnóstico - Sistema Profissional" />
+    <meta property="og:description" content="Sistema Profissional de Diagnóstico para Assistências Técnicas" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/icons/icon-512x512.png.svg" />
+    <meta property="og:image" content="/icon-512.png" />
+    <meta property="og:url" content="https://techze-diagnostico.onrender.com" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@techze" />
-    <meta name="twitter:image" content="/icons/icon-512x512.png.svg" />
+    <meta name="twitter:title" content="TechZe Diagnóstico" />
+    <meta name="twitter:description" content="Sistema Profissional de Diagnóstico" />
+    <meta name="twitter:image" content="/icon-512.png" />
     
-    <!-- PWA Meta Tags -->
+    <!-- PWA Meta Tags Otimizadas -->
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#00ffff" />
+    <meta name="background-color" content="#0a0f1a" />
+    
+    <!-- iOS PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="TechZe" />
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png.svg" />
-    <script type="module" crossorigin src="/assets/index-BU8DlFWg.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BL8LL70l.css">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="TechZe Diagnóstico" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/icon-192.png" />
+    
+    <!-- iOS Splash Screens -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-startup-image" href="/splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" />
+    <link rel="apple-touch-startup-image" href="/splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" />
+    <link rel="apple-touch-startup-image" href="/splash-828x1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" />
+    
+    <!-- Microsoft Tile Tags -->
+    <meta name="msapplication-TileColor" content="#00ffff" />
+    <meta name="msapplication-TileImage" content="/icon-192.png" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    
+    <!-- Preconnect para performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icon-192.png" />
+    <link rel="shortcut icon" href="/icon-192.png" />
+    
+    <!-- CSS para modo offline -->
+    <style>
+      /* Loading screen */
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0a0f1a 0%, #1a1f2a 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        color: #00ffff;
+        font-family: 'Orbitron', monospace;
+      }
+      
+      .loading-logo {
+        width: 80px;
+        height: 80px;
+        border: 3px solid #00ffff;
+        border-radius: 50%;
+        border-top: 3px solid transparent;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* PWA install prompt hidden by default */
+      #pwa-install-prompt {
+        display: none;
+      }
+      
+      /* Mobile optimizations */
+      html {
+        height: 100%;
+        height: calc(var(--vh, 1vh) * 100);
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+      
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        height: calc(var(--vh, 1vh) * 100);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+        background: #0a0f1a;
+      }
+      
+      #root {
+        height: 100%;
+        height: calc(var(--vh, 1vh) * 100);
+      }
+      
+      /* iOS safe area */
+      @supports (padding: max(0px)) {
+        .safe-top { padding-top: max(20px, env(safe-area-inset-top)); }
+        .safe-bottom { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+        .safe-left { padding-left: max(0px, env(safe-area-inset-left)); }
+        .safe-right { padding-right: max(0px, env(safe-area-inset-right)); }
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-DMCsgwpZ.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DwW8gnYx.css">
   <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
 
   <body>
-    <div id="root"></div>
-    <noscript>Você precisa habilitar JavaScript para executar este aplicativo.</noscript>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+      <div class="loading-logo"></div>
+      <h2>TechZe Diagnóstico</h2>
+      <p>Carregando sistema...</p>
+    </div>
+    
+    <!-- PWA Install Prompt -->
+    <div id="pwa-install-prompt" style="
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: #00ffff;
+      color: #0a0f1a;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      z-index: 1000;
+      font-weight: bold;
+    ">
+      <p style="margin: 0 0 10px 0;">📱 Instalar TechZe Diagnóstico</p>
+      <button id="pwa-install-btn" style="
+        background: #0a0f1a;
+        color: #00ffff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        margin-right: 10px;
+        cursor: pointer;
+      ">Instalar</button>
+      <button id="pwa-dismiss-btn" style="
+        background: transparent;
+        color: #0a0f1a;
+        border: 1px solid #0a0f1a;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+      ">Agora não</button>
+    </div>
+    
+    <div id="root"></div>
+    
+    <!-- Scripts -->
+    
+    <!-- PWA Install Script -->
+    <script>
+      // Remove loading screen when app loads
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const loadingScreen = document.getElementById('loading-screen');
+          if (loadingScreen) {
+            loadingScreen.style.display = 'none';
+          }
+        }, 1000);
+      });
+      
+      // PWA Install Prompt
+      let deferredPrompt;
+      
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        const installPrompt = document.getElementById('pwa-install-prompt');
+        installPrompt.style.display = 'block';
+        
+        const installBtn = document.getElementById('pwa-install-btn');
+        const dismissBtn = document.getElementById('pwa-dismiss-btn');
+        
+        installBtn.addEventListener('click', () => {
+          installPrompt.style.display = 'none';
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('PWA instalado');
+            }
+            deferredPrompt = null;
+          });
+        });
+        
+        dismissBtn.addEventListener('click', () => {
+          installPrompt.style.display = 'none';
+        });
+      });
+      
+      // Hide install prompt if already installed
+      window.addEventListener('appinstalled', () => {
+        const installPrompt = document.getElementById('pwa-install-prompt');
+        installPrompt.style.display = 'none';
+        console.log('PWA foi instalado');
+      });
+      
+      // Service Worker registration feedback
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          window.location.reload();
+        });
+      }
+    </script>
+    
+    <noscript>
+      <div style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #0a0f1a;
+        color: #00ffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        z-index: 10000;
+      ">
+        <div>
+          <h1>TechZe Diagnóstico</h1>
+          <p>Você precisa habilitar JavaScript para usar este aplicativo.</p>
+          <p>Please enable JavaScript to use this application.</p>
+        </div>
+      </div>
+    </noscript>
   </body>
 </html>

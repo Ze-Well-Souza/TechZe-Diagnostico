@@ -467,3 +467,143 @@ class ChatRecommendation(BaseModel):
     actions: List[Dict[str, Any]]
     generated_at: datetime
     accepted: Optional[bool] = None
+
+# Modelos adicionais para endpoints de API
+
+class ChatMessageRequest(BaseModel):
+    """Request para envio de mensagem de chat"""
+    user_id: str
+    content: str
+    message_type: MessageType = MessageType.TEXT
+    context: Dict[str, Any] = {}
+    session_id: Optional[str] = None
+
+class ChatMessageResponse(BaseModel):
+    """Response de mensagem de chat"""
+    response_id: str
+    content: str
+    response_type: str
+    confidence: float
+    suggested_actions: List[str] = []
+    follow_up_questions: List[str] = []
+    metadata: Dict[str, Any] = {}
+    timestamp: datetime
+
+class VoiceCommandRequest(BaseModel):
+    """Request para comando de voz"""
+    user_id: str
+    voice_text: str
+    audio_data: Optional[str] = None
+    language: str = "pt-BR"
+
+class VoiceCommandResponse(BaseModel):
+    """Response de comando de voz"""
+    command_id: str
+    recognized_command: str
+    confidence: float
+    action_taken: str
+    response_text: str
+    parameters: Dict[str, Any] = {}
+    timestamp: datetime
+
+class TutorialRequest(BaseModel):
+    """Request para iniciar tutorial"""
+    user_id: str
+    tutorial_id: str
+    preferences: Dict[str, Any] = {}
+
+class TutorialResponse(BaseModel):
+    """Response de tutorial"""
+    tutorial_id: str
+    current_step: int
+    step_content: Dict[str, Any]
+    progress_percentage: float
+    estimated_time_remaining: int
+    next_actions: List[str] = []
+
+class ConversationHistory(BaseModel):
+    """Histórico de conversação"""
+    user_id: str
+    messages: List[ChatMessage]
+    total_messages: int
+    session_count: int
+    date_range: Dict[str, datetime]
+
+class UserPreferences(BaseModel):
+    """Preferências do usuário"""
+    user_id: str
+    language: str = "pt-BR"
+    notification_settings: Dict[str, bool] = {}
+    conversation_style: str = "friendly"
+    topics_of_interest: List[str] = []
+    skill_level: str = "intermediate"
+
+# Modelos adicionais para endpoints de API
+
+class ChatMessageRequest(BaseModel):
+    """Request para envio de mensagem de chat"""
+    user_id: str
+    content: str
+    message_type: MessageType = MessageType.TEXT
+    context: Dict[str, Any] = {}
+    session_id: Optional[str] = None
+
+class ChatMessageResponse(BaseModel):
+    """Response de mensagem de chat"""
+    response_id: str
+    content: str
+    response_type: str
+    confidence: float
+    suggested_actions: List[str] = []
+    follow_up_questions: List[str] = []
+    metadata: Dict[str, Any] = {}
+    timestamp: datetime
+
+class VoiceCommandRequest(BaseModel):
+    """Request para comando de voz"""
+    user_id: str
+    voice_text: str
+    audio_data: Optional[str] = None
+    language: str = "pt-BR"
+
+class VoiceCommandResponse(BaseModel):
+    """Response de comando de voz"""
+    command_id: str
+    recognized_command: str
+    confidence: float
+    action_taken: str
+    response_text: str
+    parameters: Dict[str, Any] = {}
+    timestamp: datetime
+
+class TutorialRequest(BaseModel):
+    """Request para iniciar tutorial"""
+    user_id: str
+    tutorial_id: str
+    preferences: Dict[str, Any] = {}
+
+class TutorialResponse(BaseModel):
+    """Response de tutorial"""
+    tutorial_id: str
+    current_step: int
+    step_content: Dict[str, Any]
+    progress_percentage: float
+    estimated_time_remaining: int
+    next_actions: List[str] = []
+
+class ConversationHistory(BaseModel):
+    """Histórico de conversação"""
+    user_id: str
+    messages: List[ChatMessage]
+    total_messages: int
+    session_count: int
+    date_range: Dict[str, datetime]
+
+class UserPreferences(BaseModel):
+    """Preferências do usuário"""
+    user_id: str
+    language: str = "pt-BR"
+    notification_settings: Dict[str, bool] = {}
+    conversation_style: str = "friendly"
+    topics_of_interest: List[str] = []
+    skill_level: str = "intermediate"

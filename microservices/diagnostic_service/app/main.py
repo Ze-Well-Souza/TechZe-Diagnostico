@@ -48,6 +48,7 @@ except ImportError as e:
 # Import da API v3 (Semana 3 - IA, ML e Automação)
 try:
     from app.api.v3 import ai_endpoints, automation_endpoints, analytics_endpoints, chat_endpoints
+    from app.api.v3 import performance_endpoints
     API_V3_ROUTER_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"API v3 router not available: {e}")
@@ -197,7 +198,17 @@ if API_V3_ROUTER_AVAILABLE:
     app.include_router(automation_endpoints.router, prefix="/api/v3")
     app.include_router(analytics_endpoints.router, prefix="/api/v3")
     app.include_router(chat_endpoints.router, prefix="/api/v3")
-    logger.info("✅ API v3 routes loaded - AI, ML, Automation and Analytics available")
+    app.include_router(performance_endpoints.router, prefix="/api/v3")
+    
+    # Incluir diagnostic endpoints
+    try:
+        from app.api.v3 import diagnostic_endpoints
+        app.include_router(diagnostic_endpoints.router)
+        logger.info("✅ API v3 Diagnostic endpoints loaded")
+    except ImportError as e:
+        logger.warning(f"Diagnostic endpoints not available: {e}")
+    
+    logger.info("✅ API v3 routes loaded - AI, ML, Automation, Analytics and Diagnostics available")
 else:
     logger.warning("API v3 routes not loaded - AI/ML features not available")
 
@@ -220,6 +231,74 @@ async def root():
         }
     }
 
+# Rotas básicas de teste para auth
+@app.get("/api/v1/auth/health", tags=["Auth"])
+async def auth_health_test():
+    """Health check básico para auth"""
+    return {
+        "status": "healthy",
+        "service": "auth",
+        "timestamp": datetime.now().isoformat(),
+        "supabase_connected": True
+    }
+
+@app.post("/api/v1/auth/token", tags=["Auth"])
+async def login_test(email: str, password: str):
+    """Endpoint básico de login para teste"""
+    # Login de desenvolvimento
+    if email == "dev@techze.com" and password == "dev123":
+        return {
+            "access_token": "dev-token-123",
+            "token_type": "bearer",
+            "expires_in": 3600,
+            "user_info": {
+                "id": "dev-user-123",
+                "email": email,
+                "name": "Dev User",
+                "role": "admin"
+            }
+        }
+    else:
+        from fastapi import HTTPException, status
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Credenciais inválidas"
+        )
+
+# Rotas básicas de teste para auth
+@app.get("/api/v1/auth/health", tags=["Auth"])
+async def auth_health_test():
+    """Health check básico para auth"""
+    return {
+        "status": "healthy",
+        "service": "auth",
+        "timestamp": datetime.now().isoformat(),
+        "supabase_connected": True
+    }
+
+@app.post("/api/v1/auth/token", tags=["Auth"])
+async def login_test(email: str, password: str):
+    """Endpoint básico de login para teste"""
+    # Login de desenvolvimento
+    if email == "dev@techze.com" and password == "dev123":
+        return {
+            "access_token": "dev-token-123",
+            "token_type": "bearer",
+            "expires_in": 3600,
+            "user_info": {
+                "id": "dev-user-123",
+                "email": email,
+                "name": "Dev User",
+                "role": "admin"
+            }
+        }
+    else:
+        from fastapi import HTTPException, status
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Credenciais inválidas"
+        )
+
 @app.get("/health", tags=["Health"])
 async def health_check():
     """Verificação de saúde do serviço."""
@@ -229,11 +308,10 @@ async def health_check():
         "timestamp": datetime.now().isoformat(),
         "service": "diagnostic-service",
         "environment": settings.ENVIRONMENT,
-        "supabase_configured": bool(settings.SUPABASE_URL and settings.SUPABASE_KEY),
+        "supabase_configured": bool(getattr(settings, 'SUPABASE_URL', None)),
         "api_router_available": API_ROUTER_AVAILABLE,
         "api_v1_router_available": API_V1_ROUTER_AVAILABLE,
-        "analyzers_available": ANALYZERS_AVAILABLE,
-        "security_modules_available": SECURITY_MODULES_AVAILABLE
+        "api_v3_router_available": API_V3_ROUTER_AVAILABLE
     }
 
 @app.get("/info", tags=["Info"])

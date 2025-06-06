@@ -89,7 +89,7 @@ async def detect_system_anomalies(
         logger.info(f"Detectando anomalias em {len(request.metrics)} métricas")
         
         # Executar detecção de anomalias
-        detection_result = await anomaly_detector.detect_anomalies(
+        detection_result = await anomaly_detector.detect_anomalies_v3(
             metrics=request.metrics,
             sensitivity=request.sensitivity,
             time_window=request.time_window,
@@ -155,7 +155,7 @@ async def get_ai_recommendations(
         logger.info(f"Gerando recomendações para {request.context}")
         
         # Gerar recomendações
-        recommendations_result = await recommendation_engine.generate_recommendations(
+        recommendations_result = await recommendation_engine.generate_recommendations_v3(
             system_state=request.system_state,
             user_preferences=request.user_preferences,
             context=request.context,

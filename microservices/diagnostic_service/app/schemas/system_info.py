@@ -45,7 +45,7 @@ class SystemInfoInDB(SystemInfoBase):
     updated_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Schema para resposta de informações do sistema

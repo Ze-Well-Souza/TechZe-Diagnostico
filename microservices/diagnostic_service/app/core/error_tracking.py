@@ -38,7 +38,7 @@ class ErrorTracker:
                 dsn=self.dsn,
                 environment=self.environment,
                 integrations=[
-                    FastApiIntegration(auto_enable=True),
+                    FastApiIntegration(),
                     SqlalchemyIntegration(),
                     RedisIntegration(),
                     sentry_logging,

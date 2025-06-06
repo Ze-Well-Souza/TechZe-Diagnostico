@@ -264,19 +264,19 @@ class ComprehensiveSystemValidator:
         score = 0
         details = []
         
-        frontend_path = self.project_root / "frontend-v3"
+        frontend_path = self.project_root / "src"
         if frontend_path.exists():
             score += 20
-            details.append("✅ Frontend v3 estruturado")
+            details.append("✅ Frontend estruturado corretamente")
             
             # Verifica componentes principais
-            components_path = frontend_path / "src/components"
+            components_path = frontend_path / "components"
             if components_path.exists():
                 key_components = [
                     "dashboard",
-                    "diagnostic", 
                     "layout",
-                    "ui"
+                    "ui",
+                    "performance"
                 ]
                 
                 for component in key_components:
@@ -284,10 +284,24 @@ class ComprehensiveSystemValidator:
                         score += 15
                         details.append(f"✅ Componente: {component}")
             
+            # Verifica páginas principais
+            pages_path = frontend_path / "pages"
+            if pages_path.exists():
+                key_pages = ["Auth.tsx", "Dashboard.tsx", "Diagnostic.tsx", "Index.tsx"]
+                for page in key_pages:
+                    if (pages_path / page).exists():
+                        score += 5
+                        details.append(f"✅ Página: {page}")
+            
             # Verifica integração Supabase
-            if (frontend_path / "src/integrations/supabase").exists():
-                score += 15
+            if (frontend_path / "integrations/supabase").exists():
+                score += 10
                 details.append("✅ Integração Supabase no frontend")
+                
+            # Verifica App.tsx principal
+            if (frontend_path / "App.tsx").exists():
+                score += 10
+                details.append("✅ App.tsx principal configurado")
         
         return {
             "score": min(score, 100),

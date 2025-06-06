@@ -67,7 +67,7 @@ class DiagnosticInDB(DiagnosticBase):
     execution_time: Optional[float] = None
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Schema para resposta de diagnóstico

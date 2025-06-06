@@ -31,7 +31,7 @@ class AuditLogModel(BaseModel):
     duration_ms: Optional[int] = None
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class AuditRepository(SupabaseRepository[AuditLogModel]):
