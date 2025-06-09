@@ -41,7 +41,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: '3.11'
         cache: 'pip'
 
     - name: Install dependencies
@@ -52,10 +52,14 @@ jobs:
 
     - name: Run backend tests
       working-directory: ./microservices/diagnostic_service
+      env:
+        PYTHONPATH: .
       run: pytest -v
 
     - name: Generate test coverage report
       working-directory: ./microservices/diagnostic_service
+      env:
+        PYTHONPATH: .
       run: pytest --cov=app --cov-report=xml
 
   integration-tests:
@@ -68,7 +72,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: '3.11'
         cache: 'pip'
 
     - name: Install dependencies

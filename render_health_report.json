@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-06-09T12:39:28.532179",
+  "backend": {
+    "service": "backend",
+    "base_url": "https://techze-diagnostico-api.onrender.com",
+    "status": "unhealthy",
+    "response_time": 965.55,
+    "status_code": 404,
+    "error": null
+  },
+  "frontend": {
+    "service": "frontend",
+    "base_url": "https://techze-diagnostico-frontend.onrender.com",
+    "status": "unhealthy",
+    "response_time": 902.07,
+    "status_code": 404,
+    "error": null
+  },
+  "endpoints": [],
+  "overall_status": false
+}

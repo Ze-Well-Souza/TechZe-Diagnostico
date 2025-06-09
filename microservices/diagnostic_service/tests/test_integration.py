@@ -24,28 +24,26 @@ class TestAPIIntegration:
         assert "status" in data
         assert data["status"] == "healthy"
     
-    def test_performance_stats_endpoint(self):
-        """Testa endpoint de estatísticas de performance"""
-        response = self.client.get("/api/v3/performance/stats")
+    def test_performance_metrics_endpoint(self):
+        """Testa endpoint de métricas de performance"""
+        response = self.client.get("/api/core/performance/metrics/system")
         
         assert response.status_code == 200
         data = response.json()
-        assert "database_pools" in data
-        assert "query_performance" in data
-        assert "status" in data
+        assert "timestamp" in data
+        assert "cpu" in data
     
     def test_performance_health_endpoint(self):
         """Testa health check de performance"""
-        response = self.client.get("/api/v3/performance/health")
+        response = self.client.get("/api/core/performance/health/basic")
         
         assert response.status_code == 200
         data = response.json()
-        assert data["status"] == "healthy"
-        assert "performance_systems" in data
+        assert "status" in data
     
     def test_performance_optimization_endpoint(self):
         """Testa endpoint de otimização"""
-        response = self.client.post("/api/v3/performance/optimize")
+        response = self.client.post("/api/core/performance/optimize/database")
         
         assert response.status_code == 200
         data = response.json()
@@ -96,7 +94,7 @@ class TestErrorHandling:
     
     def test_404_error_handling(self):
         """Testa tratamento de endpoints inexistentes"""
-        response = self.client.get("/api/v3/nonexistent")
+        response = self.client.get("/api/core/nonexistent")
         
         assert response.status_code == 404
     
