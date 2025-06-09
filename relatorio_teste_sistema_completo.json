@@ -1,0 +1,342 @@
+{
+  "timestamp": "2025-06-09T12:57:17.827200",
+  "base_url": "http://127.0.0.1:8000",
+  "user_created": {
+    "email": "teste.usuario.1749484634.4h8m2o@techze.com.br",
+    "password": "TechZe@123!Teste",
+    "full_name": "Usuário Teste 1749484634",
+    "phone": "+5511925046370",
+    "company": "TechZe Testing Corp"
+  },
+  "summary": {
+    "total_tests": 22,
+    "successful_tests": 17,
+    "failed_tests": 5,
+    "success_rate": 77.27272727272727
+  },
+  "detailed_results": [
+    {
+      "test": "Health Geral",
+      "success": true,
+      "details": "Versão: 1.0.0",
+      "data": {
+        "status": "healthy",
+        "service": "diagnostic-service-consolidated",
+        "version": "1.0.0",
+        "timestamp": "2025-06-09T12:57:14.287210",
+        "environment": "production",
+        "api_status": {
+          "core_api": "available"
+        },
+        "modules": {
+          "security": true,
+          "advanced_pool": true,
+          "analyzers": true
+        }
+      },
+      "timestamp": "2025-06-09T12:57:14.401673"
+    },
+    {
+      "test": "Health Diagnósticos",
+      "success": true,
+      "details": "Serviço online",
+      "data": null,
+      "timestamp": "2025-06-09T12:57:14.468064"
+    },
+    {
+      "test": "Health Autenticação",
+      "success": true,
+      "details": "Serviço online",
+      "data": null,
+      "timestamp": "2025-06-09T12:57:14.485695"
+    },
+    {
+      "test": "Health IA",
+      "success": true,
+      "details": "Serviço online",
+      "data": null,
+      "timestamp": "2025-06-09T12:57:14.533249"
+    },
+    {
+      "test": "Health Automação",
+      "success": true,
+      "details": "Serviço online",
+      "data": null,
+      "timestamp": "2025-06-09T12:57:14.557514"
+    },
+    {
+      "test": "Health Analytics",
+      "success": true,
+      "details": "Serviço online",
+      "data": null,
+      "timestamp": "2025-06-09T12:57:14.571118"
+    },
+    {
+      "test": "Health Performance",
+      "success": true,
+      "details": "Serviço online",
+      "data": null,
+      "timestamp": "2025-06-09T12:57:14.584315"
+    },
+    {
+      "test": "Health Chat",
+      "success": true,
+      "details": "Serviço online",
+      "data": null,
+      "timestamp": "2025-06-09T12:57:14.599352"
+    },
+    {
+      "test": "Health Integração",
+      "success": true,
+      "details": "Serviço online",
+      "data": null,
+      "timestamp": "2025-06-09T12:57:14.615583"
+    },
+    {
+      "test": "Registro Usuário",
+      "success": false,
+      "details": "Status 422",
+      "data": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"email\":\"teste.usuario.1749484634.4h8m2o@techze.com.br\",\"password\":\"TechZe@123!Teste\",\"full_name\":\"Usuário Teste 1749484634\",\"phone\":\"+5511925046370\",\"company\":\"TechZe Testing Corp\"},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}",
+      "timestamp": "2025-06-09T12:57:14.920038"
+    },
+    {
+      "test": "Diagnóstico Rápido",
+      "success": true,
+      "details": "ID: quick_fb777e66, Score: N/A",
+      "data": {
+        "diagnostic_id": "quick_fb777e66",
+        "timestamp": "2025-06-09T12:57:14.950661",
+        "status": "completed",
+        "overall_health": 60,
+        "components": {
+          "cpu": {
+            "health_score": 60,
+            "status": "critical",
+            "metrics": {
+              "percent": 95.3,
+              "count": 8,
+              "frequency": {
+                "current": 1609.0,
+                "min": 0.0,
+                "max": 2112.0
+              }
+            },
+            "issues": [
+              "CPU usage crítico"
+            ],
+            "last_checked": "2025-06-09T12:57:16.085719"
+          },
+          "memory": {
+            "health_score": 70,
+            "status": "warning",
+            "metrics": {
+              "total": 8415662080,
+              "available": 483655680,
+              "percent": 94.3,
+              "used": 7932006400,
+              "free": 483655680,
+              "buffers": 0,
+              "cached": 0
+            },
+            "issues": [
+              "Memória alta"
+            ],
+            "last_checked": "2025-06-09T12:57:16.085719"
+          }
+        },
+        "recommendations": [
+          {
+            "component": "cpu",
+            "priority": "high",
+            "message": "CPU usage crítico",
+            "action": "Verificar e otimizar cpu"
+          },
+          {
+            "component": "memory",
+            "priority": "medium",
+            "message": "Memória alta",
+            "action": "Verificar e otimizar memory"
+          }
+        ],
+        "execution_time": 1.135058,
+        "ai_insights": null
+      },
+      "timestamp": "2025-06-09T12:57:16.100893"
+    },
+    {
+      "test": "Criação Sessão Chat",
+      "success": false,
+      "details": "Status 422",
+      "data": null,
+      "timestamp": "2025-06-09T12:57:16.121804"
+    },
+    {
+      "test": "Métricas Sistema",
+      "success": true,
+      "details": "Dados obtidos: 5 campos",
+      "data": {
+        "timestamp": "2025-06-09T15:57:17.218309",
+        "cpu": {
+          "percent": 96.8,
+          "count": 8,
+          "load_avg": [
+            13.26,
+            4.38,
+            1.62
+          ]
+        },
+        "memory": {
+          "total": 8415662080,
+          "available": 402427904,
+          "percent": 95.2,
+          "used": 8013234176
+        },
+        "disk": {
+          "total": 254721126400,
+          "used": 221332598784,
+          "free": 33388527616,
+          "percent": 86.9
+        },
+        "network": {
+          "bytes_sent": 480549019,
+          "bytes_recv": 4276456220,
+          "packets_sent": 560376,
+          "packets_recv": 998890
+        }
+      },
+      "timestamp": "2025-06-09T12:57:17.227477"
+    },
+    {
+      "test": "Métricas Database",
+      "success": true,
+      "details": "Dados obtidos: 3 campos",
+      "data": {
+        "timestamp": "2025-06-09T15:57:17.233907",
+        "metrics": {
+          "active_connections": 15,
+          "total_connections": 50,
+          "idle_connections": 35,
+          "avg_response_time": 0.25,
+          "slow_queries": 2,
+          "cache_hit_ratio": 0.92,
+          "error_count": 0,
+          "transactions_per_second": 45.2,
+          "connection_utilization": 0.3
+        },
+        "health_status": "healthy"
+      },
+      "timestamp": "2025-06-09T12:57:17.236360"
+    },
+    {
+      "test": "Métricas Aplicação",
+      "success": true,
+      "details": "Dados obtidos: 3 campos",
+      "data": {
+        "timestamp": "2025-06-09T15:57:17.245315",
+        "metrics": {
+          "requests_per_minute": 120,
+          "avg_response_time": 0.15,
+          "error_rate": 0.02,
+          "active_sessions": 25,
+          "cache_hit_rate": 0.88,
+          "queue_size": 5,
+          "worker_threads": 8,
+          "memory_usage_mb": 256
+        },
+        "status": "healthy"
+      },
+      "timestamp": "2025-06-09T12:57:17.251442"
+    },
+    {
+      "test": "Health Básico",
+      "success": true,
+      "details": "Dados obtidos: 4 campos",
+      "data": {
+        "status": "degraded",
+        "timestamp": "2025-06-09T12:57:17.278515",
+        "metrics": {
+          "cpu_percent": 100.0,
+          "memory_percent": 95.3,
+          "disk_percent": 86.9
+        },
+        "issues": [
+          "High CPU usage",
+          "High memory usage"
+        ]
+      },
+      "timestamp": "2025-06-09T12:57:17.285664"
+    },
+    {
+      "test": "Dashboard Performance",
+      "success": true,
+      "details": "Dados obtidos: 7 campos",
+      "data": {
+        "timestamp": "2025-06-09T15:57:17.318921",
+        "health_scores": {
+          "overall": 50.0,
+          "database": 100,
+          "system": 0
+        },
+        "database_stats": {
+          "active_connections": 15,
+          "avg_response_time": 0.25,
+          "error_count": 0,
+          "cache_hit_ratio": 0.92
+        },
+        "system_stats": {
+          "cpu_percent": 100.0,
+          "memory_percent": 95.3,
+          "disk_percent": 86.9
+        },
+        "active_alerts_count": 1,
+        "slow_queries_count": 2,
+        "recommendations_count": 3
+      },
+      "timestamp": "2025-06-09T12:57:17.334493"
+    },
+    {
+      "test": "Analytics Tempo Real",
+      "success": false,
+      "details": "Status 500",
+      "data": null,
+      "timestamp": "2025-06-09T12:57:17.719129"
+    },
+    {
+      "test": "Analytics Tendências",
+      "success": false,
+      "details": "Erro: ('Connection aborted.', ConnectionResetError(10054, 'Foi forçado o cancelamento de uma conexão existente pelo host remoto', None, 10054, None))",
+      "data": null,
+      "timestamp": "2025-06-09T12:57:17.779775"
+    },
+    {
+      "test": "Criação Tarefa",
+      "success": false,
+      "details": "Status 200",
+      "data": null,
+      "timestamp": "2025-06-09T12:57:17.799799"
+    },
+    {
+      "test": "Serviços Integração",
+      "success": true,
+      "details": "Serviços encontrados: 0",
+      "data": [],
+      "timestamp": "2025-06-09T12:57:17.812322"
+    },
+    {
+      "test": "Health Check Integração",
+      "success": true,
+      "details": "Verificação completa",
+      "data": {
+        "summary": {
+          "total_services": 0,
+          "healthy_services": 0,
+          "unhealthy_services": 0,
+          "overall_health": 0
+        },
+        "services": [],
+        "timestamp": "2025-06-09T15:57:17.816319"
+      },
+      "timestamp": "2025-06-09T12:57:17.820321"
+    }
+  ]
+}
