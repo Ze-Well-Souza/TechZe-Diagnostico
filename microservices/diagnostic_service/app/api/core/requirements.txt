@@ -1,0 +1,410 @@
+# TechZe Diagnóstico API Core - Dependências
+
+# Framework principal
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Validação e serialização
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Banco de dados
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+alembic==1.13.1
+
+# Cache e sessões
+redis==5.0.1
+hiredis==2.2.3
+
+# Autenticação e segurança
+supabase==2.3.0
+pyjwt==2.8.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# HTTP client
+httpx==0.25.2
+aiohttp==3.9.1
+
+# Machine Learning e IA
+scikit-learn==1.3.2
+numpy==1.25.2
+pandas==2.1.4
+joblib==1.3.2
+
+# Processamento de dados
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Monitoramento e métricas
+prometheus-client==0.19.0
+psutil==5.9.6
+
+# Rate limiting
+slowapi==0.1.9
+
+# WebSocket
+websockets==12.0
+
+# Logging e debugging
+loguru==0.7.2
+rich==13.7.0
+
+# Utilitários
+python-dotenv==1.0.0
+click==8.1.7
+typer==0.9.0
+
+# Testes (desenvolvimento)
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+httpx==0.25.2  # Para testes de API
+
+# Formatação e linting (desenvolvimento)
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1
+
+# Documentação (desenvolvimento)
+mkdocs==1.5.3
+mkdocs-material==9.4.8
+
+# Análise de código (desenvolvimento)
+bandit==1.7.5
+safety==2.3.5
+
+# Compressão e arquivos
+compression==0.1.0
+
+# Criptografia adicional
+cryptography==41.0.7
+
+# Processamento de imagens (se necessário)
+Pillow==10.1.0
+
+# Processamento de texto
+markdown==3.5.1
+
+# Agendamento de tarefas
+celery==5.3.4
+redis==5.0.1  # Backend para Celery
+
+# Validação de email
+email-validator==2.1.0
+
+# Geração de IDs únicos
+uuid==1.30
+
+# Manipulação de JSON
+orjson==3.9.10
+
+# Timezone
+pytz==2023.3
+
+# Configuração avançada
+dynaconf==3.2.4
+
+# Backup e sincronização
+rclone-python==0.1.16
+
+# Notificações
+slack-sdk==3.26.1
+
+# Integração com APIs externas
+requests==2.31.0
+
+# Processamento assíncrono
+aiofiles==23.2.1
+
+# Validação de schemas
+jsonschema==4.20.0
+
+# Geração de relatórios
+reportlab==4.0.7
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# Análise de performance
+line-profiler==4.1.1
+memory-profiler==0.61.0
+
+# Compressão de dados
+lz4==4.3.2
+zstandard==0.22.0
+
+# Serialização avançada
+msgpack==1.0.7
+
+# Manipulação de arquivos
+pathlibutil==0.2.12
+
+# Validação de URLs
+validators==0.22.0
+
+# Geração de códigos
+qrcode==7.4.2
+
+# Processamento de CSV
+csv-diff==1.0
+
+# Análise de logs
+logparser==0.8.2
+
+# Monitoramento de recursos
+resource-monitor==1.0.0
+
+# Integração com Docker
+docker==6.1.3
+
+# Kubernetes (se necessário)
+kubernetes==28.1.0
+
+# Observabilidade
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+
+# Métricas customizadas
+statsd==4.0.1
+
+# Backup automático
+schedule==1.2.0
+
+# Compressão de logs
+logrotate==0.1.0
+
+# Análise de dependências
+pipdeptree==2.13.1
+
+# Segurança adicional
+secrets==1.0.0
+
+# Validação de configuração
+cerberus==1.3.5
+
+# Processamento de templates
+jinja2==3.1.2
+
+# Manipulação de XML
+lxml==4.9.3
+
+# Processamento de YAML
+PyYAML==6.0.1
+
+# Análise de código
+ast-monitor==0.1.0
+
+# Otimização de queries
+sqlparse==0.4.4
+
+# Cache avançado
+cachetools==5.3.2
+
+# Processamento paralelo
+joblib==1.3.2
+
+# Análise estatística
+scipy==1.11.4
+
+# Processamento de dados geográficos (se necessário)
+geopy==2.4.1
+
+# Integração com serviços de nuvem
+boto3==1.34.0  # AWS
+azure-storage-blob==12.19.0  # Azure
+google-cloud-storage==2.10.0  # Google Cloud
+
+# Processamento de eventos
+event-scheduler==1.0.0
+
+# Análise de rede
+networkx==3.2.1
+
+# Processamento de streams
+kafka-python==2.0.2
+
+# Análise de performance de rede
+ping3==4.0.4
+
+# Monitoramento de SSL
+ssl-checker==1.0.0
+
+# Análise de logs estruturados
+structlog==23.2.0
+
+# Processamento de dados em tempo real
+streamlit==1.28.2  # Para dashboards interativos
+
+# Análise de métricas
+prometheus-client==0.19.0
+grafana-api==1.0.3
+
+# Integração com sistemas de ticketing
+jira==3.5.2
+
+# Processamento de webhooks
+webhook-listener==1.0.0
+
+# Análise de APIs
+api-analytics==1.0.0
+
+# Otimização de memória
+memory-optimizer==1.0.0
+
+# Processamento de filas
+rq==1.15.1
+
+# Análise de dependências de sistema
+system-analyzer==1.0.0
+
+# Backup incremental
+incremental-backup==1.0.0
+
+# Monitoramento de containers
+container-monitor==1.0.0
+
+# Análise de logs de aplicação
+app-log-analyzer==1.0.0
+
+# Otimização de banco de dados
+db-optimizer==1.0.0
+
+# Monitoramento de APIs externas
+external-api-monitor==1.0.0
+
+# Análise de padrões de uso
+usage-pattern-analyzer==1.0.0
+
+# Detecção de anomalias
+anomaly-detector==1.0.0
+
+# Predição de falhas
+failure-predictor==1.0.0
+
+# Otimização automática
+auto-optimizer==1.0.0
+
+# Análise de capacidade
+capacity-analyzer==1.0.0
+
+# Monitoramento de SLA
+sla-monitor==1.0.0
+
+# Análise de custos
+cost-analyzer==1.0.0
+
+# Otimização de recursos
+resource-optimizer==1.0.0
+
+# Análise de compliance
+compliance-checker==1.0.0
+
+# Monitoramento de segurança
+security-monitor==1.0.0
+
+# Análise de vulnerabilidades
+vulnerability-scanner==1.0.0
+
+# Backup de configurações
+config-backup==1.0.0
+
+# Sincronização de dados
+data-sync==1.0.0
+
+# Análise de integridade
+integrity-checker==1.0.0
+
+# Monitoramento de uptime
+uptime-monitor==1.0.0
+
+# Análise de latência
+latency-analyzer==1.0.0
+
+# Otimização de cache
+cache-optimizer==1.0.0
+
+# Monitoramento de throughput
+throughput-monitor==1.0.0
+
+# Análise de bottlenecks
+bottleneck-analyzer==1.0.0
+
+# Predição de carga
+load-predictor==1.0.0
+
+# Otimização de queries
+query-optimizer==1.0.0
+
+# Análise de índices
+index-analyzer==1.0.0
+
+# Monitoramento de conexões
+connection-monitor==1.0.0
+
+# Análise de deadlocks
+deadlock-analyzer==1.0.0
+
+# Otimização de memória
+memory-optimizer==1.0.0
+
+# Análise de garbage collection
+gc-analyzer==1.0.0
+
+# Monitoramento de threads
+thread-monitor==1.0.0
+
+# Análise de CPU
+cpu-analyzer==1.0.0
+
+# Otimização de I/O
+io-optimizer==1.0.0
+
+# Análise de disco
+disk-analyzer==1.0.0
+
+# Monitoramento de rede
+network-monitor==1.0.0
+
+# Análise de bandwidth
+bandwidth-analyzer==1.0.0
+
+# Otimização de protocolos
+protocol-optimizer==1.0.0
+
+# Análise de DNS
+dns-analyzer==1.0.0
+
+# Monitoramento de SSL/TLS
+ssl-monitor==1.0.0
+
+# Análise de certificados
+cert-analyzer==1.0.0
+
+# Otimização de CDN
+cdn-optimizer==1.0.0
+
+# Análise de load balancer
+lb-analyzer==1.0.0
+
+# Monitoramento de proxy
+proxy-monitor==1.0.0
+
+# Análise de firewall
+firewall-analyzer==1.0.0
+
+# Otimização de roteamento
+routing-optimizer==1.0.0
+
+# Análise de QoS
+qos-analyzer==1.0.0
+
+# Monitoramento de VPN
+vpn-monitor==1.0.0
+
+# Análise de túneis
+tunnel-analyzer==1.0.0
+
+# Otimização de protocolos
+protocol-optimizer==1.0.0

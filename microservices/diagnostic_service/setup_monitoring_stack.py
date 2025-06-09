@@ -24,17 +24,17 @@ def print_status(message, status="INFO"):
     print(f"{colors.get(status, '')}{status}: {message}{colors['RESET']}")
 
 def check_docker():
-    """Verifica se Docker est√° dispon√≠vel"""
+    """Verifica se Docker está disponível"""
     try:
         result = subprocess.run(['docker', '--version'], capture_output=True, text=True)
         if result.returncode == 0:
             print_status("Docker encontrado", "SUCCESS")
             return True
         else:
-            print_status("Docker n√£o encontrado", "ERROR")
+            print_status("Docker não encontrado", "ERROR")
             return False
     except FileNotFoundError:
-        print_status("Docker n√£o est√° instalado", "ERROR")
+        print_status("Docker não está instalado", "ERROR")
         return False
 
 def create_docker_compose():
@@ -158,7 +158,7 @@ networks:
     print_status("Arquivo docker-compose.monitoring.yml criado", "SUCCESS")
 
 def create_alertmanager_config():
-    """Cria configura√ß√£o do Alertmanager"""
+    """Cria configuração do Alertmanager"""
     alertmanager_config = """
 global:
   smtp_smarthost: 'localhost:587'
@@ -188,7 +188,7 @@ receivers:
   webhook_configs:
   - url: 'http://localhost:8000/api/v1/alerts/webhook'
     send_resolved: true
-  # Adicione configura√ß√µes de email/Slack aqui se necess√°rio
+  # Adicione configurações de email/Slack aqui se necessário
   # email_configs:
   # - to: 'admin@techze.com'
   #   subject: 'CRITICAL: {{ .GroupLabels.alertname }}'
@@ -226,7 +226,7 @@ def setup_grafana_datasource():
         "isDefault": True
     }
     
-    # Aguarda Grafana estar dispon√≠vel
+    # Aguarda Grafana estar disponível
     print_status("Aguardando Grafana inicializar...", "INFO")
     for i in range(30):
         try:
@@ -249,7 +249,7 @@ def setup_grafana_datasource():
             headers={"Content-Type": "application/json"}
         )
         
-        if response.status_code in [200, 409]:  # 409 = j√° existe
+        if response.status_code in [200, 409]:  # 409 = já existe
             print_status("Datasource Prometheus configurado no Grafana", "SUCCESS")
             return True
         else:
@@ -310,15 +310,15 @@ def start_monitoring_stack():
         return False
 
 def verify_services():
-    """Verifica se todos os servi√ßos est√£o funcionando"""
+    """Verifica se todos os serviços estão funcionando"""
     services = {
         "Prometheus": "http://localhost:9090/-/healthy",
         "Grafana": "http://localhost:3000/api/health",
         "Alertmanager": "http://localhost:9093/-/healthy",
-        "Redis": "http://localhost:6379"  # Ser√° verificado diferente
+        "Redis": "http://localhost:6379"  # Será verificado diferente
     }
     
-    print_status("Verificando servi√ßos...", "INFO")
+    print_status("Verificando serviços...", "INFO")
     
     for service, url in services.items():
         if service == "Redis":
@@ -327,67 +327,67 @@ def verify_services():
                 result = subprocess.run(['docker', 'exec', 'techze-redis', 'redis-cli', 'ping'], 
                                       capture_output=True, text=True)
                 if result.returncode == 0 and 'PONG' in result.stdout:
-                    print_status(f"‚úÖ {service} est√° funcionando", "SUCCESS")
+                    print_status(f"✓ {service} está funcionando", "SUCCESS")
                 else:
-                    print_status(f"‚ùå {service} n√£o est√° respondendo", "ERROR")
+                    print_status(f"✗ {service} não está respondendo", "ERROR")
             except Exception as e:
-                print_status(f"‚ùå Erro ao verificar {service}: {e}", "ERROR")
+                print_status(f"✗ Erro ao verificar {service}: {e}", "ERROR")
         else:
             try:
                 response = requests.get(url, timeout=5)
                 if response.status_code == 200:
-                    print_status(f"‚úÖ {service} est√° funcionando", "SUCCESS")
+                    print_status(f"✓ {service} está funcionando", "SUCCESS")
                 else:
-                    print_status(f"‚ùå {service} retornou status {response.status_code}", "WARNING")
+                    print_status(f"✗ {service} retornou status {response.status_code}", "WARNING")
             except Exception as e:
-                print_status(f"‚ùå {service} n√£o est√° acess√≠vel: {e}", "ERROR")
+                print_status(f"✗ {service} não está acessível: {e}", "ERROR")
 
 def print_access_info():
-    """Imprime informa√ß√µes de acesso aos servi√ßos"""
+    """Imprime informações de acesso aos serviços"""
     print_status("\n" + "="*60, "INFO")
     print_status("STACK DE MONITORAMENTO CONFIGURADO COM SUCESSO!", "SUCCESS")
     print_status("="*60, "INFO")
     print_status("", "INFO")
-    print_status("üîó URLs de Acesso:", "INFO")
+    print_status("🔗 URLs de Acesso:", "INFO")
     print_status("", "INFO")
-    print_status("üìä Grafana: http://localhost:3000", "INFO")
-    print_status("   Usu√°rio: admin", "INFO")
+    print_status("📊 Grafana: http://localhost:3000", "INFO")
+    print_status("   Usuário: admin", "INFO")
     print_status("   Senha: techze123", "INFO")
     print_status("", "INFO")
-    print_status("üìà Prometheus: http://localhost:9090", "INFO")
-    print_status("üö® Alertmanager: http://localhost:9093", "INFO")
-    print_status("üî¥ Redis: localhost:6379", "INFO")
+    print_status("📈 Prometheus: http://localhost:9090", "INFO")
+    print_status("🚨 Alertmanager: http://localhost:9093", "INFO")
+    print_status("💾 Redis: localhost:6379", "INFO")
     print_status("", "INFO")
-    print_status("üìã Dashboards Dispon√≠veis:", "INFO")
-    print_status("   ‚Ä¢ TechZe - Dashboard Operacional", "INFO")
-    print_status("   ‚Ä¢ TechZe - Dashboard de Seguran√ßa", "INFO")
-    print_status("   ‚Ä¢ TechZe - Dashboard de Neg√≥cio", "INFO")
+    print_status("📋 Dashboards Disponíveis:", "INFO")
+    print_status("   • TechZe - Dashboard Operacional", "INFO")
+    print_status("   • TechZe - Dashboard de Segurança", "INFO")
+    print_status("   • TechZe - Dashboard de Negócio", "INFO")
     print_status("", "INFO")
-    print_status("üîß Para parar o stack:", "INFO")
+    print_status("🛑 Para parar o stack:", "INFO")
     print_status("   docker-compose -f docker-compose.monitoring.yml down", "INFO")
     print_status("", "INFO")
     print_status("="*60, "INFO")
 
 def main():
-    """Fun√ß√£o principal"""
-    print_status("üöÄ Configurando Stack de Monitoramento TechZe", "INFO")
+    """Função principal"""
+    print_status("🚀 Configurando Stack de Monitoramento TechZe", "INFO")
     print_status("", "INFO")
     
     # Verifica Docker
     if not check_docker():
-        print_status("Docker √© necess√°rio para executar o stack de monitoramento", "ERROR")
+        print_status("Docker é necessário para executar o stack de monitoramento", "ERROR")
         sys.exit(1)
     
-    # Cria arquivos de configura√ß√£o
-    print_status("Criando arquivos de configura√ß√£o...", "INFO")
+    # Cria arquivos de configuração
+    print_status("Criando arquivos de configuração...", "INFO")
     create_docker_compose()
     create_alertmanager_config()
     
-    # Verifica se arquivos necess√°rios existem
+    # Verifica se arquivos necessários existem
     required_files = ['prometheus.yml', 'alert_rules.yml', 'grafana_dashboards.json']
     for file in required_files:
         if not os.path.exists(file):
-            print_status(f"Arquivo necess√°rio n√£o encontrado: {file}", "ERROR")
+            print_status(f"Arquivo necessário não encontrado: {file}", "ERROR")
             sys.exit(1)
     
     # Inicia stack
@@ -395,11 +395,11 @@ def main():
         print_status("Falha ao iniciar stack de monitoramento", "ERROR")
         sys.exit(1)
     
-    # Aguarda servi√ßos iniciarem
-    print_status("Aguardando servi√ßos iniciarem...", "INFO")
+    # Aguarda serviços iniciarem
+    print_status("Aguardando serviços iniciarem...", "INFO")
     time.sleep(30)
     
-    # Verifica servi√ßos
+    # Verifica serviços
     verify_services()
     
     # Configura Grafana
@@ -408,7 +408,7 @@ def main():
         time.sleep(5)
         import_grafana_dashboards()
     
-    # Imprime informa√ß√µes de acesso
+    # Imprime informações de acesso
     print_access_info()
 
 if __name__ == "__main__":

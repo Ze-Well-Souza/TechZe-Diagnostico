@@ -1,0 +1,1 @@
+# Módulo de integração para comunicação entre serviços

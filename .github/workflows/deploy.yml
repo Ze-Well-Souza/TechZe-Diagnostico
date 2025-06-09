@@ -65,7 +65,7 @@ jobs:
           pip install pytest pytest-asyncio pytest-cov
 
       - name: Run frontend tests
-        run: npm run test -- --coverage --watchAll=false
+        run: npm run test:coverage
 
       - name: Run backend tests
         env:
@@ -177,4 +177,4 @@ jobs:
             echo "✅ Deployment successful!"
           else
             echo "❌ Deployment failed!"
-          fi 
+          fi

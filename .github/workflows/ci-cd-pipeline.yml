@@ -76,7 +76,7 @@ jobs:
         run: npm ci
 
       - name: 🧪 Run unit tests
-        run: npm run test -- --coverage --watchAll=false
+        run: npm run test:coverage
 
       - name: 🎭 Run E2E tests
         run: |

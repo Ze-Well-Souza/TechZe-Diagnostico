@@ -30,7 +30,6 @@ jobs:
       run: npm test
 
     - name: Generate test coverage report
-      working-directory: ./frontend-v3
       run: npm run test:coverage
 
   test-backend:

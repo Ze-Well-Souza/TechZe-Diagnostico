@@ -3,7 +3,7 @@ import sys
 from typing import Any, Dict, List, Optional
 
 from loguru import logger
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 from app.core.config import settings
 

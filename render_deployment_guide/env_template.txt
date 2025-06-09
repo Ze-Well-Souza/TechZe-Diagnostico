@@ -1,0 +1,23 @@
+# Template de Variáveis de Ambiente para Render
+# Gerado em: 2025-06-09 08:35:40
+
+# IMPORTANTE: Não commite este arquivo com valores reais!
+# Use este template apenas como referência.
+
+# URL do projeto Supabase # OBRIGATÓRIO
+SUPABASE_URL=https://seu-projeto.supabase.co
+
+# Chave anônima do Supabase (pública) # OBRIGATÓRIO
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# Chave de service role do Supabase (privada) # OBRIGATÓRIO
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# Chave secreta para assinatura de tokens JWT # OBRIGATÓRIO
+JWT_SECRET_KEY=sua-chave-secreta-super-segura-aqui
+
+# URL de conexão com Redis (opcional para cache) # OPCIONAL
+REDIS_URL=redis://localhost:6379
+
+# DSN do Sentry para monitoramento de erros # OPCIONAL
+SENTRY_DSN=https://chave@sentry.io/projeto
