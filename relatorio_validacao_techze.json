@@ -1,0 +1,89 @@
+{
+  "timestamp": "2025-06-09T13:24:16.214680",
+  "render_status": {
+    "status": "success",
+    "total_services": 1,
+    "services_ativos": 0,
+    "services": [
+      {
+        "name": null,
+        "type": null,
+        "status": null,
+        "url": null,
+        "updated": null,
+        "env": null
+      }
+    ],
+    "health_score": 0.0
+  },
+  "performance": {
+    "desktop": {
+      "error": "HTTP 400",
+      "strategy": "desktop"
+    },
+    "mobile": {
+      "error": "HTTP 400",
+      "strategy": "mobile"
+    },
+    "resumo": {
+      "score_medio": 0,
+      "core_vitals_medio": {
+        "lcp": 0,
+        "fcp": 0,
+        "cls": 0,
+        "tbt": 0
+      },
+      "status": "RUIM",
+      "total_testes": 0
+    }
+  },
+  "apis": {
+    "total_testadas": 3,
+    "funcionais": 0,
+    "taxa_sucesso": 0.0,
+    "detalhes": [
+      {
+        "url": "https://techze-diagnostico-api.onrender.com/health",
+        "status_code": 404,
+        "response_time_ms": 580.17,
+        "status": "ERROR",
+        "timestamp": "2025-06-09T13:24:15.569119"
+      },
+      {
+        "url": "https://techze-diagnostico-api.onrender.com/api/v3/diagnostic/health",
+        "status_code": 404,
+        "response_time_ms": 649.12,
+        "status": "ERROR",
+        "timestamp": "2025-06-09T13:24:15.638599"
+      },
+      {
+        "url": "https://techze-diagnostico-api.onrender.com/api/v3/ai/models",
+        "status_code": 404,
+        "response_time_ms": 518.86,
+        "status": "ERROR",
+        "timestamp": "2025-06-09T13:24:15.509342"
+      }
+    ],
+    "status_geral": "ERRO"
+  },
+  "security": {
+    "https_ativo": true,
+    "security_headers": {
+      "strict-transport-security": false,
+      "x-content-type-options": false,
+      "x-frame-options": false,
+      "content-security-policy": false,
+      "https_redirect": true
+    },
+    "security_score": 20.0,
+    "status": "RUIM"
+  },
+  "score_geral": 5.0,
+  "status_geral": "🔴 CRÍTICO",
+  "acoes_recomendadas": [
+    "🔧 Otimizar performance do site",
+    "🛡️ Melhorar headers de segurança",
+    "⚡ Verificar tempo de resposta das APIs",
+    "📊 Monitorar métricas Core Web Vitals"
+  ]
+}

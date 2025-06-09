@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-06-09T14:29:28.515024",
+  "render_services": {
+    "total_services": 1,
+    "available": 0,
+    "availability_score": 0.0,
+    "services_info": [
+      {
+        "name": "Unknown",
+        "type": "Unknown",
+        "state": "Unknown",
+        "env": "Unknown"
+      }
+    ]
+  },
+  "connectivity": {
+    "total_testadas": 3,
+    "sucessos": 1,
+    "taxa_sucesso": 33.33333333333333,
+    "detalhes": [
+      {
+        "url": "https://techreparo.com",
+        "status_code": 200,
+        "response_time_ms": 306.41,
+        "status": "OK"
+      },
+      {
+        "url": "https://techze-diagnostico-api.onrender.com/",
+        "status_code": 404,
+        "response_time_ms": 347.1,
+        "status": "ERROR"
+      },
+      {
+        "url": "https://techze-diagnostico-frontend.onrender.com/",
+        "status_code": 404,
+        "response_time_ms": 474.97,
+        "status": "ERROR"
+      }
+    ]
+  },
+  "score_geral": 16.7,
+  "status_geral": "🔴 CRÍTICO"
+}
