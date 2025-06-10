@@ -1,0 +1,49 @@
+{
+  "timestamp": "2025-06-09T18:14:22.997113",
+  "total_services": 2,
+  "services_with_domains": 1,
+  "services_details": [
+    {
+      "service_id": "srv-d13i0ps9c44c739cd3e0",
+      "service_name": "techze-frontend-app",
+      "service_type": "static_site",
+      "service_url": "https://techze-frontend-app.onrender.com",
+      "custom_domains": [
+        {
+          "cursor": "HYo5lW5jTRMxZTQ5YzQ0YzczOWNkbjYw",
+          "customDomain": {
+            "createdAt": "2025-06-09T17:58:16.855897Z",
+            "domainType": "subdomain",
+            "id": "cdm-d13i1e49c44c739cdn60",
+            "name": "www.techreparo.com",
+            "publicSuffix": "com",
+            "redirectForName": "techreparo.com",
+            "verificationStatus": "verified"
+          }
+        },
+        {
+          "cursor": "HYo5lW5jTRMxZTQ5YzQ0YzczOWNkbjUw",
+          "customDomain": {
+            "createdAt": "2025-06-09T17:58:16.845558Z",
+            "domainType": "apex",
+            "id": "cdm-d13i1e49c44c739cdn50",
+            "name": "techreparo.com",
+            "publicSuffix": "com",
+            "redirectForName": "",
+            "verificationStatus": "verified"
+          }
+        }
+      ],
+      "domain_count": 2
+    },
+    {
+      "service_id": "srv-d0t22t63jp1c73dui0kg",
+      "service_name": "techze-diagnostic-api",
+      "service_type": "web_service",
+      "service_url": "https://techze-diagnostic-api.onrender.com",
+      "custom_domains": [],
+      "domain_count": 0
+    }
+  ],
+  "techreparo_domains": []
+}

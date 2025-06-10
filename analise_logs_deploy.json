@@ -1,0 +1,27 @@
+{
+  "timestamp": "2025-06-09T20:27:15.098850",
+  "deploy_info": {
+    "id": "dep-d13l6pm3jp1c73d6slrg",
+    "commit": {
+      "id": "ed8105eaa0784707de5ab049ea8318cb6a30b7a6",
+      "message": "🔧 RENDER FIXES: Dependências backend corrigidas + serviços duplicados removidos",
+      "createdAt": "2025-06-09T18:16:56Z"
+    },
+    "status": "live",
+    "trigger": "api",
+    "createdAt": "2025-06-09T21:34:31.947604Z",
+    "updatedAt": "2025-06-09T21:35:20.545256Z",
+    "startedAt": "2025-06-09T21:34:31.928753Z",
+    "finishedAt": "2025-06-09T21:35:20.545065Z"
+  },
+  "config": {
+    "build_command": "",
+    "publish_path": "public",
+    "auto_deploy": "unknown",
+    "root_dir": "",
+    "branch": "unknown"
+  },
+  "issues_found": [],
+  "logs_available": false,
+  "logs_excerpt": null
+}

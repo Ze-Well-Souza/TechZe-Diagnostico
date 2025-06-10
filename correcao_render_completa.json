@@ -1,0 +1,32 @@
+{
+  "timestamp": "2025-06-09T18:33:36.760546",
+  "initial_settings": {
+    "build_command": "",
+    "publish_path": "public",
+    "service_name": "techze-frontend-app",
+    "type": "static_site",
+    "status": "not_suspended"
+  },
+  "corrections_applied": {
+    "build_command": "npm install && npm run build",
+    "publish_path": "dist"
+  },
+  "test_results": {
+    "https://techze-frontend-app.onrender.com": {
+      "status_code": 404,
+      "success": false,
+      "content_length": 10
+    },
+    "https://techreparo.com": {
+      "status_code": 404,
+      "success": false,
+      "content_length": 10
+    },
+    "https://www.techreparo.com": {
+      "status_code": 404,
+      "success": false,
+      "content_length": 10
+    }
+  },
+  "all_working": false
+}

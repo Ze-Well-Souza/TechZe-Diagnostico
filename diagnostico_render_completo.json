@@ -1,0 +1,107 @@
+{
+  "timestamp": "2025-06-09T18:29:25.881477",
+  "service_data": {
+    "autoDeploy": "yes",
+    "autoDeployTrigger": "commit",
+    "branch": "main",
+    "createdAt": "2025-06-09T17:56:56.178779Z",
+    "dashboardUrl": "https://dashboard.render.com/static/srv-d13i0ps9c44c739cd3e0",
+    "id": "srv-d13i0ps9c44c739cd3e0",
+    "name": "techze-frontend-app",
+    "notifyOnFail": "default",
+    "ownerId": "tea-d0t0sg63jp1c73dtb1m0",
+    "repo": "https://github.com/Ze-Well-Souza/TechZe-Diagnostico",
+    "rootDir": "",
+    "serviceDetails": {
+      "buildCommand": "",
+      "buildPlan": "starter",
+      "previews": {
+        "generation": "automatic"
+      },
+      "publishPath": "public",
+      "pullRequestPreviewsEnabled": "yes",
+      "url": "https://techze-frontend-app.onrender.com"
+    },
+    "slug": "techze-frontend-app",
+    "suspended": "not_suspended",
+    "suspenders": [],
+    "type": "static_site",
+    "updatedAt": "2025-06-09T20:43:44.115939Z"
+  },
+  "deploys": [
+    {
+      "deploy": {
+        "id": "dep-d13k5u2li9vc738lmo7g",
+        "commit": {
+          "id": "ed8105eaa0784707de5ab049ea8318cb6a30b7a6",
+          "message": "🔧 RENDER FIXES: Dependências backend corrigidas + serviços duplicados removidos",
+          "createdAt": "2025-06-09T18:16:56Z"
+        },
+        "status": "live",
+        "trigger": "api",
+        "createdAt": "2025-06-09T20:24:25.933122Z",
+        "updatedAt": "2025-06-09T20:25:17.28697Z",
+        "startedAt": "2025-06-09T20:24:25.921172Z",
+        "finishedAt": "2025-06-09T20:25:17.286796Z"
+      },
+      "cursor": "BQ5LbY80Fuc1dTJsaTl2YzczOGxtbzdn"
+    },
+    {
+      "deploy": {
+        "id": "dep-d13iba3ipnbc738jphdg",
+        "commit": {
+          "id": "ed8105eaa0784707de5ab049ea8318cb6a30b7a6",
+          "message": "🔧 RENDER FIXES: Dependências backend corrigidas + serviços duplicados removidos",
+          "createdAt": "2025-06-09T18:16:56Z"
+        },
+        "status": "deactivated",
+        "trigger": "new_commit",
+        "createdAt": "2025-06-09T18:19:20.76072Z",
+        "updatedAt": "2025-06-09T20:25:17.28498Z",
+        "startedAt": "2025-06-09T18:19:20.758961Z",
+        "finishedAt": "2025-06-09T18:20:07.910701Z"
+      },
+      "cursor": "M-2iPnxVNHxiYTNpcG5iYzczOGpwaGRn"
+    },
+    {
+      "deploy": {
+        "id": "dep-d13i9r24d50c739fm4pg",
+        "commit": {
+          "id": "a69fcc29a2d4624e7a1bc77803b250f71d1ace96",
+          "message": "🔧 RENDER BUILD FIX: Script personalizado + comando alternativo para resolver vite permission denied",
+          "createdAt": "2025-06-09T17:51:50Z"
+        },
+        "status": "deactivated",
+        "trigger": "api",
+        "createdAt": "2025-06-09T18:16:13.580306Z",
+        "updatedAt": "2025-06-09T18:20:07.908352Z",
+        "startedAt": "2025-06-09T18:16:13.549078Z",
+        "finishedAt": "2025-06-09T18:17:02.334152Z"
+      },
+      "cursor": "M-2iPnxVNHw5cjI0ZDUwYzczOWZtNHBn"
+    },
+    {
+      "deploy": {
+        "id": "dep-d13i0q49c44c739cd3p0",
+        "commit": {
+          "id": "a69fcc29a2d4624e7a1bc77803b250f71d1ace96",
+          "message": "🔧 RENDER BUILD FIX: Script personalizado + comando alternativo para resolver vite permission denied",
+          "createdAt": "2025-06-09T17:51:50Z"
+        },
+        "status": "deactivated",
+        "trigger": "manual",
+        "createdAt": "2025-06-09T17:56:57.434241Z",
+        "updatedAt": "2025-06-09T18:17:02.33245Z",
+        "startedAt": "2025-06-09T17:56:57.431097Z",
+        "finishedAt": "2025-06-09T17:58:01.585434Z"
+      },
+      "cursor": "M-2iPnxVNHwwcTQ5YzQ0YzczOWNkM3Aw"
+    }
+  ],
+  "env_vars_count": 2,
+  "issues_found": [
+    "⚠️ BUILD COMMAND vazio"
+  ],
+  "critical_issues": 0,
+  "warning_issues": 1
+}
