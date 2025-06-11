@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { backgroundSyncService } from '../services/backgroundSyncService';
+import { getBackgroundSyncService } from '../services/backgroundSyncService';
 
 interface PWAContextType {
   isOnline: boolean;
@@ -75,7 +75,7 @@ export const PWAProvider: React.FC<PWAProviderProps> = ({ children }) => {
   // Atualizar contagem de operações pendentes
   const updatePendingOperations = useCallback(async () => {
     try {
-      const queueStatus = backgroundSyncService.getQueueStatus();
+      const queueStatus = getBackgroundSyncService().getQueueStatus();
       setPendingOperations(queueStatus.total);
     } catch (error) {
       console.error('Erro ao obter operações pendentes:', error);
@@ -87,7 +87,7 @@ export const PWAProvider: React.FC<PWAProviderProps> = ({ children }) => {
       setIsOnline(true);
       setSyncStatus('syncing');
       try {
-        await backgroundSyncService.forceSync();
+        await getBackgroundSyncService().forceSync();
         setSyncStatus('completed');
         setTimeout(() => setSyncStatus('idle'), 2000);
       } catch (error) {

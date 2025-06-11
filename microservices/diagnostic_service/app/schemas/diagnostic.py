@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from app.models.diagnostic import DiagnosticStatus
 
@@ -133,7 +133,8 @@ class DiagnosticResult(BaseModel):
     })
     overall_health: int = Field(..., ge=0, le=100, example=85)
     
-    @validator("overall_health")
+    @field_validator("overall_health")
+    @classmethod
     def validate_overall_health(cls, v):
         if v < 0 or v > 100:
             raise ValueError("overall_health must be between 0 and 100")

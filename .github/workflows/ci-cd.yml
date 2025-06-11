@@ -1,0 +1,434 @@
+name: TechZe CI/CD Pipeline - Advanced Security & Feedback
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Testes de segurança semanais
+    - cron: '0 3 * * 0'
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+  FAIL_FAST: true
+  SECURITY_THRESHOLD: 'high'
+
+jobs:
+  # ===== PRE-FLIGHT CHECKS =====
+  pre-flight:
+    name: 🔍 Pre-flight Checks
+    runs-on: ubuntu-latest
+    outputs:
+      should-deploy: ${{ steps.checks.outputs.deploy-ready }}
+      test-environments: ${{ steps.env-check.outputs.environments }}
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔍 Check deployment readiness
+        id: checks
+        run: |
+          # Verificar se é commit de produção
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "deploy-ready=true" >> $GITHUB_OUTPUT
+          else
+            echo "deploy-ready=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: 🌍 Environment isolation check
+        id: env-check
+        run: |
+          # Definir ambientes de teste isolados
+          echo "environments=['test-db-1', 'test-db-2', 'test-db-3']" >> $GITHUB_OUTPUT
+
+  # ===== BACKEND TESTS WITH BLOCKING =====
+  test-backend:
+    name: 🧪 Backend Tests (Blocking)
+    runs-on: ubuntu-latest
+    needs: pre-flight
+    defaults:
+      run:
+        working-directory: ./microservices/diagnostic_service
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: techze_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          
+      - name: 📦 Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          
+      - name: 🔧 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov pytest-html pytest-xdist
+          
+      - name: 📊 Create test database snapshot
+        run: |
+          echo "📊 Creating pre-test database snapshot..."
+          pg_dump -h localhost -U postgres -d techze_test > /tmp/pre_test_snapshot.sql
+        env:
+          PGPASSWORD: test_password
+          
+      - name: 🧪 Run unit tests (CRITICAL - BLOCKING)
+        run: |
+          pytest tests/ \
+            --cov=app \
+            --cov-report=xml \
+            --cov-report=html \
+            --cov-fail-under=75 \
+            --maxfail=5 \
+            --tb=short \
+            -v
+        env:
+          DATABASE_URL: postgresql://postgres:test_password@localhost:5432/techze_test
+          REDIS_URL: redis://localhost:6379/0
+          
+      - name: 🔍 Run integration tests (CRITICAL - BLOCKING)
+        run: |
+          python tests/integration/test_complete_suite.py
+          if [ $? -ne 0 ]; then
+            echo "❌ CRITICAL: Integration tests failed - BLOCKING deployment"
+            exit 1
+          fi
+        env:
+          DATABASE_URL: postgresql://postgres:test_password@localhost:5432/techze_test
+          
+      - name: 📊 Create post-test database snapshot
+        if: always()
+        run: |
+          echo "📊 Creating post-test database snapshot..."
+          pg_dump -h localhost -U postgres -d techze_test > /tmp/post_test_snapshot.sql
+        env:
+          PGPASSWORD: test_password
+          
+      - name: 📊 Upload test artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: backend-test-results
+          path: |
+            htmlcov/
+            coverage.xml
+            /tmp/*_test_snapshot.sql
+            
+      - name: 📈 Generate performance baseline
+        run: |
+          python tests/integration/test_performance_validation.py --generate-baseline
+        env:
+          DATABASE_URL: postgresql://postgres:test_password@localhost:5432/techze_test
+
+  # ===== FRONTEND TESTS WITH BLOCKING =====
+  test-frontend:
+    name: 🎨 Frontend Tests (Blocking)
+    runs-on: ubuntu-latest
+    needs: pre-flight
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🧪 Run unit tests (CRITICAL - BLOCKING)
+        run: |
+          npm test -- --coverage --watchAll=false --passWithNoTests=false
+          if [ $? -ne 0 ]; then
+            echo "❌ CRITICAL: Frontend unit tests failed - BLOCKING deployment"
+            exit 1
+          fi
+        
+      - name: 🏗️ Build application (CRITICAL - BLOCKING)
+        run: |
+          npm run build
+          if [ $? -ne 0 ]; then
+            echo "❌ CRITICAL: Frontend build failed - BLOCKING deployment"
+            exit 1
+          fi
+        
+      - name: 🔍 Run E2E tests with retry
+        uses: cypress-io/github-action@v6
+        with:
+          start: npm run dev
+          wait-on: 'http://localhost:3000'
+          wait-on-timeout: 120
+          record: true
+          parallel: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: 📊 Upload frontend artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: |
+            dist/
+            coverage/
+            cypress/videos/
+            cypress/screenshots/
+
+  # ===== ADVANCED SECURITY SCAN =====
+  security-scan:
+    name: 🔒 Advanced Security Scan (Blocking)
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔍 Trivy filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1' # Falhar se vulnerabilidades críticas
+          
+      - name: 🔐 OWASP ZAP API Security Test
+        uses: zaproxy/action-api-scan@v0.2.0
+        with:
+          target: 'http://localhost:8000/api'
+          format: openapi
+          cmd_options: '-a'
+          
+      - name: 🔒 Semgrep SAST Scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: auto
+          generateSarif: "1"
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+          
+      - name: 🛡️ Bandit Security Scan (Python)
+        run: |
+          pip install bandit[toml]
+          bandit -r microservices/diagnostic_service/app/ -f json -o bandit-report.json
+          if [ $? -eq 1 ]; then
+            echo "❌ CRITICAL: High-severity security issues found - BLOCKING deployment"
+            exit 1
+          fi
+          
+      - name: 📊 Upload security results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+          
+      - name: 🔒 Security Summary
+        if: always()
+        run: |
+          echo "## 🔒 Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "- Trivy: $(cat trivy-results.sarif | jq '.runs[0].results | length') issues found" >> $GITHUB_STEP_SUMMARY
+          echo "- OWASP ZAP: API security test completed" >> $GITHUB_STEP_SUMMARY
+          echo "- Semgrep: SAST analysis completed" >> $GITHUB_STEP_SUMMARY
+          echo "- Bandit: Python security analysis completed" >> $GITHUB_STEP_SUMMARY
+
+  # ===== PERFORMANCE & LOAD TESTING =====
+  performance-tests:
+    name: 📈 Performance Testing (Advisory)
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🚀 Setup K6 for load testing
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+          
+      - name: 📊 Run load tests
+        run: |
+          k6 run --out json=performance-results.json tests/performance/load-test.js
+          
+      - name: 📈 Performance baseline comparison
+        run: |
+          python scripts/performance/compare_baseline.py performance-results.json
+          
+      - name: 📊 Upload performance results
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-results
+          path: performance-results.json
+
+  # ===== BUILD AND DEPLOY WITH GATES =====
+  build-and-deploy:
+    name: 🚀 Build & Deploy (Conditional)
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend, security-scan, pre-flight]
+    if: |
+      needs.pre-flight.outputs.should-deploy == 'true' &&
+      needs.test-backend.result == 'success' &&
+      needs.test-frontend.result == 'success' &&
+      needs.security-scan.result == 'success'
+    
+    environment:
+      name: production
+      url: https://techze-diagnostico.onrender.com
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: ✅ Deployment gate check
+        run: |
+          echo "🔍 All quality gates passed:"
+          echo "✅ Backend tests: PASSED"
+          echo "✅ Frontend tests: PASSED" 
+          echo "✅ Security scan: PASSED"
+          echo "✅ Ready for production deployment"
+        
+      - name: 🐳 Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: 🔑 Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: 🏗️ Build and push Docker images
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/techze-api:latest
+            ghcr.io/${{ github.repository }}/techze-api:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          
+      - name: 🚀 Deploy to Production
+        run: |
+          python scripts/deploy/deploy_production.py
+          
+      - name: 🔍 Post-deploy health check
+        run: |
+          sleep 60
+          for i in {1..10}; do
+            if curl -f https://techze-diagnostico.onrender.com/health; then
+              echo "✅ Health check passed"
+              break
+            fi
+            if [ $i -eq 10 ]; then
+              echo "❌ Health check failed after 10 attempts"
+              exit 1
+            fi
+            sleep 30
+          done
+
+  # ===== FEEDBACK AND MONITORING =====
+  feedback-loop:
+    name: 📈 Feedback Loop & Analysis
+    runs-on: ubuntu-latest
+    needs: [build-and-deploy]
+    if: always()
+    
+    steps:
+      - name: 📥 Download all artifacts
+        uses: actions/download-artifact@v3
+        
+      - name: 📊 Generate comprehensive report
+        run: |
+          python scripts/analytics/generate_feedback_report.py \
+            --backend-results backend-test-results/ \
+            --frontend-results frontend-build/ \
+            --performance-results performance-results/ \
+            --output feedback-report.json
+            
+      - name: 📈 Update performance baseline
+        if: github.ref == 'refs/heads/main' && needs.build-and-deploy.result == 'success'
+        run: |
+          python scripts/performance/update_baseline.py feedback-report.json
+          
+      - name: 🎯 Create improvement recommendations
+        run: |
+          python scripts/analytics/generate_recommendations.py feedback-report.json
+          
+      - name: 📢 Send feedback notifications
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          text: |
+            CI/CD Pipeline completed: ${{ job.status }}
+            
+            Quality Gates:
+            - Backend Tests: ${{ needs.test-backend.result }}
+            - Frontend Tests: ${{ needs.test-frontend.result }}
+            - Security Scan: ${{ needs.security-scan.result }}
+            - Deployment: ${{ needs.build-and-deploy.result }}
+            
+            📊 View detailed report: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ===== CLEANUP AND MAINTENANCE =====
+  cleanup:
+    name: 🧹 Environment Cleanup
+    runs-on: ubuntu-latest
+    needs: [feedback-loop]
+    if: always()
+    
+    steps:
+      - name: 🗑️ Clean up test environments
+        run: |
+          echo "Cleaning up isolated test environments..."
+          # Limpeza dos ambientes de teste isolados
+          
+      - name: 📊 Archive test snapshots
+        run: |
+          echo "Archiving database snapshots for audit..."
+          # Arquivar snapshots para auditoria futura 

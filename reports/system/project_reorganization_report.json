@@ -1,0 +1,506 @@
+{
+  "timestamp": "2025-06-10T18:00:41.824390",
+  "moved_files": [
+    {
+      "file": "deploy_final_automatico.py",
+      "from": "root",
+      "to": "scripts/deploy"
+    },
+    {
+      "file": "deploy_render_complete.py",
+      "from": "root",
+      "to": "scripts/deploy"
+    },
+    {
+      "file": "render_auto_setup.py",
+      "from": "root",
+      "to": "scripts/deploy"
+    },
+    {
+      "file": "render_blueprint_creator.py",
+      "from": "root",
+      "to": "scripts/deploy"
+    },
+    {
+      "file": "render_build_otimizado.py",
+      "from": "root",
+      "to": "scripts/deploy"
+    },
+    {
+      "file": "setup_render_deployment.py",
+      "from": "root",
+      "to": "scripts/deploy"
+    },
+    {
+      "file": "render_health_check.py",
+      "from": "root",
+      "to": "scripts/deploy"
+    },
+    {
+      "file": "monitor_deploy_tempo_real.py",
+      "from": "root",
+      "to": "scripts/deploy"
+    },
+    {
+      "file": "verificar_status_render.py",
+      "from": "root",
+      "to": "scripts/deploy"
+    },
+    {
+      "file": "verificar_todos_dominios_render.py",
+      "from": "root",
+      "to": "scripts/deploy"
+    },
+    {
+      "file": "render-build.sh",
+      "from": "root",
+      "to": "scripts/deploy"
+    },
+    {
+      "file": "run_setup.py",
+      "from": "root",
+      "to": "scripts/setup"
+    },
+    {
+      "file": "setup_complete.py",
+      "from": "root",
+      "to": "scripts/setup"
+    },
+    {
+      "file": "setup_validacao.py",
+      "from": "root",
+      "to": "scripts/setup"
+    },
+    {
+      "file": "configurar_render_api.py",
+      "from": "root",
+      "to": "scripts/setup"
+    },
+    {
+      "file": "apply_rls_manual.py",
+      "from": "root",
+      "to": "scripts/setup"
+    },
+    {
+      "file": "apply_rls_policies.py",
+      "from": "root",
+      "to": "scripts/setup"
+    },
+    {
+      "file": "database_manager.py",
+      "from": "root",
+      "to": "scripts/setup"
+    },
+    {
+      "file": "cleanup_project.py",
+      "from": "root",
+      "to": "scripts/maintenance"
+    },
+    {
+      "file": "final_cleanup.py",
+      "from": "root",
+      "to": "scripts/maintenance"
+    },
+    {
+      "file": "fix_critical_issues.py",
+      "from": "root",
+      "to": "scripts/maintenance"
+    },
+    {
+      "file": "project_manager.py",
+      "from": "root",
+      "to": "scripts/maintenance"
+    },
+    {
+      "file": "utils.py",
+      "from": "root",
+      "to": "scripts/maintenance"
+    },
+    {
+      "file": "comprehensive_system_validator.py",
+      "from": "root",
+      "to": "scripts/validation"
+    },
+    {
+      "file": "final_validation.py",
+      "from": "root",
+      "to": "scripts/validation"
+    },
+    {
+      "file": "sistema_validacao_automatica.py",
+      "from": "root",
+      "to": "scripts/validation"
+    },
+    {
+      "file": "sistema_validacao_melhorado.py",
+      "from": "root",
+      "to": "scripts/validation"
+    },
+    {
+      "file": "validacao_rapida.py",
+      "from": "root",
+      "to": "scripts/validation"
+    },
+    {
+      "file": "validacao_sem_google.py",
+      "from": "root",
+      "to": "scripts/validation"
+    },
+    {
+      "file": "test_complete_system_real.py",
+      "from": "root",
+      "to": "scripts/validation"
+    },
+    {
+      "file": "test_integration_quick.py",
+      "from": "root",
+      "to": "scripts/validation"
+    },
+    {
+      "file": "teste_sistema_completo_real.py",
+      "from": "root",
+      "to": "scripts/validation"
+    },
+    {
+      "file": "teste_sistema_rapido.py",
+      "from": "root",
+      "to": "scripts/validation"
+    },
+    {
+      "file": "debug_mode_analysis.py",
+      "from": "root",
+      "to": "scripts/monitoring"
+    },
+    {
+      "file": "diagnosticar_render_completo.py",
+      "from": "root",
+      "to": "scripts/monitoring"
+    },
+    {
+      "file": "investigar_erro_build.py",
+      "from": "root",
+      "to": "scripts/monitoring"
+    },
+    {
+      "file": "monitorar_dns_final.py",
+      "from": "root",
+      "to": "scripts/monitoring"
+    },
+    {
+      "file": "verificar_correcao_final.py",
+      "from": "root",
+      "to": "scripts/monitoring"
+    },
+    {
+      "file": "verificar_dns_continuo.py",
+      "from": "root",
+      "to": "scripts/monitoring"
+    },
+    {
+      "file": "verificar_logs_deploy.py",
+      "from": "root",
+      "to": "scripts/monitoring"
+    },
+    {
+      "file": ".env",
+      "from": "root",
+      "to": "config/environments"
+    },
+    {
+      "file": ".env.local",
+      "from": "root",
+      "to": "config/environments"
+    },
+    {
+      "file": ".env.validacao",
+      "from": "root",
+      "to": "config/environments"
+    },
+    {
+      "file": "env.example",
+      "from": "root",
+      "to": "config/environments"
+    },
+    {
+      "file": "config.py",
+      "from": "root",
+      "to": "config/environments"
+    },
+    {
+      "file": "Dockerfile",
+      "from": "root",
+      "to": "config/docker"
+    },
+    {
+      "file": "docker-compose.yml",
+      "from": "root",
+      "to": "config/docker"
+    },
+    {
+      "file": "docker-compose.test.yml",
+      "from": "root",
+      "to": "config/docker"
+    },
+    {
+      "file": ".dockerignore",
+      "from": "root",
+      "to": "config/docker"
+    },
+    {
+      "file": "k8s-health-backup.yml",
+      "from": "root",
+      "to": "config/k8s"
+    },
+    {
+      "file": "supabase_audit_table.sql",
+      "from": "root",
+      "to": "config/database"
+    },
+    {
+      "file": "supabase_rls_policies.sql",
+      "from": "root",
+      "to": "config/database"
+    },
+    {
+      "file": "supabase_setup_fixed.sql",
+      "from": "root",
+      "to": "config/database"
+    },
+    {
+      "file": "GUIA_CONFIGURACAO_GOOGLE_API.md",
+      "from": "root",
+      "to": "docs/api"
+    },
+    {
+      "file": "PRODUCTION_DEPLOYMENT_GUIDE.md",
+      "from": "root",
+      "to": "docs/deployment"
+    },
+    {
+      "file": "README_RENDER_DEPLOYMENT.md",
+      "from": "root",
+      "to": "docs/deployment"
+    },
+    {
+      "file": "RENDER_CONFIGURATION_GUIDE.md",
+      "from": "root",
+      "to": "docs/deployment"
+    },
+    {
+      "file": "RENDER_DEPLOYMENT_FINAL.md",
+      "from": "root",
+      "to": "docs/deployment"
+    },
+    {
+      "file": "INSTRUCOES_DNS_IONOS.md",
+      "from": "root",
+      "to": "docs/deployment"
+    },
+    {
+      "file": "DEPLOY_FIXES_APPLIED.md",
+      "from": "root",
+      "to": "docs/deployment"
+    },
+    {
+      "file": "README_VALIDACAO.md",
+      "from": "root",
+      "to": "docs/developer"
+    },
+    {
+      "file": "CONFIGURACAO_FINAL_CORRETA.md",
+      "from": "root",
+      "to": "docs/developer"
+    },
+    {
+      "file": "encoding_fix_report.md",
+      "from": "root",
+      "to": "docs/developer"
+    },
+    {
+      "file": "unicode_debug_report.md",
+      "from": "root",
+      "to": "docs/developer"
+    },
+    {
+      "file": "cypress.config.ts",
+      "from": "root",
+      "to": "tests/e2e"
+    },
+    {
+      "file": "FINAL_VALIDATION_REPORT.json",
+      "from": "root",
+      "to": "reports/validation"
+    },
+    {
+      "file": "VALIDATION_SUMMARY.md",
+      "from": "root",
+      "to": "reports/validation"
+    },
+    {
+      "file": "RELATORIO_FINAL_TESTE_SISTEMA.md",
+      "from": "root",
+      "to": "reports/validation"
+    },
+    {
+      "file": "RESUMO_FINAL_SISTEMA_VALIDACAO.md",
+      "from": "root",
+      "to": "reports/validation"
+    },
+    {
+      "file": "relatorio_validacao_techze.json",
+      "from": "root",
+      "to": "reports/validation"
+    },
+    {
+      "file": "sistema_teste_completo_relatorio.json",
+      "from": "root",
+      "to": "reports/validation"
+    },
+    {
+      "file": "system_validation_report.json",
+      "from": "root",
+      "to": "reports/validation"
+    },
+    {
+      "file": "system_validation.log",
+      "from": "root",
+      "to": "reports/validation"
+    },
+    {
+      "file": "RELATORIO_RENDER_AUTO_SETUP_CONCLUIDO.md",
+      "from": "root",
+      "to": "reports/deployment"
+    },
+    {
+      "file": "render_health_report.json",
+      "from": "root",
+      "to": "reports/deployment"
+    },
+    {
+      "file": "analise_logs_deploy.json",
+      "from": "root",
+      "to": "reports/deployment"
+    },
+    {
+      "file": "correcao_render_completa.json",
+      "from": "root",
+      "to": "reports/deployment"
+    },
+    {
+      "file": "CONSOLIDATION_STATUS_REPORT.md",
+      "from": "root",
+      "to": "reports/system"
+    },
+    {
+      "file": "STATUS_FINAL_CONSOLIDACAO.md",
+      "from": "root",
+      "to": "reports/system"
+    },
+    {
+      "file": "STATUS_FINAL_100_COMPLETO.md",
+      "from": "root",
+      "to": "reports/system"
+    },
+    {
+      "file": "RESUMO_EXECUTIVO_TECHREPARO.md",
+      "from": "root",
+      "to": "reports/system"
+    },
+    {
+      "file": "RESUMO_INTEGRACAO_ADMIN_FINAL.md",
+      "from": "root",
+      "to": "reports/system"
+    },
+    {
+      "file": "DIAGNOSTICO_TECHREPARO_COM.md",
+      "from": "root",
+      "to": "reports/system"
+    },
+    {
+      "file": "diagnostico_render_completo.json",
+      "from": "root",
+      "to": "reports/system"
+    },
+    {
+      "file": "relatorio_diagnostico_completo.json",
+      "from": "root",
+      "to": "reports/system"
+    },
+    {
+      "file": "relatorio_simples.json",
+      "from": "root",
+      "to": "reports/system"
+    },
+    {
+      "file": "relatorio_teste_sistema_completo.json",
+      "from": "root",
+      "to": "reports/system"
+    },
+    {
+      "file": "auditoria_completa_dominios.json",
+      "from": "root",
+      "to": "reports/system"
+    },
+    {
+      "file": "render.yaml",
+      "from": "root",
+      "to": "deploy/render"
+    },
+    {
+      "file": "corrigir_configuracao_dns_render.py",
+      "from": "root",
+      "to": "deploy/render"
+    },
+    {
+      "file": "corrigir_render_automatico.py",
+      "from": "root",
+      "to": "deploy/render"
+    },
+    {
+      "file": "corrigir_render_config.py",
+      "from": "root",
+      "to": "deploy/render"
+    },
+    {
+      "file": "corrigir_techreparo_com.py",
+      "from": "root",
+      "to": "deploy/render"
+    },
+    {
+      "file": "forcar_configuracao_render.py",
+      "from": "root",
+      "to": "deploy/render"
+    }
+  ],
+  "created_directories": [
+    "scripts/deploy",
+    "scripts/setup",
+    "scripts/maintenance",
+    "scripts/validation",
+    "scripts/monitoring",
+    "config/environments",
+    "config/docker",
+    "config/k8s",
+    "config/database",
+    "docs/api",
+    "docs/user-manual",
+    "docs/developer",
+    "docs/deployment",
+    "tests/e2e",
+    "tests/integration",
+    "reports/validation",
+    "reports/deployment",
+    "reports/system",
+    "deploy/render",
+    "deploy/docker",
+    "deploy/k8s"
+  ],
+  "errors": [
+    "Erro ao mover PLANO_INTEGRACAO_ADMIN.md: [WinError 3] O sistema não pode encontrar o caminho especificado",
+    "Erro ao mover PLANO_SOLUCAO_DOMINIOS.md: [WinError 3] O sistema não pode encontrar o caminho especificado",
+    "Erro ao mover SOLUCAO_IMEDIATA_DNS.md: [WinError 3] O sistema não pode encontrar o caminho especificado",
+    "Erro ao mover SOLUCAO_IMEDIATA_TECHREPARO.md: [WinError 3] O sistema não pode encontrar o caminho especificado",
+    "Erro ao mover TASK_MASTER.md: [WinError 3] O sistema não pode encontrar o caminho especificado",
+    "Erro ao mover TASK_MASTER_PRD.md: [WinError 3] O sistema não pode encontrar o caminho especificado"
+  ]
+}

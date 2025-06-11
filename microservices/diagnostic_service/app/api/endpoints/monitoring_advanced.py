@@ -3,7 +3,7 @@ Advanced Monitoring and Alerts API Endpoints
 """
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from typing import Dict, List, Any, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import asyncio
 import logging
 from pydantic import BaseModel
@@ -61,7 +61,7 @@ async def advanced_health_check():
         
         return {
             "status": "healthy" if overall_healthy else "degraded",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "components": {
                 "database": {
                     "status": "healthy" if db_healthy else "unhealthy",
@@ -96,7 +96,7 @@ async def get_database_metrics():
         })
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "metrics": stats
         }
         
@@ -124,7 +124,7 @@ async def get_system_metrics():
         network = psutil.net_io_counters()
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "cpu": {
                 "percent": cpu_percent,
                 "count": cpu_count,
@@ -174,7 +174,7 @@ async def get_slow_queries(limit: int = 10):
         ]
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "slow_queries": slow_queries[:limit],
             "total_count": len(slow_queries)
         }
@@ -191,7 +191,7 @@ async def create_alert_rule(rule: AlertRule):
         
         # Store alert rule in cache
         rule_data = rule.dict()
-        rule_data['created_at'] = datetime.utcnow().isoformat()
+        rule_data['created_at'] = datetime.now(timezone.utc).isoformat()
         
         await cache.hset("alert_rules", rule.name, str(rule_data))
         
@@ -223,7 +223,7 @@ async def get_alert_rules():
                 continue
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "rules": rules,
             "total_count": len(rules)
         }
@@ -252,7 +252,7 @@ async def get_active_alerts():
                 continue
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "alerts": alerts,
             "total_count": len(alerts)
         }
@@ -275,7 +275,7 @@ async def resolve_alert(alert_id: str):
         import json
         alert = json.loads(alert_data)
         alert['resolved'] = True
-        alert['resolved_at'] = datetime.utcnow().isoformat()
+        alert['resolved_at'] = datetime.now(timezone.utc).isoformat()
         
         # Update alert in cache
         await cache.hset("active_alerts", alert_id, json.dumps(alert))
@@ -329,7 +329,7 @@ async def get_performance_recommendations():
             })
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "recommendations": recommendations,
             "total_count": len(recommendations)
         }
@@ -359,7 +359,7 @@ async def get_monitoring_dashboard():
         overall_health = (db_health + system_health) / 2
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "health_scores": {
                 "overall": overall_health,
                 "database": db_health,

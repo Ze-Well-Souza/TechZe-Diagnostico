@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePWA } from '../contexts/PWAContext';
-import { backgroundSyncService } from '../services/backgroundSyncService';
+import { getBackgroundSyncService } from '../services/backgroundSyncService';
 
 interface OfflineOperation {
   id: string;
@@ -43,7 +43,7 @@ export const useOfflineOperations = (): UseOfflineOperationsReturn => {
   // Carregar operações pendentes do localStorage
   const loadPendingOperations = useCallback(async () => {
     try {
-      const queueStatus = backgroundSyncService.getQueueStatus();
+      const queueStatus = getBackgroundSyncService().getQueueStatus();
       // Converter status da fila para array de operações
       const operations: OfflineOperation[] = [];
       // Como getQueueStatus retorna apenas estatísticas, vamos simular operações baseadas no total
@@ -77,18 +77,19 @@ export const useOfflineOperations = (): UseOfflineOperationsReturn => {
     try {
       // Usar o método correto baseado no tipo de operação
       let syncId: string;
+      const syncService = getBackgroundSyncService();
       switch (operation.type) {
         case 'diagnostic':
-          syncId = await backgroundSyncService.syncDiagnostic('create', operation.data, operation.priority);
+          syncId = await syncService.syncDiagnostic('create', operation.data, operation.priority);
           break;
         case 'device':
-          syncId = await backgroundSyncService.syncDevice('create', operation.data, operation.priority);
+          syncId = await syncService.syncDevice('create', operation.data, operation.priority);
           break;
         case 'backup':
-          syncId = await backgroundSyncService.syncBackup(operation.data, operation.priority);
+          syncId = await syncService.syncBackup(operation.data, operation.priority);
           break;
         case 'report':
-          syncId = await backgroundSyncService.syncReport(operation.data, operation.priority);
+          syncId = await syncService.syncReport(operation.data, operation.priority);
           break;
         default:
           throw new Error(`Tipo de operação não suportado: ${operation.type}`);
@@ -110,7 +111,7 @@ export const useOfflineOperations = (): UseOfflineOperationsReturn => {
   // Remover operação
   const removeOperation = useCallback(async (id: string) => {
     try {
-      await backgroundSyncService.removeFromQueue(id);
+      await getBackgroundSyncService().removeFromQueue(id);
       setPendingOperations(prev => prev.filter(op => op.id !== id));
     } catch (error) {
       console.error('Erro ao remover operação:', error);
@@ -133,18 +134,19 @@ export const useOfflineOperations = (): UseOfflineOperationsReturn => {
       );
 
       // Usar o método correto baseado no tipo de operação
+      const syncService = getBackgroundSyncService();
       switch (operation.type) {
         case 'diagnostic':
-          await backgroundSyncService.syncDiagnostic('update', operation.data, operation.priority);
+          await syncService.syncDiagnostic('update', operation.data, operation.priority);
           break;
         case 'device':
-          await backgroundSyncService.syncDevice('update', operation.data, operation.priority);
+          await syncService.syncDevice('update', operation.data, operation.priority);
           break;
         case 'backup':
-          await backgroundSyncService.syncBackup(operation.data, operation.priority);
+          await syncService.syncBackup(operation.data, operation.priority);
           break;
         case 'report':
-          await backgroundSyncService.syncReport(operation.data, operation.priority);
+          await syncService.syncReport(operation.data, operation.priority);
           break;
         default:
           throw new Error(`Tipo de operação não suportado: ${operation.type}`);
@@ -202,7 +204,7 @@ export const useOfflineOperations = (): UseOfflineOperationsReturn => {
       setIsProcessing(true);
       setSyncErrors([]);
       
-      await backgroundSyncService.forceSync();
+      await getBackgroundSyncService().forceSync();
       await loadPendingOperations();
       
       setLastSyncTime(new Date());

@@ -5,7 +5,7 @@ import asyncio
 import logging
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 import asyncpg
 from asyncpg import Pool
 import psutil
@@ -35,7 +35,7 @@ class AdvancedConnectionPool:
             query_count=0,
             error_count=0,
             avg_response_time=0.0,
-            last_health_check=datetime.utcnow()
+            last_health_check=datetime.now(timezone.utc)
         )
         
     async def initialize(self):
@@ -121,7 +121,7 @@ class AdvancedConnectionPool:
                 # Update metrics
                 self.metrics.total_connections = self.pool.get_size()
                 self.metrics.idle_connections = self.pool.get_idle_size()
-                self.metrics.last_health_check = datetime.utcnow()
+                self.metrics.last_health_check = datetime.now(timezone.utc)
                 
             except Exception as e:
                 logger.warning(f"Health check failed: {e}")

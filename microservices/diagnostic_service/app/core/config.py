@@ -51,7 +51,7 @@ class Settings(BaseSettings):
     
     # Configurações do Supabase
     SUPABASE_URL: Optional[str] = Field(default=None, env="SUPABASE_URL")
-    SUPABASE_KEY: Optional[str] = Field(default=None, env="SUPABASE_ANON_KEY")
+    SUPABASE_KEY: Optional[str] = Field(default=None, env="SUPABASE_KEY")
     SUPABASE_SERVICE_KEY: Optional[str] = Field(default=None, env="SUPABASE_SERVICE_ROLE_KEY")
     SUPABASE_JWT_SECRET: Optional[str] = Field(default=None, env="SUPABASE_JWT_SECRET")
     
@@ -230,3 +230,11 @@ class Settings(BaseSettings):
 
 # Instância global das configurações
 settings = Settings()
+
+
+def get_settings() -> Settings:
+    """
+    Retorna a instância global das configurações.
+    Função de conveniência para compatibilidade.
+    """
+    return settings

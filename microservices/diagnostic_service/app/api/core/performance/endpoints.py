@@ -6,7 +6,7 @@ métricas do sistema, alertas e otimização.
 
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from typing import Dict, List, Any, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import asyncio
 import time
 import logging
@@ -73,7 +73,7 @@ async def get_system_metrics():
         network = psutil.net_io_counters()
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "cpu": {
                 "percent": cpu_percent,
                 "count": cpu_count,
@@ -121,7 +121,7 @@ async def get_database_metrics():
         }
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "metrics": metrics,
             "health_status": "healthy" if metrics["error_count"] < 10 else "degraded"
         }
@@ -147,7 +147,7 @@ async def get_application_metrics():
         }
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "metrics": metrics,
             "status": "healthy" if metrics["error_rate"] < 0.05 else "degraded"
         }
@@ -220,7 +220,7 @@ async def advanced_health_check():
         
         return {
             "status": "healthy" if overall_healthy else "degraded",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "components": {
                 "database": {
                     "status": "healthy" if db_healthy else "unhealthy",
@@ -249,7 +249,7 @@ async def create_alert_rule(rule: AlertRule):
         # Simular armazenamento da regra
         rule_data = rule.dict()
         rule_data['id'] = f"rule_{int(time.time())}"
-        rule_data['created_at'] = datetime.utcnow().isoformat()
+        rule_data['created_at'] = datetime.now(timezone.utc).isoformat()
         
         return {
             "message": "Alert rule created successfully",
@@ -274,7 +274,7 @@ async def get_alert_rules():
                 "threshold": 85.0,
                 "severity": "high",
                 "enabled": True,
-                "created_at": datetime.utcnow().isoformat()
+                "created_at": datetime.now(timezone.utc).isoformat()
             },
             {
                 "id": "rule_2",
@@ -284,12 +284,12 @@ async def get_alert_rules():
                 "threshold": 90.0,
                 "severity": "critical",
                 "enabled": True,
-                "created_at": datetime.utcnow().isoformat()
+                "created_at": datetime.now(timezone.utc).isoformat()
             }
         ]
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "rules": rules,
             "total_count": len(rules)
         }
@@ -309,13 +309,13 @@ async def get_active_alerts():
                 "rule_name": "High CPU Usage",
                 "severity": "high",
                 "message": "CPU usage is at 92%",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "resolved": False
             }
         ]
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "alerts": alerts,
             "total_count": len(alerts)
         }
@@ -332,7 +332,7 @@ async def resolve_alert(alert_id: str):
         return {
             "message": "Alert resolved successfully",
             "alert_id": alert_id,
-            "resolved_at": datetime.utcnow().isoformat()
+            "resolved_at": datetime.now(timezone.utc).isoformat()
         }
         
     except Exception as e:
@@ -369,7 +369,7 @@ async def get_slow_queries(limit: int = 10):
         ]
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "slow_queries": slow_queries[:limit],
             "total_count": len(slow_queries)
         }
@@ -421,7 +421,7 @@ async def get_performance_recommendations():
         })
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "recommendations": recommendations,
             "total_count": len(recommendations)
         }
@@ -458,7 +458,7 @@ async def get_performance_dashboard():
         overall_health = (db_health + system_health) / 2
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "health_scores": {
                 "overall": round(overall_health, 1),
                 "database": round(db_health, 1),
@@ -484,7 +484,7 @@ async def get_performance_trends(hours: int = 24):
         from datetime import timedelta
         
         trends = []
-        base_time = datetime.utcnow() - timedelta(hours=hours)
+        base_time = datetime.now(timezone.utc) - timedelta(hours=hours)
         
         for i in range(hours):
             timestamp = base_time + timedelta(hours=i)
@@ -523,7 +523,7 @@ async def optimize_database():
             "message": "Database optimization completed",
             "optimizations_applied": optimizations,
             "estimated_improvement": "15-20% performance boost",
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
         
     except Exception as e:
@@ -546,25 +546,101 @@ async def optimize_cache():
             "message": "Cache optimization completed",
             "optimizations_applied": optimizations,
             "cache_hit_rate_improvement": "5-10%",
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
         
     except Exception as e:
         logger.error(f"Failed to optimize cache: {e}")
         raise HTTPException(status_code=500, detail="Failed to optimize cache")
 
+@router.get("/stats")
+async def get_performance_stats():
+    """Endpoint consolidado que retorna estatísticas de performance do sistema
+    
+    Este endpoint combina métricas do sistema, banco de dados e aplicação em uma única resposta,
+    facilitando o monitoramento geral do sistema.
+    """
+    try:
+        # Obter métricas do sistema
+        system_metrics = await get_system_metrics()
+        
+        # Obter métricas do banco de dados
+        db_metrics = await get_database_metrics()
+        
+        # Obter métricas da aplicação
+        app_metrics = await get_application_metrics()
+        
+        # Calcular saúde geral do sistema
+        system_health = 100 - system_metrics.get("cpu", {}).get("percent", 0) * 0.5
+        memory_health = 100 - system_metrics.get("memory", {}).get("percent", 0) * 0.5
+        disk_health = 100 - system_metrics.get("disk", {}).get("percent", 0) * 0.3
+        
+        # Calcular saúde do banco de dados
+        db_health = 100
+        if "metrics" in db_metrics:
+            error_count = db_metrics["metrics"].get("error_count", 0)
+            slow_queries = db_metrics["metrics"].get("slow_queries", 0)
+            db_health = 100 - (error_count * 5) - (slow_queries * 2)
+        
+        # Calcular saúde da aplicação
+        app_health = 100
+        if "metrics" in app_metrics:
+            error_rate = app_metrics["metrics"].get("error_rate", 0) * 100
+            app_health = 100 - (error_rate * 10)
+        
+        # Garantir que os valores de saúde estejam entre 0 e 100
+        system_health = max(0, min(100, system_health))
+        memory_health = max(0, min(100, memory_health))
+        disk_health = max(0, min(100, disk_health))
+        db_health = max(0, min(100, db_health))
+        app_health = max(0, min(100, app_health))
+        
+        # Calcular saúde geral
+        overall_health = (system_health * 0.3) + (memory_health * 0.2) + \
+                        (disk_health * 0.1) + (db_health * 0.2) + (app_health * 0.2)
+        
+        return {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "overall_health": round(overall_health, 1),
+            "system": {
+                "metrics": system_metrics,
+                "health": round(system_health, 1)
+            },
+            "database": {
+                "metrics": db_metrics,
+                "health": round(db_health, 1)
+            },
+            "application": {
+                "metrics": app_metrics,
+                "health": round(app_health, 1)
+            },
+            "components_health": {
+                "cpu": round(system_health, 1),
+                "memory": round(memory_health, 1),
+                "disk": round(disk_health, 1),
+                "database": round(db_health, 1),
+                "application": round(app_health, 1)
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to get performance stats: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get performance stats: {str(e)}")
+
 @router.get("/info")
-async def performance_info():
-    """
-    Informações do domínio performance
-    """
+async def get_info():
+    """Retorna informações sobre o módulo de performance"""
     return {
-        "domain": "performance",
-        "name": "Performance Domain",
-        "version": "1.0.0", 
-        "description": "Análise de performance e otimização",
-        "features": ['Performance Monitoring', 'Optimization', 'Resource Analysis'],
-        "status": "active"
+        "name": "Performance Module",
+        "version": "1.0.0",
+        "description": "Provides system performance metrics, health checks, and optimization",
+        "endpoints": [
+            "/stats", "/metrics/system", "/metrics/database", "/metrics/application",
+            "/health/basic", "/health/advanced",
+            "/alerts/rules", "/alerts/active", "/alerts/{alert_id}/resolve",
+            "/analysis/slow-queries", "/recommendations",
+            "/dashboard", "/trends",
+            "/optimize/database", "/optimize/cache"
+        ]
     }
 
 @router.get("/health")

@@ -395,7 +395,7 @@ async def health_check():
         content={
             "status": "healthy" if all_healthy else "unhealthy",
             "checks": checks,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
     )
 ```

@@ -18,7 +18,8 @@ class TestDatabaseSettings:
         
         # Test default values (atualizado para configuração atual)
         assert 'supabase.co' in settings.SUPABASE_URL  # URL dinâmica do Supabase
-        assert len(settings.SUPABASE_KEY) > 0  # Chave existe
+        assert settings.SUPABASE_KEY is not None  # Chave existe
+        assert len(settings.SUPABASE_KEY) > 0  # Chave não está vazia
     
     @patch.dict(os.environ, {
         'SUPABASE_URL': 'https://test.supabase.co',
@@ -212,9 +213,10 @@ def clean_environment():
 def test_configuration_isolation(clean_environment):
     """Test that configuration tests don't interfere with each other."""
     # Test with clean environment - should use defaults from config file
-    settings = Settings()
+    # Note: Settings() will still load from .env file if present
+    settings = Settings(_env_file=None)  # Don't load .env file
     
-    # Should have default values from config.py
-    assert settings.ENVIRONMENT == "development"  # From .env file
+    # Should have default values from config.py only
+    assert settings.ENVIRONMENT == "production"  # Default from config.py
     assert settings.PORT == 8000
-    assert settings.DEBUG is True
+    assert settings.DEBUG is False  # Default from config.py

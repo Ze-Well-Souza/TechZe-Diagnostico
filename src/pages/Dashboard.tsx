@@ -218,19 +218,33 @@ export default function Dashboard() {
         {/* Quick Actions - Mais visível */}
         <div className="mb-8">
           <div className="flex flex-wrap gap-4">
+            <Link to="/dashboard-global">
+              <Button className="btn-electric tech-font font-semibold" size="lg">
+                <BarChart3 className="mr-2 h-5 w-5" />
+                Dashboard Global
+              </Button>
+            </Link>
             <Link to="/diagnostic">
               <Button className="btn-electric tech-font font-semibold" size="lg">
                 <Plus className="mr-2 h-5 w-5" />
                 Novo Diagnóstico
               </Button>
             </Link>
+            <Link to="/clientes">
+              <Button variant="outline" className="electric-border" size="lg">
+                <Users className="mr-2 h-5 w-5" />
+                Clientes
+              </Button>
+            </Link>
+            <Link to="/admin/lojas">
+              <Button variant="outline" className="electric-border" size="lg">
+                <Building2 className="mr-2 h-5 w-5" />
+                Gestão de Lojas
+              </Button>
+            </Link>
             <Button variant="outline" className="electric-border" size="lg">
               <FileText className="mr-2 h-5 w-5" />
               Relatórios
-            </Button>
-            <Button variant="outline" className="electric-border" size="lg">
-              <Printer className="mr-2 h-5 w-5" />
-              Imprimir Lista
             </Button>
             <Button variant="outline" className="electric-border" size="lg">
               <Settings className="mr-2 h-5 w-5" />

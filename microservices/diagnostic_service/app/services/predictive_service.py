@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, List, Optional
 
 from sqlalchemy import func
@@ -34,7 +34,7 @@ class PredictiveService:
             Dicionário com previsões de falhas
         """
         # Define o período de análise
-        start_date = datetime.utcnow() - timedelta(days=time_window_days)
+        start_date = datetime.now(timezone.utc) - timedelta(days=time_window_days)
         
         # Obtém os diagnósticos do dispositivo no período
         diagnostics = self.db.query(Diagnostic).filter(
@@ -72,7 +72,7 @@ class PredictiveService:
             "device_id": device_id,
             "analysis_period": {
                 "start_date": start_date.isoformat(),
-                "end_date": datetime.utcnow().isoformat(),
+                "end_date": datetime.now(timezone.utc).isoformat(),
                 "days": time_window_days
             },
             "diagnostics_analyzed": len(diagnostics),
@@ -218,7 +218,7 @@ class PredictiveService:
             if days_to_full < 30:
                 predictions["disk_full"] = {
                     "message": f"O disco pode ficar cheio em aproximadamente {int(days_to_full)} dias",
-                    "estimated_date": (datetime.utcnow() + timedelta(days=days_to_full)).isoformat(),
+                    "estimated_date": (datetime.now(timezone.utc) + timedelta(days=days_to_full)).isoformat(),
                     "confidence": "medium"
                 }
         
@@ -232,7 +232,7 @@ class PredictiveService:
             if days_to_critical < 60:
                 predictions["hardware_failure"] = {
                     "message": f"Possível falha de hardware em aproximadamente {int(days_to_critical)} dias",
-                    "estimated_date": (datetime.utcnow() + timedelta(days=days_to_critical)).isoformat(),
+                    "estimated_date": (datetime.now(timezone.utc) + timedelta(days=days_to_critical)).isoformat(),
                     "confidence": "medium",
                     "affected_components": self._identify_failing_components(diagnostics[-1])
                 }

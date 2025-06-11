@@ -1,9 +1,9 @@
 # 🎯 TechZe-Diagnóstico - Relatório de Validação Completa
 
 ## 📊 Status Geral
-- **Completude**: 87.0%
-- **Status**: development_complete
-- **Data**: 2025-06-06T16:50:38.453842
+- **Completude**: 77.0%
+- **Status**: needs_work
+- **Data**: 2025-06-10T14:07:55.567752
 
 ## 🔍 Análise por Categoria
 
@@ -18,14 +18,14 @@
 - **Detalhes**: 4 itens verificados
 
 ### Ai_Ml
-- **Score**: 100%
-- **Status**: excellent
-- **Detalhes**: 6 itens verificados
-
-### Apis
 - **Score**: 80%
 - **Status**: good
-- **Detalhes**: 4 itens verificados
+- **Detalhes**: 5 itens verificados
+
+### Apis
+- **Score**: 0%
+- **Status**: needs_improvement
+- **Detalhes**: 0 itens verificados
 
 ### Frontend
 - **Score**: 100%

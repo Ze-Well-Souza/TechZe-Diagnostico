@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
 import asyncio
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from ..core.database import get_connection_stats, health_check
 
 router = APIRouter(prefix="/monitoring", tags=["monitoring"])
@@ -18,12 +18,12 @@ async def get_pool_status() -> Dict[str, Any]:
     try:
         stats = await get_connection_stats()
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "status": "healthy" if stats.get("health") else "unhealthy",
             "pool_stats": stats,
             "performance": {
                 "response_time_ms": await measure_db_response_time(),
-                "last_check": datetime.utcnow().isoformat()
+                "last_check": datetime.now(timezone.utc).isoformat()
             }
         }
     except Exception as e:
@@ -41,7 +41,7 @@ async def database_health() -> Dict[str, Any]:
     return {
         "healthy": is_healthy,
         "response_time_ms": round(response_time, 2),
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 async def measure_db_response_time() -> float:

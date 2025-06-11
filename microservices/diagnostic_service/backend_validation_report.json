@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-06-11T14:29:34.177696",
+  "validation_results": {
+    "Estrutura do Projeto": true,
+    "Dependências": true,
+    "Configurações": true,
+    "Conexão Supabase": true,
+    "Modelos de Dados": true,
+    "Serviços": true,
+    "Repositórios": true,
+    "API Endpoints": true,
+    "Aplicação FastAPI": true,
+    "Migrações DB": true
+  },
+  "summary": {
+    "tests_passed": 10,
+    "tests_total": 10,
+    "success_rate": 100.0,
+    "status": "PASS"
+  }
+}

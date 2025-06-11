@@ -1,5 +1,5 @@
 from supabase import create_client, Client
-from app.core.config import settings
+from app.core.config import get_settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -11,8 +11,13 @@ def initialize_supabase() -> Client:
     """Inicializa o cliente do Supabase."""
     global supabase_client
     
-    if not settings.SUPABASE_URL or not settings.SUPABASE_KEY:
-        logger.warning("SUPABASE_URL e SUPABASE_KEY não configurados - modo fallback")
+    settings = get_settings()
+    
+    # Usar SUPABASE_SERVICE_KEY se disponível, senão SUPABASE_KEY
+    supabase_key = settings.SUPABASE_SERVICE_KEY or settings.SUPABASE_KEY
+    
+    if not settings.SUPABASE_URL or not supabase_key:
+        logger.warning("SUPABASE_URL e SUPABASE_SERVICE_KEY não configurados - modo fallback")
         # Retornar um mock client para desenvolvimento
         return MockSupabaseClient()
     
@@ -20,13 +25,13 @@ def initialize_supabase() -> Client:
         # Configurações básicas sem proxy para evitar erro
         supabase_client = create_client(
             settings.SUPABASE_URL,
-            settings.SUPABASE_KEY,
+            supabase_key,
             options={
                 "auto_refresh_token": True,
                 "persist_session": True,
             }
         )
-        logger.info("Cliente Supabase inicializado com sucesso")
+        logger.info(f"Cliente Supabase inicializado com sucesso: {settings.SUPABASE_URL}")
         return supabase_client
     except Exception as e:
         logger.warning(f"Erro ao inicializar Supabase: {e} - usando modo fallback")
@@ -46,9 +51,10 @@ class MockSupabaseClient:
     
     def __init__(self):
         self.auth = MockAuth()
+        logger.info("MockSupabaseClient inicializado para desenvolvimento")
     
     def table(self, table_name):
-        return MockTable()
+        return MockTable(table_name)
 
 class MockAuth:
     """Auth mock para desenvolvimento"""
@@ -80,17 +86,40 @@ class MockUser:
 class MockTable:
     """Table mock para desenvolvimento"""
     
+    def __init__(self, table_name):
+        self.table_name = table_name
+        logger.debug(f"MockTable criada para: {table_name}")
+    
     def select(self, *args, **kwargs):
         return self
     
     def insert(self, data):
+        logger.debug(f"MockTable.insert chamado para {self.table_name} com dados: {data}")
         return self
     
     def update(self, data):
+        logger.debug(f"MockTable.update chamado para {self.table_name} com dados: {data}")
         return self
     
     def eq(self, column, value):
         return self
     
+    def filter(self, *args, **kwargs):
+        return self
+    
+    def order(self, *args, **kwargs):
+        return self
+    
+    def limit(self, limit):
+        return self
+    
+    def single(self):
+        return self
+    
     def execute(self):
-        return {"data": [], "error": None}
+        logger.debug(f"MockTable.execute chamado para {self.table_name}")
+        return type('MockResult', (), {
+            'data': [],
+            'error': None,
+            'count': 0
+        })()

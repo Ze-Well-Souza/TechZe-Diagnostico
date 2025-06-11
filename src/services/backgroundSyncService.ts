@@ -505,6 +505,7 @@ class BackgroundSyncService {
   }
 }
 
-// Exporta instância singleton
-export const backgroundSyncService = BackgroundSyncService.getInstance();
-export default backgroundSyncService;
+// Exporta a classe e uma função para obter a instância
+export { BackgroundSyncService };
+export const getBackgroundSyncService = () => BackgroundSyncService.getInstance();
+export default BackgroundSyncService;

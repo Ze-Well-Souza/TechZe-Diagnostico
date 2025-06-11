@@ -1,0 +1,47 @@
+{
+  "clientes": [
+    {
+      "nome": "João Silva",
+      "cpf": "123.456.789-00",
+      "telefone": "11999999999",
+      "email": "joao@email.com",
+      "endereco": {
+        "rua": "Rua das Flores, 123",
+        "cidade": "São Paulo",
+        "estado": "SP",
+        "cep": "01234-567"
+      }
+    },
+    {
+      "nome": "Maria Santos",
+      "telefone": "11888888888",
+      "email": "maria@email.com"
+    }
+  ],
+  "estoque_itens": [
+    {
+      "codigo": "MEM-8GB-DDR4",
+      "nome": "Memória 8GB DDR4",
+      "descricao": "Memória RAM 8GB DDR4 2400MHz",
+      "tipo": "peca",
+      "categoria": "memoria",
+      "quantidade_atual": 10,
+      "quantidade_minima": 2,
+      "preco_custo": 150.0,
+      "preco_venda": 280.0,
+      "status": "ativo"
+    },
+    {
+      "codigo": "HD-1TB-SATA",
+      "nome": "HD 1TB SATA",
+      "descricao": "Disco rígido 1TB SATA 7200RPM",
+      "tipo": "peca",
+      "categoria": "armazenamento",
+      "quantidade_atual": 5,
+      "quantidade_minima": 1,
+      "preco_custo": 200.0,
+      "preco_venda": 350.0,
+      "status": "ativo"
+    }
+  ]
+}

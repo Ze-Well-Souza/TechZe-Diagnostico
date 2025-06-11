@@ -1,0 +1,16 @@
+{
+  "generated_at": "2025-06-11T17:33:57.808179",
+  "overall_quality_score": 100,
+  "status": "excellent",
+  "key_metrics": {
+    "total_alerts": 0,
+    "critical_alerts": 0,
+    "security_risk": "unknown",
+    "total_recommendations": 0
+  },
+  "top_priorities": [],
+  "recent_improvements": [],
+  "next_actions": [
+    "Manter monitoramento cont\u00ednuo da qualidade"
+  ]
+}

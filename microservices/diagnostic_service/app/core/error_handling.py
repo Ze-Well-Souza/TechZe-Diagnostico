@@ -8,7 +8,7 @@ import logging
 import time
 import sys
 from typing import Dict, Any, Optional, List
-from datetime import datetime
+from datetime import datetime, timezone
 from dataclasses import dataclass, field
 from enum import Enum
 from collections import deque
@@ -121,7 +121,7 @@ class ErrorProcessor:
         # Cria evento de erro
         error_event = ErrorEvent(
             id=error_id,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             severity=severity,
             category=category,
             message=str(error),
@@ -176,7 +176,7 @@ class ErrorProcessor:
         # Últimos 5 minutos
         recent_errors = [
             err for err in self.error_buffer 
-            if (datetime.utcnow() - err.timestamp).seconds < 300
+            if (datetime.now(timezone.utc) - err.timestamp).seconds < 300
         ]
         
         # Por severidade
@@ -299,13 +299,13 @@ class GlobalErrorHandler:
         
         # Últimos erros
         recent_errors = sorted(
-            [err for err in self.processor.error_buffer if (datetime.utcnow() - err.timestamp).seconds < 3600],
+            [err for err in self.processor.error_buffer if (datetime.now(timezone.utc) - err.timestamp).seconds < 3600],
             key=lambda x: x.timestamp,
             reverse=True
         )[:20]
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "statistics": stats,
             "recent_errors": [
                 {

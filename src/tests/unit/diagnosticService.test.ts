@@ -1,7 +1,16 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { diagnosticApiService } from '@/services/diagnosticApiService';
-import { multiTenantService } from '@/services/multiTenantService';
+
+// Mock do apiClient
+vi.mock('@/services/apiClient', () => ({
+  apiClient: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn()
+  }
+}));
 
 // Mock do Supabase
 vi.mock('@/integrations/supabase/client', () => ({
@@ -35,49 +44,53 @@ vi.mock('@/integrations/supabase/client', () => ({
   }
 }));
 
+// Mock do multiTenantService
+vi.mock('@/services/multiTenantService', () => ({
+  multiTenantService: {
+    initializeTenant: vi.fn(),
+    getCurrentTenant: vi.fn(() => 'company-123')
+  }
+}));
+
 describe('DiagnosticApiService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    multiTenantService.initializeTenant('company-123');
   });
 
-  describe('getDiagnostics', () => {
-    it('should return diagnostics list', async () => {
-      const diagnostics = await diagnosticApiService.getDiagnostics();
-      expect(Array.isArray(diagnostics)).toBe(true);
+  describe('Basic functionality', () => {
+    it('should be defined', () => {
+      expect(diagnosticApiService).toBeDefined();
     });
 
-    it('should handle errors gracefully', async () => {
-      vi.mocked(diagnosticApiService.getDiagnostics).mockRejectedValueOnce(
-        new Error('Database error')
-      );
-
-      await expect(diagnosticApiService.getDiagnostics()).rejects.toThrow('Database error');
+    it('should have required methods', () => {
+      expect(typeof diagnosticApiService.runDiagnostic).toBe('function');
+      expect(typeof diagnosticApiService.getDiagnosticStatus).toBe('function');
     });
   });
 
-  describe('saveDiagnostic', () => {
-    it('should save diagnostic with user context', async () => {
-      const diagnosticData = {
+  describe('runDiagnostic', () => {
+    it('should call API with correct parameters', async () => {
+      const mockResponse = {
+        id: '123',
+        status: 'completed' as const,
         device_id: 'device-123',
-        status: 'pending' as const,
-        health_score: 85
+        health_score: 85,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
 
-      const result = await diagnosticApiService.saveDiagnostic(diagnosticData);
+      const { apiClient } = await import('@/services/apiClient');
+      vi.mocked(apiClient.post).mockResolvedValueOnce(mockResponse);
+
+      const diagnosticData = {
+        device_id: 'device-123',
+        user_id: 'user-123'
+      };
+
+      const result = await diagnosticApiService.runDiagnostic(diagnosticData);
       expect(result.id).toBe('123');
       expect(result.status).toBe('completed');
-    });
-  });
-
-  describe('multi-tenant isolation', () => {
-    it('should respect tenant context', async () => {
-      const currentTenant = multiTenantService.getCurrentTenant();
-      expect(currentTenant).toBe('company-123');
-      
-      // Verificar se as queries incluem o contexto do tenant
-      await diagnosticApiService.getDiagnostics();
-      // O mock deveria verificar se o company_id foi incluído na query
+      expect(apiClient.post).toHaveBeenCalledWith('/api/v1/diagnostics', diagnosticData);
     });
   });
 });

@@ -38,6 +38,8 @@ export class DiagnosticApiService {
     };
   }
   
+  // Métodos para dispositivos e diagnósticos implementados via backend API
+  
   // Métodos para diagnósticos via microserviço
   async runDiagnostic(request: CreateDiagnosticRequest): Promise<DiagnosticResult> {
     console.log("Iniciando diagnóstico via microserviço:", request);

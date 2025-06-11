@@ -1,6 +1,6 @@
 import logging
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, Optional, List, Tuple
 
 from sqlalchemy.orm import Session
@@ -185,7 +185,7 @@ class DiagnosticService:
                 "disk": disk_result,
                 "network": network_result,
                 "system_info": system_info.to_dict() if system_info else None,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             }
             
             # Atualiza o diagnóstico com os resultados

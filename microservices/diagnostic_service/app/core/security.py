@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Optional, Union
 
 from fastapi import Depends, HTTPException, status
@@ -30,9 +30,9 @@ def create_access_token(
         Token JWT codificado
     """
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(
+        expire = datetime.now(timezone.utc) + timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
     
@@ -40,9 +40,9 @@ def create_access_token(
     to_encode = {
         "exp": expire,
         "sub": str(subject),
-        "iat": datetime.utcnow(),  # Issued At
-        "nbf": datetime.utcnow(),  # Not Before
-        "jti": f"{subject}-{datetime.utcnow().timestamp()}"  # JWT ID único
+        "iat": datetime.now(timezone.utc),  # Issued At
+        "nbf": datetime.now(timezone.utc),  # Not Before
+        "jti": f"{subject}-{datetime.now(timezone.utc).timestamp()}"  # JWT ID único
     }
     
     encoded_jwt = jwt.encode(

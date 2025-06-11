@@ -48,6 +48,15 @@ except ImportError as e:
     logger.error(f"❌ API Core router not available: {e}")
     API_CORE_ROUTER_AVAILABLE = False
 
+# Import da API v1 (Orçamentos, Estoque, OS) - COMPATIBILIDADE
+try:
+    from app.api.router import api_router as v1_api_router
+    V1_API_ROUTER_AVAILABLE = True
+    logger.info("✅ API v1 router imported successfully")
+except ImportError as e:
+    logger.error(f"❌ API v1 router not available: {e}")
+    V1_API_ROUTER_AVAILABLE = False
+
 # Import dos analisadores
 try:
     from app.services.analyzers import CPUAnalyzer, MemoryAnalyzer, DiskAnalyzer, NetworkAnalyzer
@@ -168,6 +177,13 @@ if API_CORE_ROUTER_AVAILABLE:
 else:
     logger.error("❌ API Core routes not loaded - service will have limited functionality")
 
+# Incluir routers da API v1 (Legacy/Compatibilidade)
+if V1_API_ROUTER_AVAILABLE:
+    app.include_router(v1_api_router)
+    logger.info("✅ API v1 routes loaded - Legacy API available at /api/v1/*")
+else:
+    logger.error("❌ API v1 routes not loaded - legacy endpoints unavailable")
+
 # ==========================================
 # ENDPOINTS BÁSICOS DO SISTEMA
 # ==========================================
@@ -181,7 +197,8 @@ async def root():
         "status": "running",
         "api_consolidation": {
             "status": "active",
-            "core_api": "/api/core" if API_CORE_ROUTER_AVAILABLE else "unavailable"
+            "core_api": "/api/core" if API_CORE_ROUTER_AVAILABLE else "unavailable",
+            "v1_api": "/api/v1" if V1_API_ROUTER_AVAILABLE else "unavailable"
         },
         "environment": settings.ENVIRONMENT,
         "docs": "/docs" if settings.DEBUG else "disabled",
@@ -198,7 +215,8 @@ async def health_check():
         "timestamp": datetime.now().isoformat(),
         "environment": settings.ENVIRONMENT,
         "api_status": {
-            "core_api": "available" if API_CORE_ROUTER_AVAILABLE else "unavailable"
+            "core_api": "available" if API_CORE_ROUTER_AVAILABLE else "unavailable",
+            "v1_api": "available" if V1_API_ROUTER_AVAILABLE else "unavailable"
         },
         "modules": {
             "security": SECURITY_MODULES_AVAILABLE,

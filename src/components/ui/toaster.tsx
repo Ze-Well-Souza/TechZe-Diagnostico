@@ -1,15 +1,24 @@
 import React from 'react';
+import NotificationContainer from '@/components/notifications/NotificationContainer';
 
 interface ToasterProps {
   className?: string;
+  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center';
+  maxNotifications?: number;
 }
 
-export const Toaster: React.FC<ToasterProps> = ({ className }) => {
+export const Toaster: React.FC<ToasterProps> = ({ 
+  className,
+  position = 'bottom-right',
+  maxNotifications = 5 
+}) => {
   return (
-    <div className={`fixed bottom-4 right-4 z-50 ${className || ''}`}>
-      {/* Toaster implementation will be added later */}
-    </div>
+    <NotificationContainer
+      position={position}
+      maxNotifications={maxNotifications}
+      className={className}
+    />
   );
 };
 
-export default Toaster; 
+export default Toaster;

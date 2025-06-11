@@ -13,7 +13,7 @@ import asyncpg
 from asyncpg import Pool
 import psutil
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +61,7 @@ class AdvancedConnectionPool:
         self.circuit_breaker: Dict[str, bool] = {}
         self.health_check_interval = 30  # seconds
         self.current_node_index = 0
-        self.start_time = datetime.utcnow()
+        self.start_time = datetime.now(timezone.utc)
         
         # Query statistics
         self.query_stats = {
@@ -116,7 +116,7 @@ class AdvancedConnectionPool:
                     query_count=0,
                     error_count=0,
                     avg_response_time=0.0,
-                    last_health_check=datetime.utcnow(),
+                    last_health_check=datetime.now(timezone.utc),
                     uptime=timedelta()
                 )
                 
@@ -317,7 +317,7 @@ class AdvancedConnectionPool:
                     self.circuit_breaker[node_id] = False
                     logger.info(f"Circuit breaker resetado para {node_id}")
                 
-                self.metrics[node_id].last_health_check = datetime.utcnow()
+                self.metrics[node_id].last_health_check = datetime.now(timezone.utc)
                 
             except Exception as e:
                 logger.warning(f"Health check falhou para {node_id}: {e}")
@@ -338,7 +338,7 @@ class AdvancedConnectionPool:
                 # Update pool statistics
                 metrics.total_connections = pool.get_size()
                 metrics.idle_connections = pool.get_idle_size()
-                metrics.uptime = datetime.utcnow() - self.start_time
+                metrics.uptime = datetime.now(timezone.utc) - self.start_time
                 
                 # Calculate average response time
                 if metrics.query_count > 0:
@@ -376,7 +376,7 @@ class AdvancedConnectionPool:
         total_connections = sum(m.total_connections for m in self.metrics.values())
         
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "strategy": self.strategy.value,
             "total_nodes": len(self.nodes),
             "healthy_nodes": len([1 for cb in self.circuit_breaker.values() if not cb]),

@@ -5,7 +5,7 @@ Sistema robusto de autenticação para ambiente de produção.
 
 import os
 import secrets
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 from passlib.context import CryptContext
 from fastapi import HTTPException, status
@@ -123,13 +123,13 @@ class ProductionAuthService:
         to_encode = data.copy()
         
         if expires_delta:
-            expire = datetime.utcnow() + expires_delta
+            expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.utcnow() + timedelta(minutes=self.settings.access_token_expire_minutes)
+            expire = datetime.now(timezone.utc) + timedelta(minutes=self.settings.access_token_expire_minutes)
         
         to_encode.update({
             "exp": expire,
-            "iat": datetime.utcnow(),
+            "iat": datetime.now(timezone.utc),
             "type": "access"
         })
         
@@ -138,11 +138,11 @@ class ProductionAuthService:
     def create_refresh_token(self, data: dict) -> str:
         """Criar token JWT de refresh"""
         to_encode = data.copy()
-        expire = datetime.utcnow() + timedelta(days=self.settings.refresh_token_expire_days)
+        expire = datetime.now(timezone.utc) + timedelta(days=self.settings.refresh_token_expire_days)
         
         to_encode.update({
             "exp": expire,
-            "iat": datetime.utcnow(),
+            "iat": datetime.now(timezone.utc),
             "type": "refresh"
         })
         

@@ -5,7 +5,7 @@ Consolida todas as funcionalidades de chat, assistente virtual e conversação.
 
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from typing import Dict, List, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import logging
 from pydantic import BaseModel
@@ -90,9 +90,9 @@ async def create_chat_session(user_id: str, title: Optional[str] = None):
         session = {
             "id": session_id,
             "user_id": user_id,
-            "title": title or f"Chat Session {datetime.utcnow().strftime('%Y-%m-%d %H:%M')}",
-            "created_at": datetime.utcnow().isoformat(),
-            "updated_at": datetime.utcnow().isoformat(),
+            "title": title or f"Chat Session {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')}",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
             "status": "active",
             "message_count": 0,
             "metadata": {}
@@ -117,8 +117,8 @@ async def get_chat_sessions(user_id: str, status: Optional[str] = None, limit: i
                 "id": "session_1",
                 "user_id": user_id,
                 "title": "Diagnóstico do Sistema",
-                "created_at": datetime.utcnow().isoformat(),
-                "updated_at": datetime.utcnow().isoformat(),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat(),
                 "status": "active",
                 "message_count": 15,
                 "last_message": "Como posso otimizar a performance?"
@@ -127,8 +127,8 @@ async def get_chat_sessions(user_id: str, status: Optional[str] = None, limit: i
                 "id": "session_2",
                 "user_id": user_id,
                 "title": "Configuração de Alertas",
-                "created_at": datetime.utcnow().isoformat(),
-                "updated_at": datetime.utcnow().isoformat(),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat(),
                 "status": "active",
                 "message_count": 8,
                 "last_message": "Configurar alerta para CPU alta"
@@ -157,8 +157,8 @@ async def get_chat_session(session_id: str):
             "id": session_id,
             "user_id": "user_123",
             "title": "Diagnóstico do Sistema",
-            "created_at": datetime.utcnow().isoformat(),
-            "updated_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
             "status": "active",
             "message_count": 15,
             "metadata": {
@@ -183,7 +183,7 @@ async def update_chat_session(session_id: str, title: Optional[str] = None, stat
         if status:
             updates["status"] = status
         
-        updates["updated_at"] = datetime.utcnow().isoformat()
+        updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         return {
             "message": "Chat session updated successfully",
@@ -202,7 +202,7 @@ async def delete_chat_session(session_id: str):
         return {
             "message": "Chat session deleted successfully",
             "session_id": session_id,
-            "deleted_at": datetime.utcnow().isoformat()
+            "deleted_at": datetime.now(timezone.utc).isoformat()
         }
         
     except Exception as e:
@@ -223,7 +223,7 @@ async def send_message(session_id: str, message: ChatMessage):
             "user_id": message.user_id,
             "message": message.message,
             "message_type": "user",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "metadata": message.metadata or {}
         }
         
@@ -235,7 +235,7 @@ async def send_message(session_id: str, message: ChatMessage):
             "session_id": session_id,
             "message": assistant_response["message"],
             "message_type": "assistant",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "suggestions": assistant_response.get("suggestions", []),
             "actions": assistant_response.get("actions", [])
         }
@@ -267,14 +267,14 @@ async def get_chat_messages(session_id: str, limit: int = 50, offset: int = 0):
                 "user_id": "user_123",
                 "message": "Olá! Preciso de ajuda com o diagnóstico do sistema.",
                 "message_type": "user",
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             },
             {
                 "id": "msg_2",
                 "session_id": session_id,
                 "message": "Olá! Claro, posso ajudá-lo com o diagnóstico. Que tipo de problema você está enfrentando?",
                 "message_type": "assistant",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "suggestions": [
                     "Executar diagnóstico completo",
                     "Verificar performance do sistema",
@@ -287,14 +287,14 @@ async def get_chat_messages(session_id: str, limit: int = 50, offset: int = 0):
                 "user_id": "user_123",
                 "message": "O sistema está lento e quero verificar a performance.",
                 "message_type": "user",
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             },
             {
                 "id": "msg_4",
                 "session_id": session_id,
                 "message": "Entendi. Vou executar uma análise de performance para você. Isso pode levar alguns minutos.",
                 "message_type": "assistant",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "actions": [
                     {
                         "type": "run_diagnostic",
@@ -329,7 +329,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
         await manager.send_message(session_id, {
             "type": "connected",
             "message": "Conectado ao chat. Como posso ajudá-lo hoje?",
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         })
         
         while True:
@@ -349,7 +349,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     "message": response["message"],
                     "suggestions": response.get("suggestions", []),
                     "actions": response.get("actions", []),
-                    "timestamp": datetime.utcnow().isoformat()
+                    "timestamp": datetime.now(timezone.utc).isoformat()
                 })
             
     except WebSocketDisconnect:
@@ -432,7 +432,7 @@ async def execute_assistant_action(action: str, parameters: Dict[str, Any]):
             "action": action,
             "parameters": parameters,
             "result": result,
-            "executed_at": datetime.utcnow().isoformat()
+            "executed_at": datetime.now(timezone.utc).isoformat()
         }
         
     except Exception as e:
@@ -448,7 +448,7 @@ async def set_chat_context(context: ChatContext):
             "session_id": context.session_id,
             "context_type": context.context_type,
             "context_data": context.context_data,
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
             "expires_at": context.expires_at.isoformat() if context.expires_at else None
         }
         
@@ -474,7 +474,7 @@ async def get_chat_context(session_id: str):
                 "last_diagnostic": "2024-01-15T10:30:00Z",
                 "performance_issues": ["high_cpu", "memory_leak"]
             },
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
             "expires_at": None
         }
         
@@ -491,7 +491,7 @@ async def chat_health_check():
     try:
         return {
             "status": "healthy",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "active_connections": len(manager.active_connections),
             "assistant_status": "online",
             "capabilities_count": 5

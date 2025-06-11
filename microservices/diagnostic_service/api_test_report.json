@@ -1,0 +1,58 @@
+{
+  "timestamp": "2025-06-11T14:27:54.777922",
+  "total_tests": 7,
+  "successful_tests": 0,
+  "success_rate": 0.0,
+  "all_passed": false,
+  "tests": [
+    {
+      "endpoint": "/health",
+      "method": "GET",
+      "status": 0,
+      "success": false,
+      "error": "Cannot connect to host localhost:8000 ssl:default [O computador remoto recusou a conexão de rede]"
+    },
+    {
+      "endpoint": "/docs",
+      "method": "GET",
+      "status": 0,
+      "success": false,
+      "error": "Cannot connect to host localhost:8000 ssl:default [O computador remoto recusou a conexão de rede]"
+    },
+    {
+      "endpoint": "/openapi.json",
+      "method": "GET",
+      "status": 0,
+      "success": false,
+      "error": "Cannot connect to host localhost:8000 ssl:default [O computador remoto recusou a conexão de rede]"
+    },
+    {
+      "endpoint": "/api/core/",
+      "method": "GET",
+      "status": 0,
+      "success": false,
+      "error": "Cannot connect to host localhost:8000 ssl:default [O computador remoto recusou a conexão de rede]"
+    },
+    {
+      "endpoint": "/api/core/orcamentos/",
+      "method": "GET",
+      "status": 0,
+      "success": false,
+      "error": "Cannot connect to host localhost:8000 ssl:default [O computador remoto recusou a conexão de rede]"
+    },
+    {
+      "endpoint": "/api/core/estoque/",
+      "method": "GET",
+      "status": 0,
+      "success": false,
+      "error": "Cannot connect to host localhost:8000 ssl:default [O computador remoto recusou a conexão de rede]"
+    },
+    {
+      "endpoint": "/api/core/ordem-servico/",
+      "method": "GET",
+      "status": 0,
+      "success": false,
+      "error": "Cannot connect to host localhost:8000 ssl:default [O computador remoto recusou a conexão de rede]"
+    }
+  ]
+}

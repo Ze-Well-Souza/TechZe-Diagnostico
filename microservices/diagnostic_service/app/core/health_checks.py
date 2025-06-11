@@ -8,7 +8,7 @@ import time
 import psutil
 import logging
 from typing import Dict, List, Any, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, asdict
 from enum import Enum
 import aiohttp
@@ -59,7 +59,7 @@ class HealthCheckRegistry:
                 status=HealthStatus.UNKNOWN,
                 message=f"Health check '{name}' não encontrado",
                 details={},
-                last_check=datetime.utcnow(),
+                last_check=datetime.now(timezone.utc),
                 response_time_ms=0.0
             )
             
@@ -70,7 +70,7 @@ class HealthCheckRegistry:
             
             if isinstance(result, ComponentHealth):
                 result.response_time_ms = response_time
-                result.last_check = datetime.utcnow()
+                result.last_check = datetime.now(timezone.utc)
                 self._last_results[name] = result
                 return result
             else:
@@ -79,7 +79,7 @@ class HealthCheckRegistry:
                     status=HealthStatus.HEALTHY if result else HealthStatus.CRITICAL,
                     message="OK" if result else "Falha",
                     details={},
-                    last_check=datetime.utcnow(),
+                    last_check=datetime.now(timezone.utc),
                     response_time_ms=response_time
                 )
                 
@@ -92,7 +92,7 @@ class HealthCheckRegistry:
                 status=HealthStatus.CRITICAL,
                 message=f"Erro: {str(e)}",
                 details={"error": str(e)},
-                last_check=datetime.utcnow(),
+                last_check=datetime.now(timezone.utc),
                 response_time_ms=response_time
             )
             self._last_results[name] = result
@@ -168,7 +168,7 @@ class AdvancedHealthChecker:
                         "count": process_count
                     }
                 },
-                last_check=datetime.utcnow(),
+                last_check=datetime.now(timezone.utc),
                 response_time_ms=0.0
             )
             
@@ -178,7 +178,7 @@ class AdvancedHealthChecker:
                 status=HealthStatus.CRITICAL,
                 message=f"Erro ao verificar recursos: {str(e)}",
                 details={"error": str(e)},
-                last_check=datetime.utcnow(),
+                last_check=datetime.now(timezone.utc),
                 response_time_ms=0.0
             )
     
@@ -196,7 +196,7 @@ class AdvancedHealthChecker:
                         "supabase_url_configured": bool(settings.SUPABASE_URL),
                         "supabase_key_configured": bool(settings.SUPABASE_ANON_KEY)
                     },
-                    last_check=datetime.utcnow(),
+                    last_check=datetime.now(timezone.utc),
                     response_time_ms=0.0
                 )
             
@@ -220,7 +220,7 @@ class AdvancedHealthChecker:
                                     "status_code": response.status,
                                     "response_time_ms": response_time
                                 },
-                                last_check=datetime.utcnow(),
+                                last_check=datetime.now(timezone.utc),
                                 response_time_ms=response_time
                             )
                         else:
@@ -233,7 +233,7 @@ class AdvancedHealthChecker:
                                     "status_code": response.status,
                                     "response_time_ms": response_time
                                 },
-                                last_check=datetime.utcnow(),
+                                last_check=datetime.now(timezone.utc),
                                 response_time_ms=response_time
                             )
                             
@@ -246,7 +246,7 @@ class AdvancedHealthChecker:
                             "url": settings.SUPABASE_URL,
                             "timeout": "5s"
                         },
-                        last_check=datetime.utcnow(),
+                        last_check=datetime.now(timezone.utc),
                         response_time_ms=5000.0
                     )
                     
@@ -256,7 +256,7 @@ class AdvancedHealthChecker:
                 status=HealthStatus.CRITICAL,
                 message=f"Erro na conexão: {str(e)}",
                 details={"error": str(e)},
-                last_check=datetime.utcnow(),
+                last_check=datetime.now(timezone.utc),
                 response_time_ms=0.0
             )
 
@@ -302,7 +302,7 @@ class AdvancedHealthChecker:
         
         result = {
             "status": overall_status.value,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "response_time_ms": total_time,
             "summary": {
                 "total_components": len(components),

@@ -46,6 +46,25 @@ class CoreAPISettings(BaseSettings):
             return [host.strip() for host in self.TRUSTED_HOSTS.split(",")]
         return self.TRUSTED_HOSTS
     
+    def is_development(self) -> bool:
+        """Verifica se está em ambiente de desenvolvimento"""
+        return self.ENVIRONMENT == Environment.DEVELOPMENT
+    
+    def get_feature_config(self, feature: str) -> bool:
+        """Retorna se uma feature está habilitada"""
+        feature_map = {
+            "ai": True,  # IA sempre habilitada em desenvolvimento
+            "automation": True,  # Automação sempre habilitada em desenvolvimento
+            "monitoring": self.ENABLE_MONITORING,
+            "rate_limiting": self.RATE_LIMIT_ENABLED,
+            "audit": self.ENABLE_AUDIT_LOG
+        }
+        return feature_map.get(feature, False)
+    
+    def is_production(self) -> bool:
+        """Verifica se está em ambiente de produção"""
+        return self.ENVIRONMENT == Environment.PRODUCTION
+    
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
@@ -58,11 +77,16 @@ def validate_environment():
     """Valida se o ambiente está configurado corretamente"""
     settings = CoreAPISettings()
     
-    required_vars = [
-        "SECRET_KEY",
-        "SUPABASE_URL",
-        "SUPABASE_SERVICE_ROLE_KEY"
-    ]
+    # Em desenvolvimento, apenas SECRET_KEY é obrigatório
+    if settings.ENVIRONMENT == Environment.DEVELOPMENT:
+        required_vars = ["SECRET_KEY"]
+    else:
+        # Em produção, todas as variáveis são obrigatórias
+        required_vars = [
+            "SECRET_KEY",
+            "SUPABASE_URL",
+            "SUPABASE_SERVICE_KEY"
+        ]
     
     missing_vars = []
     for var in required_vars:

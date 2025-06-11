@@ -8,7 +8,7 @@ Gerencia a comunicação entre diferentes serviços e sistemas externos.
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from pydantic import BaseModel, Field
 from typing import Dict, List, Any, Optional, Union
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 import asyncio
 import httpx
@@ -112,7 +112,7 @@ async def register_service(config: ServiceConfig):
         "id": service_id,
         "config": config.dict(),
         "status": IntegrationStatus.PENDING,
-        "registered_at": datetime.utcnow(),
+        "registered_at": datetime.now(timezone.utc),
         "last_check": None,
         "stats": {
             "total_requests": 0,
@@ -144,7 +144,7 @@ async def list_services():
             name=config["name"],
             type=config["type"],
             status=service_data["status"],
-            last_check=service_data["last_check"] or datetime.utcnow(),
+            last_check=service_data["last_check"] or datetime.now(timezone.utc),
             response_time=service_data["stats"]["avg_response_time"],
             uptime_percentage=uptime
         ))
@@ -166,7 +166,7 @@ async def update_service(service_id: str, config: ServiceConfig):
         raise HTTPException(status_code=404, detail="Serviço não encontrado")
     
     services_registry[service_id]["config"] = config.dict()
-    services_registry[service_id]["updated_at"] = datetime.utcnow()
+    services_registry[service_id]["updated_at"] = datetime.now(timezone.utc)
     
     return {"message": "Serviço atualizado com sucesso"}
 
@@ -190,7 +190,7 @@ async def make_integration_request(request: IntegrationRequest):
     service = services_registry[request.service_id]
     config = service["config"]
     
-    start_time = datetime.utcnow()
+    start_time = datetime.now(timezone.utc)
     
     try:
         # Simular requisição HTTP
@@ -205,7 +205,7 @@ async def make_integration_request(request: IntegrationRequest):
                 json=request.body if request.body else None
             )
             
-            response_time = (datetime.utcnow() - start_time).total_seconds()
+            response_time = (datetime.now(timezone.utc) - start_time).total_seconds()
             
             # Atualizar estatísticas
             service["stats"]["total_requests"] += 1
@@ -222,30 +222,30 @@ async def make_integration_request(request: IntegrationRequest):
                 (current_avg * (total_requests - 1) + response_time) / total_requests
             )
             
-            service["last_check"] = datetime.utcnow()
+            service["last_check"] = datetime.now(timezone.utc)
             
             return IntegrationResponse(
                 success=response.status_code < 400,
                 status_code=response.status_code,
                 data=response.json() if response.headers.get("content-type", "").startswith("application/json") else response.text,
                 response_time=response_time,
-                timestamp=datetime.utcnow()
+                timestamp=datetime.now(timezone.utc)
             )
             
     except Exception as e:
-        response_time = (datetime.utcnow() - start_time).total_seconds()
+        response_time = (datetime.now(timezone.utc) - start_time).total_seconds()
         
         # Atualizar estatísticas de erro
         service["stats"]["total_requests"] += 1
         service["stats"]["failed_requests"] += 1
         service["status"] = IntegrationStatus.ERROR
-        service["last_check"] = datetime.utcnow()
+        service["last_check"] = datetime.now(timezone.utc)
         
         return IntegrationResponse(
             success=False,
             error=str(e),
             response_time=response_time,
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now(timezone.utc)
         )
 
 # Endpoints de health check
@@ -292,7 +292,7 @@ async def check_all_services_health():
                 "service_id": service_id,
                 "healthy": False,
                 "error": str(e),
-                "timestamp": datetime.utcnow()
+                "timestamp": datetime.now(timezone.utc)
             })
     
     healthy_count = sum(1 for r in results if r.get("healthy", False))
@@ -306,7 +306,7 @@ async def check_all_services_health():
             "overall_health": (healthy_count / total_count * 100) if total_count > 0 else 0
         },
         "services": results,
-        "timestamp": datetime.utcnow()
+        "timestamp": datetime.now(timezone.utc)
     }
 
 # Endpoints de webhooks
@@ -318,7 +318,7 @@ async def register_webhook(config: WebhookConfig):
     webhooks_registry[webhook_id] = {
         "id": webhook_id,
         "config": config.dict(),
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
         "stats": {
             "total_calls": 0,
             "successful_calls": 0,
@@ -386,7 +386,7 @@ async def configure_data_sync(config: DataSyncConfig):
     sync_configs[sync_id] = {
         "id": sync_id,
         "config": config.dict(),
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
         "last_sync": None,
         "stats": {
             "total_syncs": 0,
@@ -434,7 +434,7 @@ async def _execute_data_sync(sync_id: str):
         sync_config["stats"]["total_syncs"] += 1
         sync_config["stats"]["successful_syncs"] += 1
         sync_config["stats"]["records_synced"] += 100  # Simular registros sincronizados
-        sync_config["last_sync"] = datetime.utcnow()
+        sync_config["last_sync"] = datetime.now(timezone.utc)
         
         # Log da sincronização
         integration_logs.append({
@@ -442,7 +442,7 @@ async def _execute_data_sync(sync_id: str):
             "sync_id": sync_id,
             "status": "success",
             "records": 100,
-            "timestamp": datetime.utcnow()
+            "timestamp": datetime.now(timezone.utc)
         })
         
     except Exception as e:
@@ -454,7 +454,7 @@ async def _execute_data_sync(sync_id: str):
             "sync_id": sync_id,
             "status": "error",
             "error": str(e),
-            "timestamp": datetime.utcnow()
+            "timestamp": datetime.now(timezone.utc)
         })
 
 # Endpoints de monitoramento
@@ -496,7 +496,7 @@ async def get_integration_metrics():
             "successful": successful_requests,
             "failed": total_requests - successful_requests
         },
-        "timestamp": datetime.utcnow()
+        "timestamp": datetime.now(timezone.utc)
     }
 
 @integration_router.get("/logs")
@@ -505,7 +505,7 @@ async def get_integration_logs(limit: int = 100):
     return {
         "logs": integration_logs[-limit:],
         "total": len(integration_logs),
-        "timestamp": datetime.utcnow()
+        "timestamp": datetime.now(timezone.utc)
     }
 
 @integration_router.get("/health")
@@ -516,7 +516,7 @@ async def integration_health_check():
         "services_count": len(services_registry),
         "webhooks_count": len(webhooks_registry),
         "sync_configs_count": len(sync_configs),
-        "timestamp": datetime.utcnow(),
+        "timestamp": datetime.now(timezone.utc),
         "version": "1.0.0"
     }
 

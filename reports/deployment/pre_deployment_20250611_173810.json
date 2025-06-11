@@ -1,0 +1,102 @@
+{
+  "timestamp": "2025-06-11T17:38:10.079076",
+  "duration_seconds": 0.668927,
+  "overall_status": "APPROVED",
+  "success_rate": 85.71428571428571,
+  "gates_status": {
+    "quality_gates_passed": true,
+    "security_scans_completed": false,
+    "performance_tests_passed": true,
+    "database_migrations_tested": true,
+    "rollback_plan_prepared": true,
+    "monitoring_alerts_configured": true,
+    "team_notification_sent": true
+  },
+  "validation_results": [
+    {
+      "check": "Test Coverage",
+      "status": "PASS",
+      "timestamp": "2025-06-11T17:38:09.462785",
+      "details": "47 arquivos de teste encontrados"
+    },
+    {
+      "check": "Test Structure",
+      "status": "PASS",
+      "timestamp": "2025-06-11T17:38:09.469755",
+      "details": "Todos os testes críticos encontrados"
+    },
+    {
+      "check": "Production Build",
+      "status": "PASS",
+      "timestamp": "2025-06-11T17:38:09.475447",
+      "details": "Scripts de build e test configurados"
+    },
+    {
+      "check": "Environment Config",
+      "status": "PASS",
+      "timestamp": "2025-06-11T17:38:09.476487",
+      "details": "Configurações de ambiente encontradas"
+    },
+    {
+      "check": "Security Implementation",
+      "status": "PASS",
+      "timestamp": "2025-06-11T17:38:09.479117",
+      "details": "Script de segurança implementado (24594 bytes)"
+    },
+    {
+      "check": "Basic Vulnerabilities",
+      "status": "FAIL",
+      "timestamp": "2025-06-11T17:38:10.011897",
+      "details": "Vulnerabilidades: ['Arquivo .env não está no .gitignore', 'Possível secret em src\\\\components\\\\forms\\\\FormField.tsx', 'Possível secret em src\\\\components\\\\forms\\\\index.ts']"
+    },
+    {
+      "check": "Security Config",
+      "status": "PASS",
+      "timestamp": "2025-06-11T17:38:10.071857",
+      "details": "Configurações encontradas: 3"
+    },
+    {
+      "check": "Performance Tests",
+      "status": "PASS",
+      "timestamp": "2025-06-11T17:38:10.072844",
+      "details": "3 arquivos de performance encontrados"
+    },
+    {
+      "check": "Database Migrations",
+      "status": "PASS",
+      "timestamp": "2025-06-11T17:38:10.073557",
+      "details": "Estrutura de migrations encontrada"
+    },
+    {
+      "check": "Rollback Plan",
+      "status": "PASS",
+      "timestamp": "2025-06-11T17:38:10.074206",
+      "details": "Documentação de rollback encontrada"
+    },
+    {
+      "check": "Monitoring Alerts",
+      "status": "PASS",
+      "timestamp": "2025-06-11T17:38:10.075395",
+      "details": "Sistema de monitoramento encontrado"
+    },
+    {
+      "check": "Team Notification",
+      "status": "PASS",
+      "timestamp": "2025-06-11T17:38:10.078094",
+      "details": "Sistema de notificação configurado"
+    }
+  ],
+  "summary": {
+    "total_checks": 12,
+    "passed_checks": 11,
+    "failed_checks": 1,
+    "deployment_ready": true
+  },
+  "next_steps": [
+    "✅ Pre-deployment validation PASSED",
+    "🚀 Deployment can proceed",
+    "📊 Continue monitoring during deployment",
+    "🔔 Alert team of deployment start",
+    "📈 Track deployment metrics"
+  ]
+}
