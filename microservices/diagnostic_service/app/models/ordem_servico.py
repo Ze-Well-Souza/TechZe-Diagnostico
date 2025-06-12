@@ -3,7 +3,7 @@ Modelos para sistema de Ordem de Serviço - TechZe Diagnóstico
 Implementa controle completo do fluxo de trabalho de manutenção
 """
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import List, Optional, Dict, Any
 from datetime import datetime, date
 from enum import Enum
@@ -133,12 +133,12 @@ class PecaUtilizada(BaseModel):
     numero_serie: Optional[str] = Field(None, max_length=100)
     garantia_dias: Optional[int] = Field(None, ge=0, le=365)
     
-    @validator('valor_total', always=True)
-    def calcular_valor_total(cls, v, values):
+    @model_validator(mode='after')
+    def calcular_valor_total(self):
         """Calcula automaticamente o valor total"""
-        quantidade = values.get('quantidade', 1)
-        valor_unitario = values.get('valor_unitario', Decimal('0.00'))
-        return Decimal(str(quantidade)) * valor_unitario
+        if self.quantidade and self.valor_unitario:
+            self.valor_total = Decimal(str(self.quantidade)) * self.valor_unitario
+        return self
 
 
 class AnotacaoOS(BaseModel):
@@ -237,25 +237,21 @@ class OrdemServico(BaseModel):
     ativa: bool = Field(default=True)
     metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
     
-    @validator('data_atualizacao', always=True)
-    def atualizar_data_modificacao(cls, v):
-        """Atualiza automaticamente a data de modificação"""
-        return datetime.now()
-    
-    @validator('valor_total', always=True)
-    def calcular_valor_total(cls, v, values):
-        """Calcula automaticamente o valor total"""
-        valor_servicos = values.get('valor_servicos', Decimal('0.00'))
-        valor_pecas = values.get('valor_pecas', Decimal('0.00'))
-        desconto = values.get('desconto', Decimal('0.00'))
-        return valor_servicos + valor_pecas - desconto
-    
-    @validator('valor_pendente', always=True)
-    def calcular_valor_pendente(cls, v, values):
-        """Calcula automaticamente o valor pendente"""
-        valor_total = values.get('valor_total', Decimal('0.00'))
-        valor_pago = values.get('valor_pago', Decimal('0.00'))
-        return valor_total - valor_pago
+    @model_validator(mode='after')
+    def atualizar_dados_automaticos(self):
+        """Atualiza automaticamente dados calculados"""
+        # Atualizar data
+        self.data_atualizacao = datetime.now()
+        
+        # Calcular valor total
+        if hasattr(self, 'valor_servicos') and hasattr(self, 'valor_pecas') and hasattr(self, 'desconto'):
+            self.valor_total = self.valor_servicos + self.valor_pecas - self.desconto
+            
+        # Calcular valor pendente
+        if hasattr(self, 'valor_total') and hasattr(self, 'valor_pago'):
+            self.valor_pendente = self.valor_total - self.valor_pago
+            
+        return self
     
     def calcular_totais(self):
         """Calcula os totais de serviços e peças"""

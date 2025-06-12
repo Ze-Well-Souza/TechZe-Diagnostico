@@ -190,7 +190,7 @@ async def create_alert_rule(rule: AlertRule):
         cache = await get_cache_client()
         
         # Store alert rule in cache
-        rule_data = rule.dict()
+        rule_data = rule.model_dump()
         rule_data['created_at'] = datetime.now(timezone.utc).isoformat()
         
         await cache.hset("alert_rules", rule.name, str(rule_data))

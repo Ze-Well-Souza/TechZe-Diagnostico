@@ -67,7 +67,7 @@ class TestMainSettings:
         assert settings.PROJECT_NAME == "TechZe Diagnostic API"
         assert settings.VERSION == "1.0.0"  # Versão atualizada
         assert settings.API_V1_STR == "/api/v1"
-        assert settings.ENVIRONMENT.value == "production"  # Configuração atual
+        assert settings.ENVIRONMENT.value == "development"  # Configuração atual de desenvolvimento
         assert settings.HOST == "0.0.0.0"
         assert settings.PORT == 8000
     

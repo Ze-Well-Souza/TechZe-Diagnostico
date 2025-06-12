@@ -7,6 +7,7 @@ Executa: Todos os testes críticos do cronograma em sequência
 import pytest
 import time
 import json
+import statistics
 from datetime import datetime
 from typing import Dict, List, Any
 

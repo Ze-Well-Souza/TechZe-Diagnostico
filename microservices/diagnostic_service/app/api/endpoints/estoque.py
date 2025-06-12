@@ -500,4 +500,78 @@ async def buscar_itens_rapida(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
-        ) 
+        )
+
+# VERSÕES TEMPORÁRIAS SEM AUTH PARA TESTES
+@router.get("/itens/test")
+async def listar_itens_test():
+    """
+    ENDPOINT TEMPORÁRIO - Lista itens sem autenticação para testes
+    """
+    return {
+        "total": 5,
+        "items": [
+            {
+                "id": "item-1",
+                "codigo": "PC001",
+                "nome": "Tela LCD Samsung",
+                "categoria": "display",
+                "quantidade": 10,
+                "preco_venda": 150.00,
+                "status": "disponivel"
+            },
+            {
+                "id": "item-2", 
+                "codigo": "PC002",
+                "nome": "Bateria iPhone 12",
+                "categoria": "bateria",
+                "quantidade": 5,
+                "preco_venda": 80.00,
+                "status": "baixo_estoque"
+            },
+            {
+                "id": "item-3",
+                "codigo": "PC003",
+                "nome": "Cabo USB-C",
+                "categoria": "acessorio",
+                "quantidade": 25,
+                "preco_venda": 20.00,
+                "status": "disponivel"
+            },
+            {
+                "id": "item-4",
+                "codigo": "PC004", 
+                "nome": "Touch Screen Xiaomi",
+                "categoria": "display",
+                "quantidade": 3,
+                "preco_venda": 120.00,
+                "status": "baixo_estoque"
+            },
+            {
+                "id": "item-5",
+                "codigo": "PC005",
+                "nome": "Camera iPhone 13",
+                "categoria": "camera",
+                "quantidade": 8,
+                "preco_venda": 200.00,
+                "status": "disponivel"
+            }
+        ]
+    }
+
+@router.post("/itens/test")
+async def criar_item_test(item_data: dict):
+    """
+    ENDPOINT TEMPORÁRIO - Cria item sem autenticação para testes
+    """
+    return {
+        "id": f"item-{hash(str(item_data)) % 1000}",
+        "codigo": item_data.get("codigo", "TEST001"),
+        "nome": item_data.get("nome", "Item Teste"),
+        "categoria": item_data.get("categoria", "teste"),
+        "quantidade": item_data.get("quantidade", 1),
+        "preco_venda": item_data.get("preco_venda", 50.00),
+        "status": "disponivel",
+        "created_at": datetime.now().isoformat(),
+        "message": "Item criado com sucesso (teste)"
+    } 

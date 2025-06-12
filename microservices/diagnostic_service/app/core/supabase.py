@@ -104,6 +104,10 @@ class MockTable:
     def eq(self, column, value):
         return self
     
+    def like(self, column, pattern):
+        logger.debug(f"MockTable.like chamado para {self.table_name}: {column} LIKE {pattern}")
+        return self
+    
     def filter(self, *args, **kwargs):
         return self
     

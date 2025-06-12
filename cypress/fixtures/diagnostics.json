@@ -1,0 +1,29 @@
+{
+  "data": [
+    {
+      "id": "diag-001",
+      "device_name": "Desktop HP",
+      "device_type": "computer",
+      "status": "completed",
+      "created_at": "2024-01-20T09:00:00Z",
+      "issues": ["performance", "overheating"],
+      "ai_analysis": {
+        "confidence": 0.85,
+        "severity": "medium",
+        "recommendations": ["Clean internal fans", "Update drivers"]
+      }
+    },
+    {
+      "id": "diag-002", 
+      "device_name": "Notebook Dell",
+      "device_type": "laptop",
+      "status": "in_progress",
+      "created_at": "2024-01-20T10:30:00Z",
+      "issues": ["battery", "display"],
+      "ai_analysis": null
+    }
+  ],
+  "total": 2,
+  "page": 1,
+  "per_page": 10
+} 

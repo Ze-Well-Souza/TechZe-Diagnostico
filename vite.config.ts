@@ -199,7 +199,7 @@ export default defineConfig(({ mode }) => ({
           },
           // CDN Assets - Stale While Revalidate
           {
-            urlPattern: /^https:\/\/cdn\..*/,
+            urlPattern: /^https:\/\/cdn\..*$/,
             handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'cdn-cache-v2',
@@ -209,19 +209,135 @@ export default defineConfig(({ mode }) => ({
               }
             }
           }
-        ],
-        navigateFallback: '/offline.html',
-        navigateFallbackDenylist: [/^\/api\//]
-      },
-      devOptions: {
-        enabled: true,
-        type: 'module'
+        ]
       }
     })
   ].filter(Boolean),
+  
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  
+  // Otimizações de build
+  build: {
+    target: 'esnext',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: mode === 'production',
+        drop_debugger: mode === 'production',
+        pure_funcs: mode === 'production' ? ['console.log', 'console.info', 'console.warn'] : []
+      },
+      mangle: true,
+      format: {
+        comments: false
+      }
+    },
+    sourcemap: mode === 'development',
+    chunkSizeWarningLimit: 800, // Reduzido para alertar sobre chunks grandes
+    cssCodeSplit: true,
+    assetsInlineLimit: 4096,
+    rollupOptions: {
+      output: {
+        // Code splitting otimizado
+        manualChunks: {
+          // Vendor principal (React, etc.)
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          
+          // Queries e estado
+          'vendor-query': ['@tanstack/react-query'],
+          
+          // UI components
+          'vendor-ui': [
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-progress', 
+            '@radix-ui/react-select',
+            '@radix-ui/react-separator',
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-popover',
+            '@radix-ui/react-switch'
+          ],
+          
+          // Utils e helpers
+          'vendor-utils': [
+            'class-variance-authority',
+            'date-fns',
+            'react-day-picker'
+          ],
+          
+          // Supabase
+          'vendor-supabase': ['@supabase/supabase-js'],
+          
+          // Chart libraries (se existirem)
+          'vendor-charts': ['recharts', 'chart.js'].filter(pkg => {
+            try {
+              require.resolve(pkg);
+              return true;
+            } catch {
+              return false;
+            }
+          })
+        },
+        // Naming patterns otimizados
+        chunkFileNames: (chunkInfo) => {
+          if (chunkInfo.name?.includes('vendor')) {
+            return 'assets/vendor/[name].[hash].js';
+          }
+          if (chunkInfo.name?.includes('pages')) {
+            return 'assets/pages/[name].[hash].js';
+          }
+          return 'assets/chunks/[name].[hash].js';
+        },
+        entryFileNames: 'assets/entry/[name].[hash].js',
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name?.split('.') || [];
+          const extType = info[info.length - 1];
+          
+          // Organizar assets por tipo
+          if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico|webp)$/i.test(assetInfo.name || '')) {
+            return 'assets/images/[name].[hash][extname]';
+          }
+          if (/\.(woff2?|eot|ttf|otf)$/i.test(assetInfo.name || '')) {
+            return 'assets/fonts/[name].[hash][extname]';
+          }
+          if (/\.(css)$/i.test(assetInfo.name || '')) {
+            return 'assets/styles/[name].[hash][extname]';
+          }
+          
+          return 'assets/misc/[name].[hash][extname]';
+        }
+      }
+    }
+  },
+  
+  // Otimização de dependências
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@tanstack/react-query',
+      '@supabase/supabase-js'
+    ],
+    exclude: ['@vite/client', '@vite/env']
+  },
+  
+  // CSS optimization
+  css: {
+    devSourcemap: mode === 'development'
+  },
+  
+  // Experimental features
+  experimental: {
+    renderBuiltUrl(filename: string) {
+      // CDN support para produção
+      if (mode === 'production' && process.env.VITE_CDN_URL) {
+        return `${process.env.VITE_CDN_URL}/${filename}`;
+      }
+      return `/${filename}`;
+    }
+  }
 }));

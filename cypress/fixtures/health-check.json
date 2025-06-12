@@ -1,0 +1,10 @@
+{
+  "status": "healthy",
+  "timestamp": "2024-01-20T10:00:00Z",
+  "services": {
+    "database": "online",
+    "ai_service": "online",
+    "storage": "online"
+  },
+  "version": "1.0.0"
+} 

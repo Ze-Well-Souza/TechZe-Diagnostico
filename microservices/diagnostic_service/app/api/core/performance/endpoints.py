@@ -247,7 +247,7 @@ async def create_alert_rule(rule: AlertRule):
     """Cria uma nova regra de alerta"""
     try:
         # Simular armazenamento da regra
-        rule_data = rule.dict()
+        rule_data = rule.model_dump()
         rule_data['id'] = f"rule_{int(time.time())}"
         rule_data['created_at'] = datetime.now(timezone.utc).isoformat()
         

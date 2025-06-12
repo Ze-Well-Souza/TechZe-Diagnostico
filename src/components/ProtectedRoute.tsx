@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
   redirectTo?: string;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requiredPermission = 'master_admin',
   redirectTo = '/admin-login'
@@ -55,3 +55,5 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   return <>{children}</>;
 };
+
+export default ProtectedRoute;

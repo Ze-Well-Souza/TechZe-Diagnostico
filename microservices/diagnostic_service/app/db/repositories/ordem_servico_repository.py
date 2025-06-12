@@ -404,7 +404,7 @@ class OrdemServicoRepository(SupabaseRepository[OrdemServico]):
             fotos = await self.buscar_fotos(os_id)
             
             return {
-                "ordem_servico": os.dict(),
+                "ordem_servico": os.model_dump(),
                 "servicos": servicos_result.data if servicos_result.data else [],
                 "pecas": pecas_result.data if pecas_result.data else [],
                 "anotacoes": anotacoes,

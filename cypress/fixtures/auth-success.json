@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "user": {
+    "id": "test-user-123",
+    "email": "test@techzediagnostico.com",
+    "name": "Usuário Teste",
+    "role": "technician",
+    "permissions": ["read_diagnostics", "create_diagnostics", "update_diagnostics"]
+  },
+  "token": "test-jwt-token-123",
+  "refreshToken": "test-refresh-token-123",
+  "expiresIn": 3600
+} 

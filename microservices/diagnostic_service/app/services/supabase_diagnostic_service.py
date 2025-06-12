@@ -126,7 +126,7 @@ class SupabaseDiagnosticService:
                 diagnostic_id = str(diagnostic_id)
             
             # Preparar dados para atualização
-            update_data = obj_in.dict(exclude_unset=True)
+            update_data = obj_in.model_dump(exclude_unset=True)
             update_data["updated_at"] = datetime.now().isoformat()
             
             # Atualizar no Supabase

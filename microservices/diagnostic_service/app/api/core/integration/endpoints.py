@@ -110,7 +110,7 @@ async def register_service(config: ServiceConfig):
     
     services_registry[service_id] = {
         "id": service_id,
-        "config": config.dict(),
+        "config": config.model_dump(),
         "status": IntegrationStatus.PENDING,
         "registered_at": datetime.now(timezone.utc),
         "last_check": None,
@@ -165,7 +165,7 @@ async def update_service(service_id: str, config: ServiceConfig):
     if service_id not in services_registry:
         raise HTTPException(status_code=404, detail="Serviço não encontrado")
     
-    services_registry[service_id]["config"] = config.dict()
+    services_registry[service_id]["config"] = config.model_dump()
     services_registry[service_id]["updated_at"] = datetime.now(timezone.utc)
     
     return {"message": "Serviço atualizado com sucesso"}
@@ -317,7 +317,7 @@ async def register_webhook(config: WebhookConfig):
     
     webhooks_registry[webhook_id] = {
         "id": webhook_id,
-        "config": config.dict(),
+        "config": config.model_dump(),
         "created_at": datetime.now(timezone.utc),
         "stats": {
             "total_calls": 0,
@@ -385,7 +385,7 @@ async def configure_data_sync(config: DataSyncConfig):
     
     sync_configs[sync_id] = {
         "id": sync_id,
-        "config": config.dict(),
+        "config": config.model_dump(),
         "created_at": datetime.now(timezone.utc),
         "last_sync": None,
         "stats": {

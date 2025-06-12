@@ -286,7 +286,7 @@ class OrcamentoRepository(SupabaseRepository[Orcamento]):
                 .execute()
             
             return {
-                "orcamento": orcamento.dict(),
+                "orcamento": orcamento.model_dump(),
                 "itens": itens_result.data if itens_result.data else [],
                 "pecas": pecas_result.data if pecas_result.data else []
             }

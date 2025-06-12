@@ -438,4 +438,6 @@ const OrcamentosPage: React.FC<OrcamentosPageProps> = () => {
       </div>
     </div>
   );
-}
+};
+
+export default OrcamentosPage;

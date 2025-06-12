@@ -10,7 +10,7 @@ interface MainLayoutProps {
   children?: React.ReactNode;
 }
 
-export default function MainLayout({ children }: MainLayoutProps) {
+function MainLayout({ children }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user } = useAuth();
 
@@ -102,3 +102,6 @@ export default function MainLayout({ children }: MainLayoutProps) {
     </div>
   );
 }
+
+export { MainLayout };
+export default MainLayout;

@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { Notification } from '@/hooks/useNotifications';
+import { Notification as CustomNotification } from '@/hooks/useNotifications';
 
 export interface PushNotificationPayload {
   title: string;
@@ -145,7 +145,7 @@ class NotificationService {
   }
 
   // Buscar notificações do usuário
-  async getUserNotifications(userId: string): Promise<Notification[]> {
+  async getUserNotifications(userId: string): Promise<CustomNotification[]> {
     try {
       const { data, error } = await supabase
         .from('notifications')

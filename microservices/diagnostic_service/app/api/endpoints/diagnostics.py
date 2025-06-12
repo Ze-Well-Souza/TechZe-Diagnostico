@@ -45,7 +45,7 @@ class MockDiagnosticService:
     async def update_diagnostic(self, diagnostic_id, diagnostic_update, user_id):
         for diag in self.diagnostics:
             if diag["id"] == diagnostic_id and diag["user_id"] == user_id:
-                diag.update(diagnostic_update.dict(exclude_unset=True))
+                diag.update(diagnostic_update.model_dump(exclude_unset=True))
                 diag["updated_at"] = "2024-01-28T10:30:00Z"
                 return diag
         return None

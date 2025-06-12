@@ -1,11 +1,11 @@
 {
-  "timestamp": "2025-06-11T17:38:48.827346",
+  "timestamp": "2025-06-12T14:24:33.730953",
   "suite": "SEMANAS_1_2_COMPLETA",
   "agent": "CURSOR",
-  "duration_seconds": 8.985279321670532,
-  "total_tests": 6,
-  "passed_tests": 3,
-  "success_rate": 50.0,
+  "duration_seconds": 0.3499455451965332,
+  "total_tests": 7,
+  "passed_tests": 7,
+  "success_rate": 100.0,
   "categories": {
     "Backend": {
       "passed": 1,
@@ -19,16 +19,20 @@
       "passed": 1,
       "total": 1
     },
+    "Stress": {
+      "passed": 1,
+      "total": 1
+    },
     "Models": {
-      "passed": 0,
+      "passed": 1,
       "total": 1
     },
     "Security": {
-      "passed": 0,
+      "passed": 1,
       "total": 1
     },
     "Health": {
-      "passed": 0,
+      "passed": 1,
       "total": 1
     }
   },
@@ -37,7 +41,7 @@
       "test_name": "backend_integration",
       "category": "Backend",
       "passed": true,
-      "timestamp": "2025-06-11T17:38:47.123653",
+      "timestamp": "2025-06-12T14:24:33.397450",
       "details": {
         "components": "7/7",
         "status": "PASS"
@@ -47,7 +51,7 @@
       "test_name": "api_connectivity",
       "category": "API",
       "passed": true,
-      "timestamp": "2025-06-11T17:38:47.302301",
+      "timestamp": "2025-06-12T14:24:33.441170",
       "details": {
         "endpoints_tested": 4,
         "endpoints_passed": 4,
@@ -58,45 +62,58 @@
       "test_name": "performance_basic",
       "category": "Performance",
       "passed": true,
-      "timestamp": "2025-06-11T17:38:47.371055",
+      "timestamp": "2025-06-12T14:24:33.511515",
       "details": {
-        "avg_time_ms": 5.982613563537598,
-        "max_time_ms": 8.719444274902344,
-        "min_time_ms": 3.8912296295166016,
+        "avg_time_ms": 6.834602355957031,
+        "max_time_ms": 11.464357376098633,
+        "min_time_ms": 3.996133804321289,
         "avg_acceptable": true,
         "max_acceptable": true
       }
     },
     {
+      "test_name": "stress_concurrent",
+      "category": "Stress",
+      "passed": true,
+      "timestamp": "2025-06-12T14:24:33.672836",
+      "details": {
+        "concurrent_requests": 20,
+        "successful_requests": 20,
+        "success_rate": 100.0,
+        "avg_response_time": 64.70179557800293
+      }
+    },
+    {
       "test_name": "data_models",
       "category": "Models",
-      "passed": false,
-      "timestamp": "2025-06-11T17:38:48.405309",
+      "passed": true,
+      "timestamp": "2025-06-12T14:24:33.676822",
       "details": {
-        "error": "1 validation error for DadosEquipamento\nproblema_relatado\n  String should have at least 10 characters [type=string_too_short, input_value='N\u00e3o liga', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.11/v/string_too_short"
+        "orcamento_id": "ORC-2025-001",
+        "status": "rascunho"
       }
     },
     {
       "test_name": "security_basic",
       "category": "Security",
-      "passed": false,
-      "timestamp": "2025-06-11T17:38:48.704996",
+      "passed": true,
+      "timestamp": "2025-06-12T14:24:33.707344",
       "details": {
-        "checks_passed": 2,
+        "checks_passed": 3,
         "total_checks": 3
       }
     },
     {
       "test_name": "final_health",
       "category": "Health",
-      "passed": false,
-      "timestamp": "2025-06-11T17:38:48.763663",
+      "passed": true,
+      "timestamp": "2025-06-12T14:24:33.729634",
       "details": {
         "health_endpoint": true,
         "info_endpoint": true,
         "root_endpoint": true,
         "has_status": true,
-        "is_healthy": false
+        "is_healthy": true
       }
     }
   ]

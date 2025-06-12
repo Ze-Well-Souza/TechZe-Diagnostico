@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-06-12T11:11:14.498042",
+  "test_results": {
+    "configura\u00e7\u00f5es": true,
+    "supabase": true,
+    "modelos": true,
+    "servi\u00e7os": true,
+    "reposit\u00f3rios": true,
+    "api_endpoints": true,
+    "fastapi_app": true
+  },
+  "summary": {
+    "total_tests": 7,
+    "passed": 7,
+    "failed": 0
+  },
+  "status": "PASS"
+}

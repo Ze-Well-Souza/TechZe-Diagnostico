@@ -86,52 +86,64 @@ class DiagnosticListResponse(BaseModel):
 # Schema para resultados de diagnóstico
 class DiagnosticResult(BaseModel):
     """Resultados detalhados de um diagnóstico."""
-    cpu: Dict[str, Any] = Field(..., example={
-        "status": "healthy",
-        "usage": 25.5,
-        "temperature": 45.2,
-        "details": {
-            "model": "Intel Core i7-9700K",
-            "cores": 8,
-            "threads": 8,
-            "frequency": "3.6 GHz"
+    cpu: Dict[str, Any] = Field(..., json_schema_extra={
+        "example": {
+            "status": "healthy",
+            "usage": 25.5,
+            "temperature": 45.2,
+            "details": {
+                "model": "Intel Core i7-9700K",
+                "cores": 8,
+                "threads": 8,
+                "frequency": "3.6 GHz"
+            }
         }
     })
-    memory: Dict[str, Any] = Field(..., example={
-        "status": "healthy",
-        "usage": 40.2,
-        "available": 8192,  # MB
-        "total": 16384  # MB
+    memory: Dict[str, Any] = Field(..., json_schema_extra={
+        "example": {
+            "status": "healthy",
+            "usage": 40.2,
+            "available": 8192,  # MB
+            "total": 16384  # MB
+        }
     })
-    disk: Dict[str, Any] = Field(..., example={
-        "status": "warning",
-        "usage": 85.3,
-        "available": 120000,  # MB
-        "total": 512000,  # MB
-        "read_speed": 150.5,  # MB/s
-        "write_speed": 120.3  # MB/s
+    disk: Dict[str, Any] = Field(..., json_schema_extra={
+        "example": {
+            "status": "warning",
+            "usage": 85.3,
+            "available": 120000,  # MB
+            "total": 512000,  # MB
+            "read_speed": 150.5,  # MB/s
+            "write_speed": 120.3  # MB/s
+        }
     })
-    network: Dict[str, Any] = Field(..., example={
-        "status": "healthy",
-        "connectivity": "stable",
-        "speed": 100.5,  # Mbps
-        "latency": 15.3  # ms
+    network: Dict[str, Any] = Field(..., json_schema_extra={
+        "example": {
+            "status": "healthy",
+            "connectivity": "stable",
+            "speed": 100.5,  # Mbps
+            "latency": 15.3  # ms
+        }
     })
-    antivirus: Dict[str, Any] = Field(..., example={
-        "status": "healthy",
-        "installed": ["Windows Defender"],
-        "real_time_protection": True,
-        "firewall_enabled": True,
-        "recommendations": []
+    antivirus: Dict[str, Any] = Field(..., json_schema_extra={
+        "example": {
+            "status": "healthy",
+            "installed": ["Windows Defender"],
+            "real_time_protection": True,
+            "firewall_enabled": True,
+            "recommendations": []
+        }
     })
-    drivers: Dict[str, Any] = Field(..., example={
-        "status": "warning",
-        "total_drivers": 150,
-        "problematic_drivers": 2,
-        "outdated_drivers": 5,
-        "recommendations": ["Atualize os drivers de vídeo"]
+    drivers: Dict[str, Any] = Field(..., json_schema_extra={
+        "example": {
+            "status": "warning",
+            "total_drivers": 150,
+            "problematic_drivers": 2,
+            "outdated_drivers": 5,
+            "recommendations": ["Atualize os drivers de vídeo"]
+        }
     })
-    overall_health: int = Field(..., ge=0, le=100, example=85)
+    overall_health: int = Field(..., ge=0, le=100, json_schema_extra={"example": 85})
     
     @field_validator("overall_health")
     @classmethod

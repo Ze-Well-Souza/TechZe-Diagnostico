@@ -3,7 +3,7 @@ Modelos para sistema de estoque - TechZe Diagnóstico
 Implementa controle completo de estoque para loja de manutenção
 """
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import List, Optional, Dict, Any
 from datetime import datetime, date
 from enum import Enum
@@ -156,26 +156,22 @@ class ItemEstoque(BaseModel):
     tags: Optional[List[str]] = Field(default_factory=list)
     ativo: bool = Field(default=True)
     
-    @validator('data_atualizacao', always=True)
-    def atualizar_data_modificacao(cls, v):
-        """Atualiza automaticamente a data de modificação"""
-        return datetime.now()
-    
-    @validator('quantidade_disponivel', always=True)
-    def calcular_quantidade_disponivel(cls, v, values):
-        """Calcula automaticamente a quantidade disponível"""
-        atual = values.get('quantidade_atual', 0)
-        reservada = values.get('quantidade_reservada', 0)
-        return atual - reservada
-    
-    @validator('margem_lucro', always=True)
-    def calcular_margem_lucro(cls, v, values):
-        """Calcula automaticamente a margem de lucro"""
-        custo = values.get('preco_custo', Decimal('0.00'))
-        venda = values.get('preco_venda', Decimal('0.00'))
-        if custo > 0:
-            return ((venda - custo) / custo) * Decimal('100')
-        return Decimal('0.00')
+    @model_validator(mode='after')
+    def atualizar_dados_automaticos(self):
+        """Atualiza automaticamente dados calculados"""
+        # Atualizar data de modificação
+        self.data_atualizacao = datetime.now()
+        
+        # Calcular quantidade disponível
+        self.quantidade_disponivel = self.quantidade_atual - self.quantidade_reservada
+        
+        # Calcular margem de lucro
+        if self.preco_custo > 0:
+            self.margem_lucro = ((self.preco_venda - self.preco_custo) / self.preco_custo) * Decimal('100')
+        else:
+            self.margem_lucro = Decimal('0.00')
+            
+        return self
     
     def verificar_estoque_baixo(self) -> bool:
         """Verifica se o item está com estoque baixo"""
@@ -218,12 +214,13 @@ class MovimentacaoEstoque(BaseModel):
     aprovado_por: Optional[str] = None
     data_aprovacao: Optional[datetime] = None
     
-    @validator('valor_total', always=True)
-    def calcular_valor_total(cls, v, values):
+    @model_validator(mode='after')
+    def calcular_valor_total(self):
         """Calcula automaticamente o valor total"""
-        quantidade = values.get('quantidade', 0)
-        preco_unitario = values.get('preco_unitario', Decimal('0.00'))
-        return Decimal(str(quantidade)) * preco_unitario
+        quantidade = self.quantidade
+        preco_unitario = self.preco_unitario
+        self.valor_total = Decimal(str(quantidade)) * preco_unitario
+        return self
 
 
 # ==========================================

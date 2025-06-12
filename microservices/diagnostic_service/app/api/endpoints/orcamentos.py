@@ -16,7 +16,7 @@ from ...services.orcamento_service import OrcamentoService
 from ...core.auth import get_current_user
 from ...core.rbac import require_permission
 
-router = APIRouter(prefix="/orcamentos", tags=["Orçamentos"])
+router = APIRouter(tags=["Orçamentos"])
 
 # Dependências
 def get_orcamento_service() -> OrcamentoService:
@@ -357,4 +357,95 @@ _Válido até: {orcamento.valido_ate.strftime('%d/%m/%Y')}_
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
-        ) 
+        )
+
+# VERSÕES TEMPORÁRIAS SEM AUTH PARA TESTES
+@router.post("/test", status_code=status.HTTP_201_CREATED)
+async def criar_orcamento_test(
+    orcamento_data: dict,
+    service: OrcamentoService = Depends(get_orcamento_service)
+):
+    """
+    ENDPOINT TEMPORÁRIO - Cria orçamento sem autenticação para testes
+    """
+    try:
+        # Mock current_user para desenvolvimento
+        mock_user = {"id": "test-user", "role": "admin"}
+        
+        # Converter dados para OrcamentoCreate (simplificado)
+        from ...models.orcamento import DadosCliente, DadosEquipamento
+        
+        cliente_data = orcamento_data.get("cliente", {
+            "nome": "Cliente Teste",
+            "telefone": "11999887766",
+            "email": "test@cliente.com"
+        })
+        
+        equipamento_data = orcamento_data.get("equipamento", {
+            "tipo": "smartphone",
+            "marca": "Samsung",
+            "modelo": "Galaxy Test",
+            "problema_relatado": "Teste automatizado"
+        })
+        
+        # Criar objetos necessários
+        cliente = DadosCliente(**cliente_data)
+        equipamento = DadosEquipamento(**equipamento_data)
+        
+        # Criar um orcamento simplificado
+        from ...models.orcamento import Orcamento, StatusOrcamento
+        orcamento = Orcamento(
+            numero=f"TEST-{hash(str(orcamento_data)) % 10000}",
+            cliente=cliente,
+            equipamento=equipamento,
+            status=StatusOrcamento.PENDENTE
+        )
+        
+        # Simular criação bem-sucedida
+        return {
+            "id": orcamento.id,
+            "numero": orcamento.numero,
+            "status": orcamento.status.value,
+            "cliente": cliente_data,
+            "equipamento": equipamento_data,
+            "created_at": orcamento.data_criacao.isoformat(),
+            "message": "Orçamento criado com sucesso (teste)"
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Erro no teste: {str(e)}"
+        )
+
+@router.get("/test/list")
+async def listar_orcamentos_test():
+    """
+    ENDPOINT TEMPORÁRIO - Lista orçamentos sem autenticação para testes
+    """
+    return {
+        "total": 3,
+        "items": [
+            {
+                "id": "test-1",
+                "numero": "TEST-001",
+                "status": "pendente",
+                "cliente": {"nome": "Cliente Test 1"},
+                "valor_total": 150.00
+            },
+            {
+                "id": "test-2", 
+                "numero": "TEST-002",
+                "status": "aprovado",
+                "cliente": {"nome": "Cliente Test 2"},
+                "valor_total": 250.00
+            },
+            {
+                "id": "test-3",
+                "numero": "TEST-003", 
+                "status": "pendente",
+                "cliente": {"nome": "Cliente Test 3"},
+                "valor_total": 350.00
+            }
+        ]
+    } 

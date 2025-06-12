@@ -671,4 +671,74 @@ async def listar_tipos_servico(
     **Roles:** Técnico, Gerente, Admin
     """
     return [{"value": tipo.value, "label": tipo.value.replace("_", " ").title()} 
-            for tipo in TipoServico] 
+            for tipo in TipoServico]
+
+# VERSÕES TEMPORÁRIAS SEM AUTH PARA TESTES  
+@router.get("/test/list")
+async def listar_ordens_servico_test():
+    """
+    ENDPOINT TEMPORÁRIO - Lista OS sem autenticação para testes
+    """
+    return {
+        "total": 4,
+        "items": [
+            {
+                "id": "os-1",
+                "numero": "OS-001",
+                "status": "aguardando",
+                "cliente": {"nome": "João Silva"},
+                "equipamento": {"tipo": "smartphone", "marca": "Samsung"},
+                "tecnico_responsavel": "Técnico 1",
+                "prioridade": "normal",
+                "created_at": "2025-01-08T10:00:00Z"
+            },
+            {
+                "id": "os-2",
+                "numero": "OS-002", 
+                "status": "em_andamento",
+                "cliente": {"nome": "Maria Santos"},
+                "equipamento": {"tipo": "notebook", "marca": "Dell"},
+                "tecnico_responsavel": "Técnico 2",
+                "prioridade": "alta",
+                "created_at": "2025-01-08T11:00:00Z"
+            },
+            {
+                "id": "os-3",
+                "numero": "OS-003",
+                "status": "concluida",
+                "cliente": {"nome": "Pedro Costa"},
+                "equipamento": {"tipo": "tablet", "marca": "Apple"},
+                "tecnico_responsavel": "Técnico 1",
+                "prioridade": "normal",
+                "created_at": "2025-01-08T12:00:00Z"
+            },
+            {
+                "id": "os-4",
+                "numero": "OS-004",
+                "status": "aguardando_peca",
+                "cliente": {"nome": "Ana Oliveira"},
+                "equipamento": {"tipo": "smartphone", "marca": "iPhone"},
+                "tecnico_responsavel": "Técnico 3",
+                "prioridade": "baixa",
+                "created_at": "2025-01-08T13:00:00Z"
+            }
+        ]
+    }
+
+@router.post("/test")
+async def criar_ordem_servico_test(os_data: dict):
+    """
+    ENDPOINT TEMPORÁRIO - Cria OS sem autenticação para testes
+    """
+    return {
+        "id": f"os-{hash(str(os_data)) % 1000}",
+        "numero": f"OS-{hash(str(os_data)) % 10000:04d}",
+        "status": "aguardando",
+        "cliente": os_data.get("cliente", {"nome": "Cliente Teste"}),
+        "equipamento": os_data.get("equipamento", {"tipo": "smartphone", "marca": "Teste"}),
+        "tecnico_responsavel": "Técnico Teste",
+        "prioridade": os_data.get("prioridade", "normal"),
+        "valor_total": os_data.get("valor_total", 100.00),
+        "created_at": datetime.now().isoformat(),
+        "message": "Ordem de serviço criada com sucesso (teste)"
+    } 

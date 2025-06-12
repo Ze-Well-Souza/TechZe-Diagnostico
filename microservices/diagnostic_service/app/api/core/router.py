@@ -4,74 +4,68 @@ Consolida todos os domínios funcionais em uma estrutura unificada.
 """
 
 from fastapi import APIRouter
-from .auth.endpoints import router as auth_router
-from .diagnostics.endpoints import router as diagnostics_router
-from .diagnostics.simple_endpoints import simple_router as diagnostics_simple_router
-from .ai.endpoints import router as ai_router
-from .automation.endpoints import router as automation_router
-from .analytics.endpoints import router as analytics_router
-from .performance.endpoints import router as performance_router
-from .chat.endpoints import router as chat_router
-from .integration.endpoints import integration_router
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Router principal da API Core
-api_router = APIRouter(prefix="/api/core")
+api_router = APIRouter()
 
-# Incluir todos os routers de domínio
-api_router.include_router(
-    auth_router, 
-    prefix="/auth", 
-    tags=["Authentication"]
-)
+# Importações condicionais para sub-routers
+routers_config = [
+    {"name": "auth", "module": ".auth.endpoints", "router": "router", "tags": ["Authentication"]},
+    {"name": "diagnostics", "module": ".diagnostics.endpoints", "router": "router", "tags": ["Diagnostics"]},
+    {"name": "diagnostics-simple", "module": ".diagnostics.simple_endpoints", "router": "simple_router", "tags": ["Diagnostics Simple"]},
+    {"name": "ai", "module": ".ai.endpoints", "router": "router", "tags": ["Artificial Intelligence"]},
+    {"name": "automation", "module": ".automation.endpoints", "router": "router", "tags": ["Automation"]},
+    {"name": "analytics", "module": ".analytics.endpoints", "router": "router", "tags": ["Analytics"]},
+    {"name": "performance", "module": ".performance.endpoints", "router": "router", "tags": ["Performance"]},
+    {"name": "chat", "module": ".chat.endpoints", "router": "router", "tags": ["Chat"]},
+    {"name": "integration", "module": ".integration.endpoints", "router": "integration_router", "tags": ["Integration"]}
+]
 
-api_router.include_router(
-    diagnostics_router, 
-    prefix="/diagnostics", 
-    tags=["Diagnostics"]
-)
-
-api_router.include_router(
-    ai_router, 
-    prefix="/ai", 
-    tags=["Artificial Intelligence"]
-)
-
-api_router.include_router(
-    automation_router, 
-    prefix="/automation", 
-    tags=["Automation"]
-)
-
-api_router.include_router(
-    analytics_router, 
-    prefix="/analytics", 
-    tags=["Analytics"]
-)
-
-api_router.include_router(
-    performance_router, 
-    prefix="/performance", 
-    tags=["Performance"]
-)
-
-api_router.include_router(
-    chat_router, 
-    prefix="/chat", 
-    tags=["Chat"]
-)
-
-api_router.include_router(
-    integration_router, 
-    prefix="/integration", 
-    tags=["Integration"]
-)
-
-# Incluir router simples para teste
-api_router.include_router(
-    diagnostics_simple_router,
-    prefix="/diagnostics-simple", 
-    tags=["Diagnostics Simple"]
-)
+# Incluir routers disponíveis
+available_domains = []
+for config in routers_config:
+    try:
+        module = __import__(f"app.api.core{config['module']}", fromlist=[config['router']])
+        router_obj = getattr(module, config['router'])
+        
+        if config['name'] == 'diagnostics-simple':
+            api_router.include_router(
+                router_obj,
+                prefix="/diagnostics-simple", 
+                tags=config['tags']
+            )
+            # diagnostics-simple não conta como domínio separado
+        else:
+            api_router.include_router(
+                router_obj, 
+                prefix=f"/{config['name']}", 
+                tags=config['tags']
+            )
+            available_domains.append(config['name'])
+        logger.info(f"✅ Router {config['name']} incluído com sucesso")
+        
+    except ImportError as e:
+        logger.warning(f"⚠️ Router {config['name']} não disponível: {e}")
+        # Criar stub router para domínios não disponíveis
+        stub_router = APIRouter()
+        
+        @stub_router.get("/health")
+        async def domain_health():
+            return {
+                "status": "unavailable",
+                "domain": config['name'],
+                "message": f"Domain {config['name']} is not available in this build"
+            }
+        
+        api_router.include_router(
+            stub_router,
+            prefix=f"/{config['name']}", 
+            tags=[f"{config['tags'][0]} (Stub)"]
+        )
+        logger.info(f"🔧 Stub router criado para {config['name']}")
 
 # Endpoint de informações da API
 @api_router.get("/info")
@@ -81,14 +75,19 @@ async def api_info():
         "name": "TechZe Diagnostic Service - API Core",
         "version": "1.0.0",
         "description": "API consolidada com organização por domínios funcionais",
-        "domains": [
-            "auth",
-            "diagnostics", 
-            "ai",
-            "automation",
-            "analytics",
-            "performance",
-            "chat",
-            "integration"
-        ]
+        "domains": available_domains,
+        "available_domains": available_domains,
+        "total_domains": len(routers_config),
+        "coverage": f"{len(available_domains)}/{len(routers_config)} ({len(available_domains)/len(routers_config)*100:.1f}%)"
+    }
+
+# Endpoint de health check geral
+@api_router.get("/health")
+async def core_health():
+    """Health check da API Core"""
+    return {
+        "status": "healthy",
+        "api_core": "active",
+        "available_domains": available_domains,
+        "domains_count": len(available_domains)
     }
