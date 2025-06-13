@@ -4,7 +4,7 @@ Implementa controle completo do fluxo de trabalho de manutenção
 """
 
 from pydantic import BaseModel, Field, field_validator, model_validator
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Annotated
 from datetime import datetime, date
 from enum import Enum
 from decimal import Decimal
@@ -112,8 +112,8 @@ class ServicoPrestado(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     descricao: str = Field(..., min_length=3, max_length=500)
     tipo: TipoServico
-    tempo_gasto_horas: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=8, decimal_places=2)
-    valor_servico: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
+    tempo_gasto_horas: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
+    valor_servico: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
     data_inicio: Optional[datetime] = None
     data_conclusao: Optional[datetime] = None
     tecnico_responsavel: Optional[str] = None
@@ -128,8 +128,8 @@ class PecaUtilizada(BaseModel):
     codigo: str = Field(..., min_length=1, max_length=100)
     nome: str = Field(..., min_length=3, max_length=200)
     quantidade: int = Field(..., ge=1, le=1000)
-    valor_unitario: Decimal = Field(..., ge=0, max_digits=10, decimal_places=2)
-    valor_total: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
+    valor_unitario: Annotated[Decimal, Field(ge=0)]
+    valor_total: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
     numero_serie: Optional[str] = Field(None, max_length=100)
     garantia_dias: Optional[int] = Field(None, ge=0, le=365)
     
@@ -203,21 +203,21 @@ class OrdemServico(BaseModel):
     pecas: List[PecaUtilizada] = Field(default_factory=list)
     
     # Valores
-    valor_servicos: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
-    valor_pecas: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
-    desconto: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
-    valor_total: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
+    valor_servicos: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
+    valor_pecas: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
+    desconto: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
+    valor_total: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
     
     # Pagamento
     status_pagamento: StatusPagamento = Field(default=StatusPagamento.PENDENTE)
-    valor_pago: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
-    valor_pendente: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
+    valor_pago: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
+    valor_pendente: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
     forma_pagamento: Optional[str] = Field(None, max_length=100)
     
     # Diagnóstico e solução
     diagnostico: Optional[str] = Field(None, max_length=2000)
     solucao_aplicada: Optional[str] = Field(None, max_length=2000)
-    tempo_total_horas: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=8, decimal_places=2)
+    tempo_total_horas: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
     
     # Garantia
     garantia_dias: int = Field(default=90, ge=0, le=365)
@@ -295,9 +295,9 @@ class OrdemServicoUpdate(BaseModel):
     data_prevista_entrega: Optional[datetime] = None
     observacoes_internas: Optional[str] = None
     observacoes_cliente: Optional[str] = None
-    valor_servicos: Optional[Decimal] = None
-    valor_pecas: Optional[Decimal] = None
-    desconto: Optional[Decimal] = None
+    valor_servicos: Annotated[Decimal | None, Field(None)]
+    valor_pecas: Annotated[Decimal | None, Field(None)]
+    desconto: Annotated[Decimal | None, Field(None)]
     forma_pagamento: Optional[str] = None
     status_pagamento: Optional[StatusPagamento] = None
     avaliacao_cliente: Optional[int] = Field(None, ge=1, le=5)

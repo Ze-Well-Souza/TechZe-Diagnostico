@@ -1,8 +1,8 @@
 {
-  "timestamp": "2025-06-12T14:24:33.730953",
+  "timestamp": "2025-06-12T17:39:19.971996",
   "suite": "SEMANAS_1_2_COMPLETA",
   "agent": "CURSOR",
-  "duration_seconds": 0.3499455451965332,
+  "duration_seconds": 0.34621286392211914,
   "total_tests": 7,
   "passed_tests": 7,
   "success_rate": 100.0,
@@ -41,7 +41,7 @@
       "test_name": "backend_integration",
       "category": "Backend",
       "passed": true,
-      "timestamp": "2025-06-12T14:24:33.397450",
+      "timestamp": "2025-06-12T17:39:19.636400",
       "details": {
         "components": "7/7",
         "status": "PASS"
@@ -51,7 +51,7 @@
       "test_name": "api_connectivity",
       "category": "API",
       "passed": true,
-      "timestamp": "2025-06-12T14:24:33.441170",
+      "timestamp": "2025-06-12T17:39:19.677809",
       "details": {
         "endpoints_tested": 4,
         "endpoints_passed": 4,
@@ -62,11 +62,11 @@
       "test_name": "performance_basic",
       "category": "Performance",
       "passed": true,
-      "timestamp": "2025-06-12T14:24:33.511515",
+      "timestamp": "2025-06-12T17:39:19.767516",
       "details": {
-        "avg_time_ms": 6.834602355957031,
-        "max_time_ms": 11.464357376098633,
-        "min_time_ms": 3.996133804321289,
+        "avg_time_ms": 7.72249698638916,
+        "max_time_ms": 10.553121566772461,
+        "min_time_ms": 4.001140594482422,
         "avg_acceptable": true,
         "max_acceptable": true
       }
@@ -75,19 +75,19 @@
       "test_name": "stress_concurrent",
       "category": "Stress",
       "passed": true,
-      "timestamp": "2025-06-12T14:24:33.672836",
+      "timestamp": "2025-06-12T17:39:19.902866",
       "details": {
         "concurrent_requests": 20,
         "successful_requests": 20,
         "success_rate": 100.0,
-        "avg_response_time": 64.70179557800293
+        "avg_response_time": 49.36172962188721
       }
     },
     {
       "test_name": "data_models",
       "category": "Models",
       "passed": true,
-      "timestamp": "2025-06-12T14:24:33.676822",
+      "timestamp": "2025-06-12T17:39:19.908016",
       "details": {
         "orcamento_id": "ORC-2025-001",
         "status": "rascunho"
@@ -97,7 +97,7 @@
       "test_name": "security_basic",
       "category": "Security",
       "passed": true,
-      "timestamp": "2025-06-12T14:24:33.707344",
+      "timestamp": "2025-06-12T17:39:19.937343",
       "details": {
         "checks_passed": 3,
         "total_checks": 3
@@ -107,7 +107,7 @@
       "test_name": "final_health",
       "category": "Health",
       "passed": true,
-      "timestamp": "2025-06-12T14:24:33.729634",
+      "timestamp": "2025-06-12T17:39:19.966174",
       "details": {
         "health_endpoint": true,
         "info_endpoint": true,

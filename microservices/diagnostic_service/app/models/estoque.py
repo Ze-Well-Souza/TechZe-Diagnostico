@@ -4,7 +4,7 @@ Implementa controle completo de estoque para loja de manutenção
 """
 
 from pydantic import BaseModel, Field, field_validator, model_validator
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Annotated
 from datetime import datetime, date
 from enum import Enum
 from decimal import Decimal
@@ -118,9 +118,9 @@ class ItemEstoque(BaseModel):
     quantidade_disponivel: int = Field(default=0, ge=0)
     
     # Preços
-    preco_custo: Decimal = Field(..., ge=0, max_digits=10, decimal_places=2)
-    preco_venda: Decimal = Field(..., ge=0, max_digits=10, decimal_places=2)
-    margem_lucro: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=5, decimal_places=2)
+    preco_custo: Annotated[Decimal, Field(ge=0)]
+    preco_venda: Annotated[Decimal, Field(ge=0)]
+    margem_lucro: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
     
     # Localização
     localizacao: Optional[str] = Field(None, max_length=100)
@@ -143,7 +143,7 @@ class ItemEstoque(BaseModel):
     status: StatusItem = Field(default=StatusItem.ATIVO)
     requer_serie: bool = Field(default=False)
     controlado: bool = Field(default=False)
-    peso_kg: Optional[Decimal] = Field(None, ge=0, max_digits=8, decimal_places=3)
+    peso_kg: Annotated[Decimal | None, Field(None, ge=0)]
     dimensoes: Optional[str] = Field(None, max_length=100)
     
     # Informações técnicas
@@ -195,8 +195,8 @@ class MovimentacaoEstoque(BaseModel):
     quantidade_posterior: int = Field(..., ge=0)
     
     # Preços
-    preco_unitario: Decimal = Field(..., ge=0, max_digits=10, decimal_places=2)
-    valor_total: Decimal = Field(..., ge=0, max_digits=10, decimal_places=2)
+    preco_unitario: Annotated[Decimal, Field(ge=0)]
+    valor_total: Annotated[Decimal, Field(ge=0)]
     
     # Referências
     documento: Optional[str] = Field(None, max_length=100)
@@ -239,8 +239,8 @@ class ItemEstoqueCreate(BaseModel):
     modelo: Optional[str] = None
     quantidade_minima: int = Field(default=5, ge=0)
     quantidade_maxima: Optional[int] = None
-    preco_custo: Decimal = Field(..., ge=0, max_digits=10, decimal_places=2)
-    preco_venda: Decimal = Field(..., ge=0, max_digits=10, decimal_places=2)
+    preco_custo: Annotated[Decimal, Field(ge=0)]
+    preco_venda: Annotated[Decimal, Field(ge=0)]
     localizacao: Optional[str] = None
     fornecedor_principal: Optional[str] = None
     data_validade: Optional[date] = None
@@ -257,8 +257,8 @@ class ItemEstoqueUpdate(BaseModel):
     modelo: Optional[str] = None
     quantidade_minima: Optional[int] = Field(None, ge=0)
     quantidade_maxima: Optional[int] = None
-    preco_custo: Optional[Decimal] = Field(None, ge=0, max_digits=10, decimal_places=2)
-    preco_venda: Optional[Decimal] = Field(None, ge=0, max_digits=10, decimal_places=2)
+    preco_custo: Annotated[Decimal | None, Field(None, ge=0)]
+    preco_venda: Annotated[Decimal | None, Field(None, ge=0)]
     localizacao: Optional[str] = None
     fornecedor_principal: Optional[str] = None
     data_validade: Optional[date] = None
@@ -288,7 +288,7 @@ class MovimentacaoCreate(BaseModel):
     item_id: str
     tipo: TipoMovimentacao
     quantidade: int = Field(..., ge=1)
-    preco_unitario: Decimal = Field(..., ge=0, max_digits=10, decimal_places=2)
+    preco_unitario: Annotated[Decimal, Field(ge=0)]
     motivo: str = Field(..., min_length=3, max_length=500)
     documento: Optional[str] = None
     ordem_servico_id: Optional[str] = None

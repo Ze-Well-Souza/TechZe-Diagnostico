@@ -4,7 +4,7 @@ Implementa orçamentação completa para loja de manutenção
 """
 
 from pydantic import BaseModel, Field, field_validator, model_validator
-from typing import List, Optional, Dict, Any, Union
+from typing import List, Optional, Dict, Any, Union, Annotated
 from datetime import datetime, date
 from enum import Enum
 from decimal import Decimal
@@ -68,8 +68,8 @@ class ItemOrcamento(BaseModel):
     descricao: str = Field(..., min_length=3, max_length=500)
     tipo: TipoServico
     quantidade: int = Field(default=1, ge=1, le=1000)
-    valor_unitario: Decimal = Field(..., ge=0, max_digits=10, decimal_places=2)
-    valor_total: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
+    valor_unitario: Annotated[Decimal, Field(ge=0)]
+    valor_total: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
     tempo_estimado_horas: Optional[float] = Field(None, ge=0, le=10000, alias="tempo_estimado")
     observacoes: Optional[str] = Field(None, max_length=1000)
     codigo_interno: Optional[str] = Field(None, max_length=50)
@@ -94,8 +94,8 @@ class PecaOrcamento(BaseModel):
     descricao: Optional[str] = Field(None, max_length=500)
     tipo: TipoPeca = Field(default=TipoPeca.HARDWARE)
     quantidade: int = Field(..., ge=1, le=1000)
-    valor_unitario: Decimal = Field(..., ge=0, max_digits=10, decimal_places=2)
-    valor_total: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
+    valor_unitario: Decimal = Field(..., ge=0)
+    valor_total: Decimal = Field(default=Decimal('0.00'), ge=0)
     fornecedor: Optional[str] = Field(None, max_length=100)
     tempo_entrega_dias: Optional[int] = Field(None, ge=0, le=90)
     garantia_dias: Optional[int] = Field(None, ge=0, le=365)
@@ -156,13 +156,13 @@ class CondicoesPagamento(BaseModel):
     """Condições de pagamento do orçamento"""
     forma_pagamento: List[str] | str = Field(default_factory=lambda: ["dinheiro", "pix", "cartao"], alias="forma_pagamento")
     condicoes: str = Field(default="À vista")
-    desconto_porcentagem: Optional[Decimal] = Field(None, ge=0, le=100, max_digits=5, decimal_places=2)
-    desconto_valor: Optional[Decimal] = Field(None, ge=0, max_digits=10, decimal_places=2)
+    desconto_porcentagem: Annotated[Decimal | None, Field(None, ge=0, le=100)]
+    desconto_valor: Annotated[Decimal | None, Field(None, ge=0)]
     prazo_dias: Optional[int] = Field(None, ge=0, alias="prazo_dias")
-    entrada_valor: Optional[Decimal] = Field(None, ge=0, max_digits=10, decimal_places=2)
+    entrada_valor: Annotated[Decimal | None, Field(None, ge=0)]
     parcelas: Optional[int] = Field(None, ge=1, le=12)
-    valor_parcela: Optional[Decimal] = Field(None, ge=0, max_digits=10, decimal_places=2)
-    juros_mes: Optional[Decimal] = Field(None, ge=0, le=10, max_digits=5, decimal_places=2)
+    valor_parcela: Annotated[Decimal | None, Field(None, ge=0)]
+    juros_mes: Annotated[Decimal | None, Field(None, ge=0, le=10)]
 
     @field_validator('forma_pagamento', mode='before')
     @classmethod
@@ -206,10 +206,10 @@ class Orcamento(BaseModel):
     pecas: List[PecaOrcamento] = Field(default_factory=list)
     
     # Valores
-    subtotal_servicos: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
-    subtotal_pecas: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
-    desconto_total: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
-    valor_total: Decimal = Field(default=Decimal('0.00'), ge=0, max_digits=10, decimal_places=2)
+    subtotal_servicos: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
+    subtotal_pecas: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
+    desconto_total: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
+    valor_total: Annotated[Decimal, Field(default=Decimal('0.00'), ge=0)]
     
     # Condições
     condicoes_pagamento: CondicoesPagamento = Field(default_factory=CondicoesPagamento)
@@ -394,4 +394,4 @@ class OrcamentoRelatorio(BaseModel):
     orcamentos_por_prioridade: Dict[PrioridadeOrcamento, int]
     ticket_medio: Decimal
     taxa_aprovacao: float
-    tempo_medio_aprovacao_horas: Optional[float] 
+    tempo_medio_aprovacao_horas: Optional[float]
